@@ -31,7 +31,7 @@ export default function AuthPage() {
       // لو رجع توكن أو نجاح
       if (res.data.token) {
         alert("✅ Auth successful!");
-        navigate("/agent"); // بعد النجاح يدخل عالصفحة بتاعة الAgent
+        navigate("/dashboard"); // بعد النجاح يدخل عالصفحة بتاعة الAgent
       }
     } catch (error) {
       console.error("❌ Auth error:", error);
