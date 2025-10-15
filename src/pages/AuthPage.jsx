@@ -19,7 +19,7 @@ export default function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = isLogin ? "/Auth/login" : "/Auth/register";
+      const endpoint = isLogin ? "/api/Auth/login" : "/api/Auth/register";
       const payload = isLogin
         ? { email: formData.email, password: formData.password }
         : { username: formData.username, email: formData.email, password: formData.password };
