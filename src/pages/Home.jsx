@@ -1,13 +1,17 @@
 import React from "react";
 import HeroSection from "../components/HeroSection";
-import FeaturesSection from "../components/FeaturesSection";
+import Highlights from "../components/Highlights";
 import SecurityTools from "../components/SecurityTools";
 import Footer from "../components/Footer";
+import PartnersSection from "../components/PartnersSection";
+
+
 const Home = () => {
   return (
     <>
       <HeroSection />
-      <FeaturesSection />
+      <PartnersSection />
+      <Highlights />
       <SecurityTools />
       <Footer />
     </>
