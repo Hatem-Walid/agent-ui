@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Shield, Cpu, Network, Cloud } from "lucide-react";
+import { useState } from "react";
 
 const features = [
   {
@@ -25,6 +26,8 @@ const features = [
 ];
 
 export default function PlatformOverview() {
+  const [activeFeature, setActiveFeature] = useState(null);
+
   return (
     <section className="bg-[#0b0f1a] text-white py-24 px-6 overflow-hidden">
       <div className="max-w-6xl mx-auto text-center mb-16">
@@ -54,10 +57,29 @@ export default function PlatformOverview() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.15 }}
             className="bg-[#141a2e]/60 backdrop-blur-md border border-purple-700/20 rounded-2xl p-8 shadow-lg hover:shadow-purple-500/20 hover:-translate-y-2 transition-all duration-300"
+            onTouchStart={() => setActiveFeature(i)}
+            onTouchEnd={() => setActiveFeature(null)}
           >
-            <div className="flex justify-center mb-4">{feature.icon}</div>
-            <h3 className="text-xl font-semibold text-purple-300 mb-2">{feature.title}</h3>
-            <p className="text-gray-400 text-sm">{feature.desc}</p>
+            <div className={`flex justify-center mb-4 transition-all duration-300
+              ${activeFeature === i ? 'scale-110' : ''}
+            `}>
+              {feature.icon}
+            </div>
+            <h3 className={`text-xl font-semibold text-purple-300 mb-2 text-center transition-all duration-300
+              ${activeFeature === i ? 'text-purple-200' : ''}
+            `}>
+              {feature.title}
+            </h3>
+            <p className={`text-gray-400 text-sm text-center transition-all duration-300
+              ${activeFeature === i ? 'text-gray-300' : ''}
+            `}>
+              {feature.desc}
+            </p>
+            
+            {/* تأثير الضغط للموبايل فقط */}
+            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border-2 border-purple-400/40 transition-all duration-300 pointer-events-none
+              ${activeFeature === i ? 'opacity-100' : 'opacity-0'}
+            `} />
           </motion.div>
         ))}
       </div>
