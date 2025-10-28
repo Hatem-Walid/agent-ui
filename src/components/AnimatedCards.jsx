@@ -71,20 +71,13 @@ const testimonials = [
   },
 ];
 
-function initials(name) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
 export default function TestimonialsSection() {
   const [index, setIndex] = useState(0);
   const autoplayRef = useRef(null);
   const containerRef = useRef(null);
   const [isInView, setIsInView] = useState(true);
+  const [isTouching, setIsTouching] = useState(false);
+  const [lastScrollTime, setLastScrollTime] = useState(0);
 
   useEffect(() => {
     startAutoplay();
@@ -105,8 +98,59 @@ export default function TestimonialsSection() {
   }, []);
 
   useEffect(() => {
-    if (isInView) startAutoplay();
+    if (isInView && !isTouching) startAutoplay();
     else stopAutoplay();
+  }, [isInView, isTouching]);
+
+  // Scroll event for desktop only - FIXED VERSION
+  useEffect(() => {
+    const handleWheel = (e) => {
+      // Check if it's desktop (window width > 768px) and section is in view
+      if (window.innerWidth > 768 && isInView) {
+        const now = Date.now();
+        
+        // Prevent too rapid scrolling (debounce)
+        if (now - lastScrollTime < 800) return;
+        
+        setLastScrollTime(now);
+        
+        if (e.deltaY > 20) {
+          // Scroll down - next testimonial
+          handleNext();
+        } else if (e.deltaY < -20) {
+          // Scroll up - previous testimonial
+          handlePrev();
+        }
+        // Don't prevent default to allow normal scrolling on page
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, [isInView, lastScrollTime]);
+
+  // Alternative: استخدام Keyboard arrows للتنقل
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (window.innerWidth > 768 && isInView) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          handleNext();
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          handlePrev();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isInView]);
 
   function startAutoplay() {
@@ -132,6 +176,37 @@ export default function TestimonialsSection() {
     setIndex((p) => (p + 1) % testimonials.length);
     startAutoplay();
   }
+
+  // Swipe functions for mobile
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsTouching(true);
+    stopAutoplay();
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    setIsTouching(false);
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext();
+    } else if (isRightSwipe) {
+      handlePrev();
+    }
+    
+    setTimeout(() => startAutoplay(), 2000);
+  };
 
   return (
     <section
@@ -177,13 +252,13 @@ export default function TestimonialsSection() {
             <div className="flex items-center gap-4">
               <button
                 onClick={handlePrev}
-                className="p-3 rounded-lg bg-white/1000 hover:bg-gradient-to-r from-purple-900 to-blue-5 transition"
+                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <ChevronLeft size={18} color="white" />
               </button>
               <button
                 onClick={handleNext}
-                className="p-3 rounded-lg bg-white/ hover:bg-gradient-to-r from-blue-5 to-purple-900 transition"
+                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <ChevronRight size={18} color="white" />
               </button>
@@ -200,10 +275,27 @@ export default function TestimonialsSection() {
                 </div>
               </div>
             </div>
+
+            {/* Scroll & Keyboard Indicators for Desktop */}
+            <div className="hidden md:block mt-6 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                Scroll to navigate
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                Use arrow keys ← → ↑ ↓
+              </div>
+            </div>
           </div>
 
-          {/* RIGHT */}
-          <div className="flex justify-center md:justify-end relative">
+          {/* RIGHT - Mobile Touch Area */}
+          <div 
+            className="flex justify-center md:justify-end relative"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={testimonials[index].id}
@@ -213,7 +305,9 @@ export default function TestimonialsSection() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="w-full max-w-xl relative"
               >
-                <div className="backdrop-blur-2xl  bg-gradient-to-r from-blue-1 to-purple-900 border border-white/1 rounded-4xl p-10 shadow-2xl">
+                <div className={`backdrop-blur-2xl bg-gradient-to-r from-blue-1 to-purple-900 border border-white/1 rounded-4xl p-10 shadow-2xl transition-all duration-300
+                  ${isTouching ? 'scale-95 bg-white/5' : ''}
+                `}>
                   <blockquote className="text-lg text-white/50 leading-relaxed mb-6">
                     “{testimonials[index].quote}”
                   </blockquote>
@@ -230,6 +324,11 @@ export default function TestimonialsSection() {
                       {testimonials[index].company}
                     </div>
                   </div>
+                </div>
+
+                {/* Swipe Indicator for Mobile */}
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 md:hidden transition-opacity">
+                  Swipe to navigate
                 </div>
               </motion.div>
             </AnimatePresence>
