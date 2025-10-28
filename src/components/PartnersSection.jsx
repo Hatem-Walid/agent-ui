@@ -1,5 +1,6 @@
 // src/components/PartnersSection.jsx
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const logos = [
   "/logos/pngwing.com (1).png",
@@ -13,31 +14,53 @@ const logos = [
 ];
 
 export default function PartnersSection() {
+  const [activeLogo, setActiveLogo] = useState(null);
+
   return (
-    <section className="relative py-2 overflow-hidden bg-[#0b0f1d]">
-     
+    <section className="relative py-2 md:py-2 lg:py-2 overflow-hidden bg-[#0b0f1d] border-t border-b border-gray-800/30">
+    
+      {/* Logos Container */}
       <div className="relative w-full overflow-hidden">
+        {/* First Row */}
         <motion.div
-          className="flex items-center gap-16 md:gap-24"
+          className="flex items-center gap-12 md:gap-16 lg:gap-20 mb-6 md:mb-5"
           animate={{ x: ["0%", "-50%"] }}
           transition={{
             repeat: Infinity,
-            duration: 25,
+            duration: 40,
             ease: "linear",
           }}
         >
           {[...logos, ...logos].map((logo, i) => (
-            <div key={i} className="relative flex-shrink-0 group">
+            <div 
+              key={`first-${i}`} 
+              className="relative flex-shrink-0 group"
+              onTouchStart={() => setActiveLogo(i)}
+              onTouchEnd={() => setActiveLogo(null)}
+            >
               <img
                 src={logo}
                 alt="Partner Logo"
-                className="h-9 md:h-9 object-contain opacity-80 group-hover:opacity-100 transition duration-300"
+                className={`h-8 md:h-10 lg:h-12 object-contain opacity-80 group-hover:opacity-100 transition-all duration-300 grayscale group-hover:grayscale-0
+                  ${activeLogo === i ? 'opacity-100 grayscale-0 scale-110' : ''}
+                `}
               />
-              <div className="absolute inset-0 blur-xl bg-purple-500/30 opacity-0 group-hover:opacity-60 transition duration-500 rounded-full" />
+              
+              {/* Hover Effect for Desktop */}
+              <div className="absolute inset-0 blur-xl bg-purple-500/20 opacity-0 group-hover:opacity-40 transition duration-500 rounded-full scale-150 hidden md:block" />
+              
+              {/* Tap Effect for Mobile */}
+              <div className={`absolute inset-0 blur-xl bg-purple-500/40 rounded-full scale-150 transition-all duration-200 md:hidden
+                ${activeLogo === i ? 'opacity-60 scale-125' : 'opacity-0'}
+              `} />
             </div>
           ))}
         </motion.div>
       </div>
+
+      {/* Gradient Overlays */}
+      <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-[#0b0f1d] to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-[#0b0f1d] to-transparent z-10" />
     </section>
   );
 }
