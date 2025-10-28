@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { 
+  Shield, 
+} from "lucide-react";
+
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -36,13 +40,19 @@ export default function Hero() {
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-3xl px-4">
-        <h1 className="text-5xl md:text-6xl font-bold mb-4 text-purple-400 drop-shadow-[0_0_6px_rgba(124,58,237,0.8)]">
+      
+      <div className="relative z-10 max-w-5xl px-4">
+          <div className="inline-flex items-center gap-2 bg-purple-100/20 text-blue-300 px-4 py-2 rounded-full text-xs sm:text-sm font-medium mb-5 backdrop-blur-sm border border-purple-500/30">
+          <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
+          CyberAgentX
+        </div>
+        <h1 className="text-5xl md:text-6xl font-bold mb-4 block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 drop-shadow-[0_0_6px_rgba(124,58,237,0.8)]">
           Empower Your Security with AI
         </h1>
         <p className="text-lg md:text-xl text-gray-200 mb-6 leading-relaxed drop-shadow-[0_0_4px_rgba(255,255,255,0.3)]">
-          Discover how our platform leverages Artificial Intelligence to protect your applications,
-          detect vulnerabilities, and ensure top-tier security across all layers.
+          You're Always Ready To Run with a full suite , 
+            that help security teams and developers secure applications from the first line 
+            of code to cloud deployment .
         </p>
         <button
           onClick={() => navigate("/dashboard")}
