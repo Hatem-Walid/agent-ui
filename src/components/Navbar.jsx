@@ -14,8 +14,8 @@ const Navbar = () => {
       bgColor: "#0D0716",
       textColor: "#fff",
       links: [
-        { label: "Company", href: "/about" },
-        { label: "Careers", href: "/about" }
+        { label: "Company", href: "/About" },
+        { label: "Careers", href: "/About" }
       ]
     },
     {
