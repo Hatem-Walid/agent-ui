@@ -3,6 +3,9 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AgentDashboard from "./pages/AgentDashboard";
 import AuthPage from "./pages/AuthPage"; 
+import About from "./pages/About";
+import './app.css';
+
 
 function App() {
   return (
@@ -12,6 +15,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<AgentDashboard />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/About" element={<About />} />
       </Routes>
     </>
   );

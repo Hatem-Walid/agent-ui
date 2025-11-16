@@ -62,10 +62,9 @@ const CheckmarkOneSection = () => {
   };
 
   return (
-    <section className="relative py-16 bg-gradient-to-br from-[#0f1025] via-[#1a1640] to-[#2a1460] overflow-hidden">
+    <section className="relative py-16 bg-gradient-to-br from-[#050029] via-[#050029] to-[#2a1460] overflow-hidden">
       {/* تأثيرات خلفية */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.1),transparent_70%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(79,70,229,0.15),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(79,70,229,0.15),transparent_70%)]" /> 
       <div className="absolute inset-0 bg-grid-slate-800/20" />
 
       <div className="relative max-w-7xl mx-auto px-4">

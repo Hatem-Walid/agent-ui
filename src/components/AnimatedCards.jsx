@@ -219,18 +219,9 @@ export default function TestimonialsSection() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, #0a0b1f 0%, #101532 100%)",
+            "linear-gradient(190deg, #1b0033 0%, #060025 100%)",
+
           zIndex: 0,
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-15"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-          zIndex: 1,
         }}
       />
 

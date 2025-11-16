@@ -17,7 +17,7 @@ export default function PartnersSection() {
   const [activeLogo, setActiveLogo] = useState(null);
 
   return (
-    <section className="relative py-2 md:py-2 lg:py-2 overflow-hidden bg-[#0b0f1d] border-t border-b border-gray-800/30">
+    <section className="relative py-2 md:py-2 lg:py-2 overflow-hidden bg-[#000000]">
     
       {/* Logos Container */}
       <div className="relative w-full overflow-hidden">
@@ -59,8 +59,8 @@ export default function PartnersSection() {
       </div>
 
       {/* Gradient Overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-[#0b0f1d] to-transparent z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-[#0b0f1d] to-transparent z-10" />
+      <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-[#34003d83] to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l  from-[#34003d83] to-transparent z-10" />
     </section>
   );
 }
