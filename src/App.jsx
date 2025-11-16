@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import AgentDashboard from "./pages/AgentDashboard";
 import AuthPage from "./pages/AuthPage"; 
 import About from "./pages/About";
-import '../src/App.css';
+//import './App.css';
 
 
 function App() {
