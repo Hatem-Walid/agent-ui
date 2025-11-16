@@ -11,7 +11,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
 
   const demo = [
     {
-      image: './public/assets/ibrahem.png',
+      image: '/assets/ibrahem.png',
       title: 'Alex Rivera',
       subtitle: 'Full Stack Developer',
       handle: '@alexrivera',
@@ -20,7 +20,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://github.com/'
     },
     {
-      image: './public/assets/ibrahem.png',
+      image: '/assets/ibrahem.png',
       title: 'Jordan Chen',
       subtitle: 'DevOps Engineer',
       handle: '@jordanchen',
