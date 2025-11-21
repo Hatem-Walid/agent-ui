@@ -296,7 +296,7 @@ export default function TestimonialsSection() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="w-full max-w-xl relative"
               >
-                <div className={`backdrop-blur-2xl bg-gradient-to-r from-blue-1 to-purple-900 border border-white/1 rounded-4xl p-10 shadow-2xl transition-all duration-300
+                <div className={`backdrop-blur-2xl bg-gradient-to-r from-white/5 to-purple-900 border border-white/1 rounded-4xl p-10 shadow-2xl transition-all duration-300
                   ${isTouching ? 'scale-95 bg-white/5' : ''}
                 `}>
                   <blockquote className="text-lg text-white/50 leading-relaxed mb-6">
