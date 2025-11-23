@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-
+import { Link } from 'react-router-dom';
 const Navbar = () => {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -127,7 +127,7 @@ const Navbar = () => {
   };
 
   const setCardRef = i => el => { if (el) cardsRef.current[i] = el; };
-
+  
   return (
     <div className="navbar-container absolute left-1/2 -translate-x-1/2 w-[90%] max-w-[900px] z-[99] top-[1.2em] md:top-[2em]">
       <nav
@@ -158,12 +158,13 @@ const Navbar = () => {
           </div>
 
           {/* Get Started button */}
-          <button
-            type="button"
+            <Link
+            id="Get-Started"
+            to="/auth"
             className="navbar-cta-button bg-black text-amber-100 hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 items-center h-full font-medium cursor-pointer transition-colors duration-300"
           >
             Get Started
-          </button>
+          </Link>
         </div>
 
         <div

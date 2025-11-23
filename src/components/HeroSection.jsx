@@ -69,7 +69,7 @@ export default function Hero() {
         <div className="flex justify-center items-center gap-6 text-center relative z-50">
           <button
             id="get-started"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/ai")}
             className="relative px-9 py-2 rounded-full font-semibold text-white text-base md:text-lg
               backdrop-blur-2xl bg-purple-500/20 border border-purple-300/20
               hover:bg-purple-500/30 transition-all duration-300 
@@ -82,7 +82,7 @@ export default function Hero() {
 
           <button
             id="learn-more"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/ai")}
             className="relative px-9 py-2 rounded-full font-semibold text-white text-base md:text-lg
               backdrop-blur-2xl bg-white/10 border border-white/20
               hover:bg-white/20 transition-all duration-300 
