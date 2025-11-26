@@ -11,26 +11,33 @@ export default function AuthPage() {
   const [tab, setTab] = useState("login"); 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({
-    email: "", firstName: "", lastName: "", password: "",
-    age: "", gender: "", phone: "", address: ""
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    age: "",
+    gender: "",
+    phone: "",
+    address: "",
   });
-  const [showConfetti, setShowConfetti] = useState(false);
+
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
 
   // ----------------------- Handlers -----------------------
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
-    setLoginForm(prev => ({ ...prev, [name]: value }));
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
-    setRegisterForm(prev => ({ ...prev, [name]: value }));
+    setRegisterForm((prev) => ({ ...prev, [name]: value }));
+
     if (name === "password") setPasswordStrength(getPasswordStrength(value));
   };
 
-  const togglePassword = () => setShowPassword(prev => !prev);
+  const togglePassword = () => setShowPassword((prev) => !prev);
 
   // ----------------------- Password Strength -----------------------
   const getPasswordStrength = (pass) => {
@@ -66,29 +73,56 @@ export default function AuthPage() {
 
     try {
       const data = await login(loginForm);
-      sessionStorage.setItem("token", data.token); // لو الـ API بيرجع توكن
+      sessionStorage.setItem("token", data.token);
       showToast("Login successful! 🎉");
       setLoginForm({ email: "", password: "" });
     } catch (err) {
-      showToast(err.response?.data?.message || err.message || "Login failed", "error");
+      showToast(
+        err.response?.data?.message || "Login failed",
+        "error"
+      );
     }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+
     const error = validateRegister();
     if (error) return showToast(error, "error");
 
+    // Mapping frontend → backend fields
+    const payload = {
+      Fname: registerForm.firstName,
+      Lname: registerForm.lastName,
+      Email: registerForm.email,
+      Password: registerForm.password,
+      Age: Number(registerForm.age),
+      Gender: registerForm.gender === "male", // true/false
+      Phone: registerForm.phone,
+      Address: registerForm.address,
+    };
+
     try {
-      await register(registerForm);
+      await register(payload);
       showToast("Registration successful! 🎉");
+
       setRegisterForm({
-        email: "", firstName: "", lastName: "", password: "",
-        age: "", gender: "", phone: "", address: ""
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+        age: "",
+        gender: "",
+        phone: "",
+        address: "",
       });
+
       setPasswordStrength(0);
     } catch (err) {
-      showToast(err.response?.data?.message || err.message || "Registration failed", "error");
+      showToast(
+        err.response?.data?.message || "Registration failed",
+        "error"
+      );
     }
   };
 
@@ -127,10 +161,16 @@ export default function AuthPage() {
                 showPassword={showPassword}
                 togglePassword={togglePassword}
               />
-              <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">Login</button>
+
+              <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
+                Login
+              </button>
+
               <div className="text-center text-gray-400 text-sm mt-2">
                 Don’t have an account?{" "}
-                <button type="button" onClick={() => setTab("register")} className="text-purple-400 hover:text-purple-300">Register here</button>
+                <button type="button" onClick={() => setTab("register")} className="text-purple-400 hover:text-purple-300">
+                  Register here
+                </button>
               </div>
             </motion.form>
           ) : (
@@ -143,57 +183,107 @@ export default function AuthPage() {
               onSubmit={handleRegisterSubmit}
               className="space-y-4"
             >
-              <Input label="Email *" name="Email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
-              <Input label="First Name *" name="Fname" value={registerForm.firstName} onChange={handleRegisterChange} required />
-              <Input label="Last Name" name="Lname" value={registerForm.lastName} onChange={handleRegisterChange} />
-              <PasswordInput label="Password *" name="Password" value={registerForm.password} onChange={handleRegisterChange} showPassword={showPassword} togglePassword={togglePassword} />
+              <Input label="Email *" name="email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
+              <Input label="First Name *" name="firstName" value={registerForm.firstName} onChange={handleRegisterChange} required />
+              <Input label="Last Name" name="lastName" value={registerForm.lastName} onChange={handleRegisterChange} />
+
+              <PasswordInput
+                label="Password *"
+                name="password"
+                value={registerForm.password}
+                onChange={handleRegisterChange}
+                showPassword={showPassword}
+                togglePassword={togglePassword}
+              />
 
               {/* Password Strength Meter */}
               <div className="relative">
                 <motion.div className="w-full h-2 bg-gray-700/50 rounded-xl overflow-hidden" initial={false}>
                   <motion.div
-                    className={`h-full rounded-xl`}
+                    className="h-full rounded-xl"
                     animate={{
-                      width: passwordStrength === 0 ? "0%" : passwordStrength === 1 ? "25%" : passwordStrength === 2 ? "50%" : passwordStrength === 3 ? "75%" : "100%",
-                      backgroundColor: passwordStrength === 0 ? "#00000000" : passwordStrength === 1 ? "#f56565" : passwordStrength === 2 ? "#ecc94b" : passwordStrength === 3 ? "#4299e1" : "#48bb78",
+                      width:
+                        passwordStrength === 0
+                          ? "0%"
+                          : passwordStrength === 1
+                          ? "25%"
+                          : passwordStrength === 2
+                          ? "50%"
+                          : passwordStrength === 3
+                          ? "75%"
+                          : "100%",
+                      backgroundColor:
+                        passwordStrength === 0
+                          ? "#00000000"
+                          : passwordStrength === 1
+                          ? "#f56565"
+                          : passwordStrength === 2
+                          ? "#ecc94b"
+                          : passwordStrength === 3
+                          ? "#4299e1"
+                          : "#48bb78",
                     }}
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
-                    onAnimationComplete={() => {
-                      if (passwordStrength === 4) {
-                        showToast("Strong Password! 💪", "success");
-                        setShowConfetti(true);
-                        setTimeout(() => setShowConfetti(false), 1500);
-                      }
-                    }}
+                    transition={{ duration: 0.4 }}
                   />
                 </motion.div>
-                <motion.p className="mt-1 text-sm font-semibold" animate={{ color: passwordStrength === 0 ? "#f56565" : passwordStrength === 1 ? "#f56565" : passwordStrength === 2 ? "#ecc94b" : passwordStrength === 3 ? "#4299e1" : "#48bb78" }} transition={{ duration: 0.4 }}>
-                  {passwordStrength === 0 ? "" : passwordStrength === 1 ? "Weak" : passwordStrength === 2 ? "Medium" : passwordStrength === 3 ? "Strong" : "Very Strong"}
+
+                <motion.p
+                  className="mt-1 text-sm font-semibold"
+                  animate={{
+                    color:
+                      passwordStrength === 0
+                        ? "#f56565"
+                        : passwordStrength === 1
+                        ? "#f56565"
+                        : passwordStrength === 2
+                        ? "#ecc94b"
+                        : passwordStrength === 3
+                        ? "#4299e1"
+                        : "#48bb78",
+                  }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {passwordStrength === 0
+                    ? ""
+                    : passwordStrength === 1
+                    ? "Weak"
+                    : passwordStrength === 2
+                    ? "Medium"
+                    : passwordStrength === 3
+                    ? "Strong"
+                    : "Very Strong"}
                 </motion.p>
               </div>
 
-              <Input label="Age" name="Age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
-              <select name="Gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
-                <option value="" className="text-gray-900">Select Gender</option>
+              <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
+
+              <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
+                <option value="">Select Gender</option>
                 <option value="male" className="text-gray-900">Male</option>
                 <option value="female" className="text-gray-900">Female</option>
               </select>
-              <Input label="Phone" name="Phone" value={registerForm.phone} onChange={handleRegisterChange} />
-              <Input label="Address" name="Address" value={registerForm.address} onChange={handleRegisterChange} />
 
-              <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">Register</button>
+              <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
+              <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />
+
+              <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
+                Register
+              </button>
 
               <div className="text-center text-gray-400 text-sm mt-2">
                 Already have an account?{" "}
-                <button type="button" onClick={() => setTab("login")} className="text-purple-400 hover:text-purple-300">Login here</button>
+                <button type="button" onClick={() => setTab("login")} className="text-purple-400 hover:text-purple-300">
+                  Login here
+                </button>
               </div>
             </motion.form>
           )}
         </AnimatePresence>
 
-        {/* Back to Home */}
         <div className="text-center mt-4">
-          <button onClick={() => navigate("/")} className="text-gray-400 hover:text-purple-400 text-sm underline">← Back to Home</button>
+          <button onClick={() => navigate("/")} className="text-gray-400 hover:text-purple-400 text-sm underline">
+            ← Back to Home
+          </button>
         </div>
       </div>
     </div>
@@ -214,8 +304,20 @@ function PasswordInput({ label, value, onChange, name, showPassword, togglePassw
   return (
     <div className="relative">
       <label className="text-gray-300 mb-1 block">{label}</label>
-      <input name={name} type={showPassword ? "text" : "password"} value={value} onChange={onChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none placeholder-gray-400" />
-      <button type="button" onClick={togglePassword} className="absolute right-3 top-7/10 -translate-y-1/2 text-gray-400 hover:text-purple-300">{showPassword ? "🙈" : "👁️"}</button>
+      <input
+        name={name}
+        type={showPassword ? "text" : "password"}
+        value={value}
+        onChange={onChange}
+        className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none placeholder-gray-400"
+      />
+      <button
+        type="button"
+        onClick={togglePassword}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-300"
+      >
+        {showPassword ? "🙈" : "👁️"}
+      </button>
     </div>
   );
 }
