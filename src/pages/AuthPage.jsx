@@ -20,6 +20,7 @@ export default function AuthPage() {
     phone: "",
     address: "",
   });
+const [showConfetti, setShowConfetti] = useState(false);
 
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
