@@ -111,7 +111,7 @@ export default function SplineAgentPage() {
 
       {/* Background Spline */}
       <div className="absolute inset-0 z-0">
-        <Spline scene="https://prod.spline.design/7EJHexbzyfNBTeID/scene.splinecode" />
+        <Spline scene="https://prod.spline.design/u6UUd9ny38gtOZtR/scene.splinecode" />
       </div>
 
       {/* Sidebar toggle button */}
@@ -157,16 +157,16 @@ export default function SplineAgentPage() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed top-0 left-0 h-full w-77 z-50 pointer-events-auto overflow-y-auto"
             >
-              <div className="h-full bg-gradient-to-b from-gray-900/95 to-black/95 backdrop-blur-2xl border-r border-white/10 p-6 flex flex-col shadow-2xl">
+              <div className="h-full bg-gradient-to-b from-purple-900/40 to-black/95 backdrop-blur-2xl border-r border-white/10 p-6 flex flex-col shadow-2xl">
                 {/* Sidebar Header with Close Button */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
-                      SA
+                      Vuln
                     </div>
                     <div>
-                      <h2 className="text-white font-bold text-xl">Spline Agent</h2>
-                      <p className="text-gray-400 text-sm">AI Assistant</p>
+                      <h2 className="text-white font-bold text-xl">VULN SNEAK</h2>
+                      <p className="text-gray-400 text-sm">AI cyber Agent</p>
                     </div>
                   </div>
                   <button
@@ -216,10 +216,10 @@ export default function SplineAgentPage() {
                 <div className="pt-6 border-t border-white/10">
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer">
                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center text-white font-bold">
-                      S
+                      H
                     </div>
                     <div className="flex-1">
-                      <p className="text-white font-medium">Sam</p>
+                      <p className="text-white font-medium">Hatem</p>
                       <p className="text-gray-400 text-sm">Premium Plan</p>
                     </div>
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -247,11 +247,11 @@ export default function SplineAgentPage() {
               transition={{ delay: 0.2 }} 
               className="text-center mb-12"
             >
-              <h1 className="text-6xl font-light bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent mb-4">
-                Hello, Sam
+              <h1 className="text-6xl text-shadow-purple-950 font-light bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent mb-4">
+                Hello, Hatem
               </h1>
               <p className="text-gray-300 text-xl max-w-md mx-auto">
-                Your AI assistant is ready to help with projects, analytics, and team coordination.
+                Your AI assistant is ready to help with projects, cyber analytics, and team coordination.
               </p>
             </motion.div>
 
@@ -299,8 +299,8 @@ export default function SplineAgentPage() {
                   >
                     <div className={`max-w-[70%] p-4 rounded-3xl backdrop-blur-xl ${
                       msg.sender === "user" 
-                        ? " bg-white/10 backdrop-blur-xl text-black shadow-2xl shadow-black/45 border-b-black" 
-                        : "bg-black/30 border border-white/20 text-white"
+                        ? " bg-white/50 backdrop-blur-xl text-black shadow-2xl shadow-black/45 border-b-black" 
+                        : "bg-black/40 border border-white/20 text-white"
                     }`}>
                       <div className="flex items-start gap-3">
                         {msg.sender === "bot" && (

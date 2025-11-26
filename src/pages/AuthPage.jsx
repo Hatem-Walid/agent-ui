@@ -1,137 +1,344 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "../components/ToastProvider";
 import { useNavigate } from "react-router-dom";
-import apiClient from "../api/apiClient.js";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ email: "", password: "", username: "" });
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const toggleMode = () => setIsLogin(!isLogin);
+  const [tab, setTab] = useState("login"); // 'login' or 'register'
 
-  // 🧠 وظيفة عامة للتعامل مع إدخال المستخدم
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [registerForm, setRegisterForm] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    age: "",
+    gender: "",
+    phone: "",
+    address: "",
+  });
+
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // -----------------------
+  // Handlers
+  // -----------------------
+  const handleLoginChange = (e) => {
+    const { name, value } = e.target;
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 📤 الإرسال الفعلي للـ API
-  const handleSubmit = async (e) => {
+  const handleRegisterChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "password") setPasswordStrength(getPasswordStrength(value));
+  };
+
+  const togglePassword = () => setShowPassword((prev) => !prev);
+
+  // -----------------------
+  // Password Strength
+  // -----------------------
+  const getPasswordStrength = (pass) => {
+    let score = 0;
+    if (pass.length >= 6) score++;           // طول الباسوورد
+    if (/[A-Z]/.test(pass)) score++;        // وجود حرف كبير
+    if (/[0-9]/.test(pass)) score++;        // وجود رقم
+    if (/[^A-Za-z0-9]/.test(pass)) score++; // وجود رمز خاص
+    return score;                           // بيطلع رقم من 0 لـ 4
+  };
+
+
+  // -----------------------
+  // Validation
+  // -----------------------
+  const validateLogin = () => {
+    if (!loginForm.email) return "Email is required";
+    if (!loginForm.password) return "Password is required";
+    return null;
+  };
+
+  const validateRegister = () => {
+    if (!registerForm.email) return "Email is required";
+    if (!registerForm.firstName) return "First name is required";
+    if (!registerForm.password) return "Password is required";
+    if (passwordStrength < 2)
+      return "Weak password — add uppercase letters, numbers, or symbols";
+    return null;
+  };
+
+  // -----------------------
+  // Submit
+  // -----------------------
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    const error = validateLogin();
+    if (error) return showToast(error, "error");
+
     try {
-      const endpoint = isLogin ? "/api/Auth/login" : "/api/Auth/register";
-      const payload = isLogin
-        ? { email: formData.email, password: formData.password }
-        : { username: formData.username, email: formData.email, password: formData.password };
-
-      const res = await apiClient.post(endpoint, payload);
-
-      console.log("✅ Response:", res.data);
-
-      // لو رجع توكن أو نجاح
-      if (res.data.token) {
-        alert("✅ Auth successful!");
-        navigate("/dashboard"); // بعد النجاح يدخل عالصفحة بتاعة الAgent
+      const res = await fetch("https://your-api.com/api/Auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginForm),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        return showToast(data.message || "Login failed", "error");
       }
-    } catch (error) {
-      console.error("❌ Auth error:", error);
-      alert("Something went wrong. Please try again.");
+      showToast("Login successful! 🎉");
+      setLoginForm({ email: "", password: "" });
+    } catch (err) {
+      showToast("Server error. Try again later.", "error");
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f0f1a] relative overflow-hidden">
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-purple-700/30 via-indigo-700/20 to-purple-900/30 blur-3xl"
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-      ></motion.div>
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    const error = validateRegister();
+    if (error) return showToast(error, "error");
 
-      <div className="relative z-10 bg-[#151525]/90 border border-purple-700/30 backdrop-blur-md rounded-2xl shadow-2xl p-10 w-[90%] max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-6 text-purple-400">
-          {isLogin ? "Welcome Back" : "Create an Account"}
-        </h1>
+    try {
+      const res = await fetch("https://your-api.com/api/Auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registerForm),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        return showToast(data.message || "Registration failed", "error");
+      }
+      showToast("Registration successful! 🎉");
+      setRegisterForm({
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+        age: "",
+        gender: "",
+        phone: "",
+        address: "",
+      });
+      setPasswordStrength(0);
+    } catch (err) {
+      showToast("Server error. Try again later.", "error");
+    }
+  };
+
+  // -----------------------
+  // Form Variants for Animation
+  // -----------------------
+  const formVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -40 },
+  };
+
+  // -----------------------
+  // UI
+  // -----------------------
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 bg-[#0f0f1a]">
+      <div className="w-full max-w-lg bg-[#151525]/90 backdrop-blur-xl border border-purple-700/30 p-8 rounded-3xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-purple-400 text-center mb-6">
+          {tab === "login" ? "Welcome Back" : "Create Account"}
+        </h2>
 
         <AnimatePresence mode="wait">
-          <motion.form
-            key={isLogin ? "login" : "register"}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40 }}
-            transition={{ duration: 0.4 }}
-            onSubmit={handleSubmit}
-            className="space-y-5"
-          >
-            {!isLogin && (
-              <div>
-                <label className="block text-sm text-gray-300 mb-1">Username</label>
-                <input
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  type="text"
-                  className="w-full px-4 py-2 bg-[#1e1e2e] border border-purple-700/50 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-100 outline-none"
-                  placeholder="Enter your username"
-                  required
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Email</label>
-              <input
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                type="email"
-                className="w-full px-4 py-2 bg-[#1e1e2e] border border-purple-700/50 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-100 outline-none"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Password</label>
-              <input
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                type="password"
-                className="w-full px-4 py-2 bg-[#1e1e2e] border border-purple-700/50 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-100 outline-none"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition duration-300"
+          {tab === "login" ? (
+            <motion.form
+              key="login"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={formVariants}
+              onSubmit={handleLoginSubmit}
+              className="space-y-4"
             >
-              {isLogin ? "Login" : "Register"}
-            </button>
-          </motion.form>
+              <Input label="Email *" name="email" type="email" value={loginForm.email} onChange={handleLoginChange} required />
+              <PasswordInput
+                label="Password *"
+                name="password"
+                value={loginForm.password}
+                onChange={handleLoginChange}
+                showPassword={showPassword}
+                togglePassword={togglePassword}
+              />
+              <button
+                type="submit"
+                className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl"
+              >
+                Login
+              </button>
+
+              <div className="text-center text-gray-400 text-sm mt-2">
+                Don’t have an account?{" "}
+                <button type="button" onClick={() => setTab("register")} className="text-purple-400 hover:text-purple-300">
+                  Register here
+                </button>
+              </div>
+            </motion.form>
+          ) : (
+            <motion.form
+              key="register"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={formVariants}
+              onSubmit={handleRegisterSubmit}
+              className="space-y-4"
+            >
+              <Input label="Email *" name="email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
+              <Input label="First Name *" name="firstName" value={registerForm.firstName} onChange={handleRegisterChange} required />
+              <Input label="Last Name" name="lastName" value={registerForm.lastName} onChange={handleRegisterChange} />
+              <PasswordInput
+                label="Password *"
+                name="password"
+                value={registerForm.password}
+                onChange={handleRegisterChange}
+                showPassword={showPassword}
+                togglePassword={togglePassword}
+              />
+
+              {/* Password Strength Meter */}
+              <div className="relative">
+              {/* Password Strength Bar */}
+              <motion.div
+                className="w-full h-2 bg-gray-700/50 rounded-xl overflow-hidden"
+                initial={false}
+              >
+                <motion.div
+                  className={`h-full rounded-xl`}
+                  animate={{
+                    width:
+                      passwordStrength === 0
+                        ? "0%"
+                        : passwordStrength === 1
+                        ? "25%"
+                        : passwordStrength === 2
+                        ? "50%"
+                        : passwordStrength === 3
+                        ? "75%"
+                        : "100%",
+                    backgroundColor:
+                      passwordStrength === 0
+                        ? "#00000000"
+                        : passwordStrength === 1
+                        ? "#f56565"
+                        : passwordStrength === 2
+                        ? "#ecc94b"
+                        : passwordStrength === 3
+                        ? "#4299e1"
+                        : "#48bb78",
+                  }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  onAnimationComplete={() => {
+                    if (passwordStrength === 4) {
+                      showToast("Strong Password! 💪", "success");
+                      setShowConfetti(true);
+                      setTimeout(() => setShowConfetti(false), 1500);
+                    }
+                  }}
+                />
+              </motion.div>
+
+              {/* Text Feedback */}
+              <motion.p
+                className="mt-1 text-sm font-semibold"
+                animate={{
+                  color:
+                    passwordStrength === 0
+                      ? "#f56565"
+                      : passwordStrength === 1
+                      ? "#f56565"
+                      : passwordStrength === 2
+                      ? "#ecc94b"
+                      : passwordStrength === 3
+                      ? "#4299e1"
+                      : "#48bb78",
+                }}
+                transition={{ duration: 0.4 }}
+              >
+                {passwordStrength === 0
+                  ? ""
+                  : passwordStrength === 1
+                  ? "Weak"
+                  : passwordStrength === 2
+                  ? "Medium"
+                  : passwordStrength === 3
+                  ? "Strong"
+                  : "Very Strong"}
+              </motion.p>
+            </div>
+
+
+              <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
+              <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
+                <option value="" className="text-gray-900">Select Gender</option>
+                <option value="male" className="text-gray-900">Male</option>
+                <option value="female" className="text-gray-900">Female</option>
+              </select>
+              <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
+              <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl"
+              >
+                Register
+              </button>
+
+              <div className="text-center text-gray-400 text-sm mt-2">
+                Already have an account?{" "}
+                <button type="button" onClick={() => setTab("login")} className="text-purple-400 hover:text-purple-300">
+                  Login here
+                </button>
+              </div>
+            </motion.form>
+          )}
         </AnimatePresence>
 
-        <div className="text-center mt-6">
-          <p className="text-gray-400 text-sm">
-            {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
-            <button
-              type="button"
-              onClick={toggleMode}
-              className="text-purple-400 hover:text-purple-300 transition"
-            >
-              {isLogin ? "Register here" : "Login here"}
-            </button>
-          </p>
-
-          <button
-            onClick={() => navigate("/")}
-            className="mt-4 text-gray-400 hover:text-purple-400 text-sm underline"
-          >
+        {/* Back to Home */}
+        <div className="text-center mt-4">
+          <button onClick={() => navigate("/")} className="text-gray-400 hover:text-purple-400 text-sm underline">
             ← Back to Home
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// -------------------------------
+// Input Components
+// -------------------------------
+function Input({ label, ...props }) {
+  return (
+    <div>
+      <label className="text-gray-300 mb-1 block">{label}</label>
+      <input {...props} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none placeholder-gray-400" />
+    </div>
+  );
+}
+
+function PasswordInput({ label, value, onChange, name, showPassword, togglePassword }) {
+  return (
+    <div className="relative">
+      <label className="text-gray-300 mb-1 block">{label}</label>
+      <input
+        name={name}
+        type={showPassword ? "text" : "password"}
+        value={value}
+        onChange={onChange}
+        className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none placeholder-gray-400"
+      />
+      <button type="button" onClick={togglePassword} className="absolute right-3 top-7/10 -translate-y-1/2 text-gray-400 hover:text-purple-300">
+        {showPassword ? "🙈" : "👁️"}
+      </button>
     </div>
   );
 }

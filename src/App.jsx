@@ -1,16 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AgentDashboard from "./pages/AgentDashboard";
 import AuthPage from "./pages/AuthPage"; 
 import About from "./pages/About";
-import './App.css';
 import SplineChatPage from "./pages/SplineChatPage";
+import './App.css';
 
 function App() {
+  const location = useLocation();
+  const hideNavbarRoutes = ["/auth"];
+
   return (
     <>
-      <Navbar />
+      {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<AgentDashboard />} />
