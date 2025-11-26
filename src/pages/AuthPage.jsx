@@ -143,10 +143,10 @@ export default function AuthPage() {
               onSubmit={handleRegisterSubmit}
               className="space-y-4"
             >
-              <Input label="Email *" name="email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
-              <Input label="First Name *" name="firstName" value={registerForm.firstName} onChange={handleRegisterChange} required />
-              <Input label="Last Name" name="lastName" value={registerForm.lastName} onChange={handleRegisterChange} />
-              <PasswordInput label="Password *" name="password" value={registerForm.password} onChange={handleRegisterChange} showPassword={showPassword} togglePassword={togglePassword} />
+              <Input label="Email *" name="Email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
+              <Input label="First Name *" name="Fname" value={registerForm.firstName} onChange={handleRegisterChange} required />
+              <Input label="Last Name" name="Lname" value={registerForm.lastName} onChange={handleRegisterChange} />
+              <PasswordInput label="Password *" name="Password" value={registerForm.password} onChange={handleRegisterChange} showPassword={showPassword} togglePassword={togglePassword} />
 
               {/* Password Strength Meter */}
               <div className="relative">
@@ -172,14 +172,14 @@ export default function AuthPage() {
                 </motion.p>
               </div>
 
-              <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
-              <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
+              <Input label="Age" name="Age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
+              <select name="Gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
                 <option value="" className="text-gray-900">Select Gender</option>
                 <option value="male" className="text-gray-900">Male</option>
                 <option value="female" className="text-gray-900">Female</option>
               </select>
-              <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
-              <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />
+              <Input label="Phone" name="Phone" value={registerForm.phone} onChange={handleRegisterChange} />
+              <Input label="Address" name="Address" value={registerForm.address} onChange={handleRegisterChange} />
 
               <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">Register</button>
 
