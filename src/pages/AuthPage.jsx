@@ -23,6 +23,7 @@ export default function AuthPage() {
 
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // 🔹 جديد
 
   // ----------------------- Handlers -----------------------
   const handleLoginChange = (e) => {
@@ -33,7 +34,6 @@ export default function AuthPage() {
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm((prev) => ({ ...prev, [name]: value }));
-
     if (name === "password") setPasswordStrength(getPasswordStrength(value));
   };
 
@@ -68,36 +68,38 @@ export default function AuthPage() {
   // ----------------------- Submit -----------------------
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return; // 🔹 منع double submit
     const error = validateLogin();
     if (error) return showToast(error, "error");
 
+    setIsSubmitting(true);
     try {
       const data = await login(loginForm);
       sessionStorage.setItem("token", data.token);
       showToast("Login successful! 🎉");
       setLoginForm({ email: "", password: "" });
     } catch (err) {
-      showToast(
-        err.response?.data?.message || "Login failed",
-        "error"
-      );
+      showToast(err.response?.data?.message || "Login failed", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-
+    if (isSubmitting) return; // 🔹 منع double submit
     const error = validateRegister();
     if (error) return showToast(error, "error");
 
-    // Mapping frontend → backend fields
+    setIsSubmitting(true);
+
     const payload = {
       Fname: registerForm.firstName,
       Lname: registerForm.lastName,
       Email: registerForm.email,
       Password: registerForm.password,
       Age: Number(registerForm.age),
-      Gender: registerForm.gender === "male", // true/false
+      Gender: registerForm.gender === "male",
       Phone: registerForm.phone,
       Address: registerForm.address,
     };
@@ -105,7 +107,6 @@ export default function AuthPage() {
     try {
       await register(payload);
       showToast("Registration successful! 🎉");
-
       setRegisterForm({
         email: "",
         firstName: "",
@@ -116,13 +117,11 @@ export default function AuthPage() {
         phone: "",
         address: "",
       });
-
       setPasswordStrength(0);
     } catch (err) {
-      showToast(
-        err.response?.data?.message || "Registration failed",
-        "error"
-      );
+      showToast(err.response?.data?.message || "Registration failed", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -161,11 +160,9 @@ export default function AuthPage() {
                 showPassword={showPassword}
                 togglePassword={togglePassword}
               />
-
-              <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
-                Login
+              <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
+                {isSubmitting ? "Processing..." : "Login"}
               </button>
-
               <div className="text-center text-gray-400 text-sm mt-2">
                 Don’t have an account?{" "}
                 <button type="button" onClick={() => setTab("register")} className="text-purple-400 hover:text-purple-300">
@@ -186,7 +183,6 @@ export default function AuthPage() {
               <Input label="Email *" name="email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
               <Input label="First Name *" name="firstName" value={registerForm.firstName} onChange={handleRegisterChange} required />
               <Input label="Last Name" name="lastName" value={registerForm.lastName} onChange={handleRegisterChange} />
-
               <PasswordInput
                 label="Password *"
                 name="password"
@@ -195,8 +191,6 @@ export default function AuthPage() {
                 showPassword={showPassword}
                 togglePassword={togglePassword}
               />
-
-              {/* Password Strength Meter */}
               <div className="relative">
                 <motion.div className="w-full h-2 bg-gray-700/50 rounded-xl overflow-hidden" initial={false}>
                   <motion.div
@@ -226,7 +220,6 @@ export default function AuthPage() {
                     transition={{ duration: 0.4 }}
                   />
                 </motion.div>
-
                 <motion.p
                   className="mt-1 text-sm font-semibold"
                   animate={{
@@ -256,18 +249,16 @@ export default function AuthPage() {
               </div>
 
               <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
-
               <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
                 <option value="">Select Gender</option>
                 <option value="male" className="text-gray-900">Male</option>
                 <option value="female" className="text-gray-900">Female</option>
               </select>
-
               <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
               <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />
 
-              <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
-                Register
+              <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
+                {isSubmitting ? "Processing..." : "Register"}
               </button>
 
               <div className="text-center text-gray-400 text-sm mt-2">
