@@ -4,6 +4,7 @@ import App from "./App";
 import "./index.css";
 import  ToastProvider  from "./components/ToastProvider";// ← أضف ده
 import { BrowserRouter as Router } from "react-router-dom";
+import { injectSpeedInsights } from "@vercel/speed-insights";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -14,3 +15,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </ToastProvider>
   </React.StrictMode>
 );
+
+// Inject Vercel Speed Insights
+injectSpeedInsights();
