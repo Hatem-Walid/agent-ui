@@ -77,8 +77,6 @@ export default function SplineAgentPage() {
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef(null);
-  
-  // Ref للملف المخفي
   const fileInputRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -89,47 +87,66 @@ export default function SplineAgentPage() {
     scrollToBottom();
   }, [messages]);
 
-  // دالة التعامل مع رفع الملف
+  // --- الدالة المعدلة للتوافق مع C# Backend ---
   const handleFileUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!started) setStarted(true);
 
-    // 1. عرض رسالة أن المستخدم يرفع ملف
-    const userMessage = { sender: "user", text: `📎 File uploaded: ${file.name}` };
+    // 1. عرض رسالة للمستخدم
+    const userMessage = { sender: "user", text: `📎 Uploading: ${file.name}...` };
     setMessages((prev) => [...prev, userMessage]);
 
     try {
+      // 2. استخدام FormData لأن الـ Backend يستخدم [FromForm]
       const formData = new FormData();
-      formData.append('file', file);
+      // *هام*: الاسم هنا 'formFile' ليطابق اسم المتغير في دالة الـ C#
+      formData.append('formFile', file); 
 
-      // 2. إرسال الملف إلى الـ End Point
-      // استبدل هذا الرابط بالـ End Point الخاص بك
+      // *تنبيه*: إذا كان الـ Backend يحتاج توكن (Auth Token)، يجب إضافته في الـ Headers هنا
       const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Message', {
         method: 'POST',
-        body: formData
+        // لا تضع Content-Type يدوياً عند استخدام FormData، المتصفح يضعه تلقائياً
+        body: formData,
+        // headers: {
+        //   'Authorization': `Bearer ${token}` // فك التعليق لو عندك توكن محفوظ
+        // }
       });
 
-      if (!response.ok) throw new Error('Network response was not ok');
+      if (!response.ok) {
+        // محاولة قراءة رسالة الخطأ من السيرفر
+        const errorText = await response.text();
+        throw new Error(`Server Error: ${response.status} - ${errorText}`);
+      }
 
-      // 3. استقبال الرد (Text أو JSON حسب الموديل)
-      const data = await response.json(); 
-      // لو الرد JSON استخدم: const data = await response.json(); ثم استخرج النص data.message مثلاً
+      // 3. استقبال الرد JSON
+      const data = await response.json();
 
-      // 4. عرض رد الموديل
-      setMessages((prev) => [...prev, { sender: "bot", text: data }]);
+      // 4. تنسيق الرد بناءً على الحقول التي يرجعها الـ C#
+      // الحقول هي: Status, Vulnerability_name, Label, Comment, Filename
+      const formattedReply = `
+🔍 Analysis Result for ${data.Filename || "File"}:
+
+• Status: ${data.Status || "N/A"}
+• Vulnerability: ${data.Vulnerability_name || "None detected"}
+• Label: ${data.Label || "Safe"}
+
+📝 Comment:
+${data.Comment || "No comments provided."}
+      `.trim();
+
+      setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
 
     } catch (error) {
       console.error("Upload Error:", error);
-      setMessages((prev) => [...prev, { sender: "bot", text: "Error uploading or processing file." }]);
+      setMessages((prev) => [...prev, { sender: "bot", text: "❌ Failed to process file. Make sure you are logged in or the server is reachable." }]);
     }
 
-    // تصفير المدخل ليسمح برفع نفس الملف مرة أخرى إذا لزم الأمر
+    // تصفير المدخل
     event.target.value = null;
   };
 
-  // دالة لفتح نافذة اختيار الملف عند الضغط على زر المشبك
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
@@ -375,7 +392,8 @@ export default function SplineAgentPage() {
                           </div>
                         )}
                         <div className="flex-1">
-                          <p className="leading-relaxed">{msg.text}</p>
+                          {/* هنا نقوم بمعالجة الأسطر الجديدة في الرد */}
+                          <div className="leading-relaxed whitespace-pre-wrap">{msg.text}</div>
                           <p className="text-xs opacity-70 mt-2">
                             {msg.sender === "user" ? "You" : "Spline Agent"} • Just now
                           </p>
