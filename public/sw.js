@@ -10,8 +10,7 @@ const API_CACHE = "agentx-api-cache";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
-  "/favicon.ico",
-  "/manifest.json",
+  "/public/manifest.json",
 ];
 
 // ===============================
@@ -63,71 +62,21 @@ async function handleAPIRequest(req) {
   const cache = await caches.open(API_CACHE);
   const cached = await cache.match(req);
 
-  // حاول ترجع الكاش الأول عشان السرعة
   const networkFetch = fetch(req)
     .then((res) => {
-      cache.put(req, res.clone());
+      // Clone immediately for caching
+      const resClone = res.clone();
+      cache.put(req, resClone).catch(() => {});
       return res;
     })
     .catch(() => cached);
 
-  // لو فيه كاش → رجّعه فوراً
   return cached || networkFetch;
 }
 
 // ===============================
-// Fetch Handler
+// Failed POST Queue for Background Sync
 // ===============================
-self.addEventListener("fetch", (event) => {
-  const req = event.request;
-
-  // 3D Assets → fetch only
-  if (isHeavy3D(req.url)) {
-    event.respondWith(fetch(req));
-    return;
-  }
-
-  // API Requests (JSON)
-  if (req.url.includes("/api")) {
-    event.respondWith(handleAPIRequest(req));
-    return;
-  }
-
-  // HTML → network first
-  if (isHTML(req)) {
-    event.respondWith(
-      fetch(req).catch(() => caches.match("/index.html"))
-    );
-    return;
-  }
-
-  // Static → cache first
-  event.respondWith(
-    caches.match(req).then((cacheRes) => {
-      if (cacheRes) return cacheRes;
-
-      return fetch(req).then((networkRes) => {
-        if (req.url.startsWith(self.location.origin)) {
-          caches.open(CACHE_NAME).then((cache) =>
-            cache.put(req, networkRes.clone())
-          );
-        }
-        return networkRes;
-      });
-    })
-  );
-});
-
-// ===============================
-// 2) Background Sync
-// ===============================
-self.addEventListener("sync", async (event) => {
-  if (event.tag === "retry-api-queue") {
-    console.log("[BG SYNC] Retrying queued requests...");
-    event.waitUntil(processFailedQueue());
-  }
-});
-
 const failedQueue = [];
 
 async function processFailedQueue() {
@@ -143,33 +92,96 @@ async function processFailedQueue() {
   }
 }
 
-// intercept failed POST
+// ===============================
+// Fetch Handler
+// ===============================
 self.addEventListener("fetch", (event) => {
   const req = event.request;
 
+  // Skip 3D / heavy assets
+  if (isHeavy3D(req.url)) {
+    event.respondWith(fetch(req));
+    return;
+  }
+
+  // Handle POST API requests for offline
   if (req.method === "POST" && req.url.includes("/api")) {
     event.respondWith(
-      fetch(req).catch(async () => {
-        const cloned = req.clone();
-        const body = await cloned.json();
-        failedQueue.push({
-          url: req.url,
-          options: {
-            method: "POST",
-            headers: cloned.headers,
-            body: JSON.stringify(body),
-          },
-        });
+      (async () => {
+        try {
+          return await fetch(req);
+        } catch {
+          // Clone request safely before reading body
+          const cloned = req.clone();
+          let bodyText = null;
+          try {
+            bodyText = await cloned.text();
+          } catch {}
 
-        // schedule background sync
-        self.registration.sync.register("retry-api-queue");
+          failedQueue.push({
+            url: req.url,
+            options: {
+              method: "POST",
+              headers: cloned.headers,
+              body: bodyText,
+            },
+          });
 
-        return new Response(
-          JSON.stringify({ message: "Saved offline & will retry" }),
-          { status: 202 }
-        );
-      })
+          // schedule background sync
+          self.registration.sync.register("retry-api-queue");
+
+          return new Response(
+            JSON.stringify({ message: "Saved offline & will retry" }),
+            { status: 202 }
+          );
+        }
+      })()
     );
+    return;
+  }
+
+  // API requests → Cache first then network
+  if (req.url.includes("/api")) {
+    event.respondWith(handleAPIRequest(req));
+    return;
+  }
+
+  // HTML → Network first
+  if (isHTML(req)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => res)
+        .catch(() => caches.match("/index.html"))
+    );
+    return;
+  }
+
+  // Static → Cache first
+  event.respondWith(
+    caches.match(req).then((cacheRes) => {
+      if (cacheRes) return cacheRes;
+
+      return fetch(req).then((networkRes) => {
+        if (req.url.startsWith(self.location.origin)) {
+          // Clone for cache safely
+          const resClone = networkRes.clone();
+          caches.open(CACHE_NAME).then((cache) =>
+            cache.put(req, resClone).catch(() => {})
+          );
+        }
+        return networkRes;
+      });
+    })
+  );
+});
+
+// ===============================
+// 2) Background Sync
+// ===============================
+self.addEventListener("sync", async (event) => {
+  if (event.tag === "retry-api-queue") {
+    console.log("[BG SYNC] Retrying queued requests...");
+    event.waitUntil(processFailedQueue());
   }
 });
 
@@ -194,7 +206,6 @@ self.addEventListener("push", (event) => {
 // Handle click
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-
   event.waitUntil(
     clients.openWindow("https://agent-ui.com/ai") // غيّر اللينك حسب المشروع
   );
