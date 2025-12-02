@@ -105,7 +105,7 @@ export default function SplineAgentPage() {
       formData.append('formFile', file); 
 
       // *تنبيه*: إذا كان الـ Backend يحتاج توكن (Auth Token)، يجب إضافته في الـ Headers هنا
-      const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Message', {
+      const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Chat/Message', {
         method: 'POST',
         // لا تضع Content-Type يدوياً عند استخدام FormData، المتصفح يضعه تلقائياً
         body: formData,
