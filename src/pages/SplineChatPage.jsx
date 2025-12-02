@@ -86,46 +86,36 @@ export default function SplineAgentPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+const handleFileUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-  // --- الدالة المعدلة للتوافق مع C# Backend ---
-  const handleFileUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  if (!started) setStarted(true);
 
-    if (!started) setStarted(true);
+  // عرض رسالة للمستخدم
+  const userMessage = { sender: "user", text: `📎 Uploading: ${file.name}...` };
+  setMessages((prev) => [...prev, userMessage]);
 
-    // 1. عرض رسالة للمستخدم
-    const userMessage = { sender: "user", text: `📎 Uploading: ${file.name}...` };
-    setMessages((prev) => [...prev, userMessage]);
+  try {
+    const formData = new FormData();
+    formData.append('formFile', file); // لازم الاسم يكون formFile
 
-    try {
-      // 2. استخدام FormData لأن الـ Backend يستخدم [FromForm]
-      const formData = new FormData();
-      // *هام*: الاسم هنا 'formFile' ليطابق اسم المتغير في دالة الـ C#
-      formData.append('formFile', file); 
-
-      // *تنبيه*: إذا كان الـ Backend يحتاج توكن (Auth Token)، يجب إضافته في الـ Headers هنا
-      const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Chat/Message', {
-        method: 'POST',
-        // لا تضع Content-Type يدوياً عند استخدام FormData، المتصفح يضعه تلقائياً
-        body: formData,
-         headers: {
-           'Authorization': `Bearer ${token}` // فك التعليق لو عندك توكن محفوظ
-        }
-      });
-
-      if (!response.ok) {
-        // محاولة قراءة رسالة الخطأ من السيرفر
-        const errorText = await response.text();
-        throw new Error(`Server Error: ${response.status} - ${errorText}`);
+    const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Message', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${token}` // فك التعليق لو عندك توكن
       }
+    });
 
-      // 3. استقبال الرد JSON
-      const data = await response.json();
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server Error: ${response.status} - ${errorText}`);
+    }
 
-      // 4. تنسيق الرد بناءً على الحقول التي يرجعها الـ C#
-      // الحقول هي: Status, Vulnerability_name, Label, Comment, Filename
-      const formattedReply = `
+    const data = await response.json();
+
+    const formattedReply = `
 🔍 Analysis Result for ${data.Filename || "File"}:
 
 • Status: ${data.Status || "N/A"}
@@ -134,42 +124,18 @@ export default function SplineAgentPage() {
 
 📝 Comment:
 ${data.Comment || "No comments provided."}
-      `.trim();
+    `.trim();
 
-      setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
+    setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
 
-    } catch (error) {
-      console.error("Upload Error:", error);
-      setMessages((prev) => [...prev, { sender: "bot", text: "❌ Failed to process file. Make sure you are logged in or the server is reachable." }]);
-    }
+  } catch (error) {
+    console.error("Upload Error:", error);
+    setMessages((prev) => [...prev, { sender: "bot", text: "❌ Failed to process file. Make sure you are logged in or the server is reachable." }]);
+  }
 
-    // تصفير المدخل
-    event.target.value = null;
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    if (!started) setStarted(true);
-
-    const userMessage = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-
-    setTimeout(() => {
-      const botResponses = [
-        "I understand your question about the project timeline. Let me check the latest updates...",
-        "Based on the current progress, we're on track to deliver by next Friday.",
-        "Would you like me to schedule a meeting with the development team to discuss this further?",
-        "I've analyzed the data and found some interesting patterns you should consider."
-      ];
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      setMessages((prev) => [...prev, { sender: "bot", text: randomResponse }]);
-    }, 1000);
-  };
+  // تصفير المدخل
+  event.target.value = null;
+};
 
   return (
     <div className="w-full h-screen relative overflow-hidden bg-black ">
