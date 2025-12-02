@@ -40,7 +40,7 @@ const ShinyInput = ({
   shinySpeed = 3,
   textColor = "#b5b5b5a4",
   shineColor = "rgba(255, 255, 255, 0.8)",
-  textClassName = "" // ← تأكد من وجود هذا
+  textClassName = "" 
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -61,7 +61,7 @@ const ShinyInput = ({
           <ShinyText 
             text={placeholder} 
             speed={shinySpeed}
-            className={`text-current ${textClassName}`} // ← استخدام textClassName هنا
+            className={`text-current ${textClassName}`} 
             textColor={textColor}
             shineColor={shineColor}
           />
@@ -77,6 +77,9 @@ export default function SplineAgentPage() {
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Ref للملف المخفي
+  const fileInputRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -85,6 +88,51 @@ export default function SplineAgentPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // دالة التعامل مع رفع الملف
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!started) setStarted(true);
+
+    // 1. عرض رسالة أن المستخدم يرفع ملف
+    const userMessage = { sender: "user", text: `📎 File uploaded: ${file.name}` };
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // 2. إرسال الملف إلى الـ End Point
+      // استبدل هذا الرابط بالـ End Point الخاص بك
+      const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Message', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      // 3. استقبال الرد (Text أو JSON حسب الموديل)
+      const data = await response.json(); 
+      // لو الرد JSON استخدم: const data = await response.json(); ثم استخرج النص data.message مثلاً
+
+      // 4. عرض رد الموديل
+      setMessages((prev) => [...prev, { sender: "bot", text: data }]);
+
+    } catch (error) {
+      console.error("Upload Error:", error);
+      setMessages((prev) => [...prev, { sender: "bot", text: "Error uploading or processing file." }]);
+    }
+
+    // تصفير المدخل ليسمح برفع نفس الملف مرة أخرى إذا لزم الأمر
+    event.target.value = null;
+  };
+
+  // دالة لفتح نافذة اختيار الملف عند الضغط على زر المشبك
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -108,6 +156,14 @@ export default function SplineAgentPage() {
 
   return (
     <div className="w-full h-screen relative overflow-hidden bg-black ">
+
+      {/* Input مخفي للتعامل مع الملفات */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        className="hidden"
+      />
 
       {/* Background Spline */}
       <div className="absolute inset-0 z-0">
@@ -259,9 +315,19 @@ export default function SplineAgentPage() {
               initial={{ y: 30, opacity: 0 }} 
               animate={{ y: 0, opacity: 1 }} 
               transition={{ delay: 0.4 }} 
-              className="w-full max-w-2xl bg-black/50 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-2xl flex items-center pointer-events-auto"
+              className="w-full max-w-2xl bg-black/50 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-2xl flex items-center pointer-events-auto gap-2"
             >
-              {/* استبدال input العادي بـ ShinyInput */}
+               {/* زر المشبك في الشاشة الأولى */}
+               <button
+                onClick={triggerFileInput}
+                className="p-3 text-white/70 hover:text-white transition-colors duration-200"
+                title="Upload file"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                </svg>
+              </button>
+
               <ShinyInput
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -326,8 +392,20 @@ export default function SplineAgentPage() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input bar مع ShinyInput */}
-            <div className="p-8 flex gap-4 pointer-events-auto bg-black/70 rounded-full">
+              {/* Input bar مع ShinyInput وزر المشبك */}
+            <div className="p-8 flex gap-4 pointer-events-auto bg-black/70 rounded-full items-center">
+                
+                {/* زر المشبك في واجهة الشات */}
+                <button
+                    onClick={triggerFileInput}
+                    className="p-3 text-white/70 hover:text-white transition-colors duration-200 border border-white/20 rounded-full hover:bg-white/10"
+                    title="Upload file"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                    </svg>
+                </button>
+
                 <ShinyInput
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -335,7 +413,7 @@ export default function SplineAgentPage() {
                     placeholder="Message your AI agent..."
                     className="flex-1 bg-black/70 border border-white/20 p-5 rounded-full"
                     shinySpeed={3}
-                    textClassName="ml-9" // ← إضافة هذا السطر
+                    textClassName="ml-9" 
                 />
 
                 <button 
@@ -350,7 +428,6 @@ export default function SplineAgentPage() {
         </AnimatePresence>
       </div>
 
-      {/* إضافة الـ styles للـ shine animation */}
       <style>{`
         @keyframes shine {
           0% { background-position: 100%; }
