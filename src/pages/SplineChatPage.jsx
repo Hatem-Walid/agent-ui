@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Spline from "@splinetool/react-spline";
 import { motion, AnimatePresence } from "framer-motion";
-
+ import apiClient from "../api/apiClient"; // استورد ملف الـ axios اللي انت عاملها
 // مكون ShinyText مع إمكانية تعديل الألوان
 const ShinyText = ({ 
   text, 
@@ -86,57 +86,87 @@ export default function SplineAgentPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+  // --- الدالة المعدلة للتوافق مع C# Backend ---
 const handleFileUpload = async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
 
+  // ✅ التحقق من التوكن
+  const token = sessionStorage.getItem("token");
+  if (!token) {
+    console.warn("No token found in sessionStorage");
+  }
+
   if (!started) setStarted(true);
 
-  // عرض رسالة للمستخدم
-  const userMessage = { sender: "user", text: `📎 Uploading: ${file.name}...` };
-  setMessages((prev) => [...prev, userMessage]);
+  setMessages((prev) => [...prev, { sender: "user", text: `📎 Uploading: ${file.name}...` }]);
 
   try {
     const formData = new FormData();
-    formData.append('formFile', file); // لازم الاسم يكون formFile
+    formData.append('formFile', file); // الاسم لازم يكون زي السيرفر
 
-    const response = await fetch('https://bipartisan-sudie-noncontentiously.ngrok-free.dev/api/v1/Message', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${token}` // فك التعليق لو عندك توكن
-      }
-    });
+    // نستخدم apiClient اللي فيه interceptor للتوكن
+    const response = await apiClient.post("/api/v1/Chat/Message", formData);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server Error: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
+    const data = response.data;
 
     const formattedReply = `
-🔍 Analysis Result for ${data.Filename || "File"}:
+🔍 Analysis Result for ${data.filename || "File"}:
 
-• Status: ${data.Status || "N/A"}
-• Vulnerability: ${data.Vulnerability_name || "None detected"}
-• Label: ${data.Label || "Safe"}
+• Status: ${data.status || "N/A"}
+• Vulnerability: ${data.vulnerability_name || "None detected"}
+• Label: ${data.label || "Safe"}
 
 📝 Comment:
-${data.Comment || "No comments provided."}
+${data.comment || "No comments provided."}
     `.trim();
 
     setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
 
-  } catch (error) {
-    console.error("Upload Error:", error);
-    setMessages((prev) => [...prev, { sender: "bot", text: "❌ Failed to process file. Make sure you are logged in or the server is reachable." }]);
+  } catch (err) {
+    console.error("Upload Error:", err);
+
+    let msg = "❌ Failed to process file.";
+    if (err.response) {
+      // عرض تفاصيل الخطأ لو السيرفر رجع response
+      msg += `\nStatus: ${err.response.status}\nData: ${JSON.stringify(err.response.data)}`;
+    } else {
+      msg += `\nError: ${err.message}`;
+    }
+
+    setMessages((prev) => [...prev, { sender: "bot", text: msg }]);
   }
 
-  // تصفير المدخل
   event.target.value = null;
 };
 
+const triggerFileInput = () => {
+  fileInputRef.current?.click();
+};
+
+const sendMessage = () => {
+  if (!input.trim()) return;
+  if (!started) setStarted(true);
+
+  const userMessage = { sender: "user", text: input };
+  setMessages((prev) => [...prev, userMessage]);
+  setInput("");
+
+  setTimeout(() => {
+    const botResponses = [
+      "I understand your question about the project timeline. Let me check the latest updates...",
+      "Based on the current progress, we're on track to deliver by next Friday.",
+      "Would you like me to schedule a meeting with the development team to discuss this further?",
+      "I've analyzed the data and found some interesting patterns you should consider."
+    ];
+    const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+    setMessages((prev) => [...prev, { sender: "bot", text: randomResponse }]);
+  }, 1000);
+};
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div className="w-full h-screen relative overflow-hidden bg-black ">
 
