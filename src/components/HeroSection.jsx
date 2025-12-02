@@ -1,10 +1,12 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, Suspense, lazy, memo } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
-import LiquidEther from "./LiquidEther";
 
-export default function Hero() {
+// Lazy load LiquidEther
+const LiquidEther = lazy(() => import("./LiquidEther"));
+
+function Hero() {
   const navigate = useNavigate();
   const heroRef = useRef(null);
 
@@ -22,10 +24,9 @@ export default function Hero() {
       gsap.set(".hero-desc", { autoAlpha: 0, y: 25 });
       gsap.to(".hero-desc", { autoAlpha: 1, y: 0, duration: 1.2, delay: 0.9 });
 
-      // Buttons منفصلين لضمان الظهور
+      // Buttons
       gsap.set(["#get-started", "#learn-more"], { autoAlpha: 0, y: 20 });
-      gsap.to("#get-started", { autoAlpha: 1, y: 0, duration: 1, delay: 1.2 });
-      gsap.to("#learn-more", { autoAlpha: 1, y: 0, duration: 1, delay: 1.4 });
+      gsap.to(["#get-started", "#learn-more"], { autoAlpha: 1, y: 0, duration: 1, delay: 1.2, stagger: 0.2 });
 
       // Info
       gsap.set(".hero-info", { autoAlpha: 0 });
@@ -41,9 +42,12 @@ export default function Hero() {
       className="relative min-h-[100vh] flex flex-col items-center justify-center text-center overflow-visible px-6 lg:px-8 bg-transparent"
     >
       {/* Liquid Ether Background */}
-      <div className="absolute inset-0 -z-10 w-full h-full pointer-events-none">
-        <LiquidEther className="w-full h-full" />
-      </div>
+      <Suspense fallback={<div className="absolute inset-0 -z-10 bg-black"></div>}>
+        <div className="absolute inset-0 -z-10 w-full h-full pointer-events-none">
+          <LiquidEther className="w-full h-full" />
+        </div>
+      </Suspense>
+
       <div className="absolute inset-0 -z-20 bg-black"></div>
 
       {/* Content */}
@@ -110,3 +114,6 @@ export default function Hero() {
     </section>
   );
 }
+
+// Memoize the component
+export default memo(Hero);

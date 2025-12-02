@@ -111,7 +111,7 @@ export default function SplineAgentPage() {
 
       {/* Background Spline */}
       <div className="absolute inset-0 z-0">
-        <Spline scene="https://prod.spline.design/u6UUd9ny38gtOZtR/scene.splinecode" />
+        <Spline scene="https://prod.spline.design/A9xBImxmWqFKUZaU/scene.splinecode" />
       </div>
 
       {/* Sidebar toggle button */}
