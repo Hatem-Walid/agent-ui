@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet";
 
 // Lazy load لكل الـComponents
-// const HeroSection = lazy(() => import("../components/HeroSection"));
+const HeroSection = lazy(() => import("../components/HeroSection"));
 const Highlights = lazy(() => import("../components/Highlights"));
 const AnimatedCards = lazy(() => import("../components/AnimatedCards"));
 const Footer = lazy(() => import("../components/Footer"));
@@ -34,7 +34,7 @@ const Home = () => {
 
       {/* Components */}
       <Suspense fallback={<div>Loading...</div>}>
-        {/* <HeroSection /> */}
+        <HeroSection />
         <PartnersSection />
         <PlatformOverview
           textAutoHide={true}
