@@ -2,27 +2,55 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png+xml" href="./public/assets/logo.png" />
 
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0d1117">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
 
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d1117" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agent-ui</title>
-  </head>
-  <body>
     
-    <div id="root"></div>
+    <!-- تحسين SEO -->
+    <title>Agent UI - Dashboard</title>
+    <meta name="description" content="مرحباً بك في Agent UI، منصة لإدارة ومتابعة الأداء والفحص الأمني بطريقة سهلة وفعالة.">
+    <meta name="keywords" content="Agent UI, dashboard, security, performance, monitoring">
+    <meta name="author" content="Agent UI Team">
+
+    <!-- ⚡ تحسين سرعة الظهور: Skeleton UI -->
+    <style>
+      #initial-loader {
+        width: 100%;
+        height: 100vh;
+        background: #0d1117;
+        color: #fff;
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Skeleton مكان React -->
+    <div id="root">
+      <div id="initial-loader">Loading...</div>
+    </div>
+
+    <!-- React/Vite Entry -->
     <script type="module" src="/src/main.jsx"></script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
 
-      .then(() => console.log('✅ Service Worker registered'))
-      .catch(err => console.log('❌ SW failed:', err));
-  }
-</script>
-
+    <!-- Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then(() => console.log("🥇 Service Worker registered"))
+          .catch((err) => console.log("❌ SW failed:", err));
+      }
+    </script>
   </body>
 </html>

@@ -163,7 +163,7 @@ const Navbar = () => {
             to="/auth"
             className="navbar-cta-button bg-black text-amber-100 hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 items-center h-full font-medium cursor-pointer transition-colors duration-300"
           >
-            Get Started
+            Login
           </Link>
         </div>
 

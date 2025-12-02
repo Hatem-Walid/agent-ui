@@ -8,15 +8,14 @@ module.exports = {
     extend: {
       keyframes: {
         shine: {
-          '0%': { 'background-position': '100%' },
-          '100%': { 'background-position': '-100%' },
+          "0%": { backgroundPositionX: "200%" },
+          "100%": { backgroundPositionX: "-200%" },
         },
       },
       animation: {
-        shine: 'shine 5s linear infinite',
+        shine: "shine 4s linear infinite",
       },
     },
   },
   plugins: [],
-}
-
+};

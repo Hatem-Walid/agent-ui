@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AuthPage from "./pages/AuthPage"; 
 import About from "./pages/About";
-// import SplineChatPage from "./pages/SplineChatPage";
+import SplineChatPage from "./pages/SplineChatPage";
 import './App.css';
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/About" element={<About />} />
-        {/* <Route path="/ai" element={<SplineChatPage />} /> */}
+        <Route path="/ai" element={<SplineChatPage />} />
       </Routes>
     </>
   );
