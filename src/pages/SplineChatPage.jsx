@@ -109,9 +109,9 @@ export default function SplineAgentPage() {
         method: 'POST',
         // لا تضع Content-Type يدوياً عند استخدام FormData، المتصفح يضعه تلقائياً
         body: formData,
-        // headers: {
-        //   'Authorization': `Bearer ${token}` // فك التعليق لو عندك توكن محفوظ
-        // }
+         headers: {
+           'Authorization': `Bearer ${token}` // فك التعليق لو عندك توكن محفوظ
+        }
       });
 
       if (!response.ok) {
