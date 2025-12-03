@@ -158,8 +158,13 @@ const Navbar = () => {
           </div>
 
           {/* Logo */}
-          <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 text-white font-bold text-lg">
-            VulnSneak
+         <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
+            {/* استخدام وسم <img> لعرض الصورة داخل الصفحة */}
+            <img 
+              src="public\assets\vuln-logo.png" 
+              alt="Logo" 
+              className="h-30 w-auto" // يمكنك تعديل حجم الصورة هنا
+            />
           </div>
 
           {/* 3. Get Started button area - AUTH LOGIC ADDED HERE */}
