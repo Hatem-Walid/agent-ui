@@ -55,12 +55,12 @@ function Hero() {
         {/* Badge */}
         <div className="badge inline-flex items-center gap-2 bg-purple-100/15 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 backdrop-blur-sm border border-white/20 cursor-default">
           <Shield className="w-4 h-4" />
-          CyberAgentX
+          VulnSneak
         </div>
 
         {/* Main Heading */}
         <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-bold mb-1 block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 leading-snug md:leading-normal">
-          Empower Your Security with AI
+          Improve Your Security with AI
         </h1>
 
         {/* Description */}
@@ -86,7 +86,7 @@ function Hero() {
 
           <button
             id="learn-more"
-            onClick={() => navigate("/ai")}
+            onClick={() => navigate("/blog")}
             className="relative px-9 py-2 rounded-full font-semibold text-white text-base md:text-lg
               backdrop-blur-2xl bg-white/10 border border-white/20
               hover:bg-white/20 transition-all duration-300 
@@ -102,7 +102,7 @@ function Hero() {
         <div className="hero-info mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center text-sm text-gray-400">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            Trusted by 10,000+ security teams
+            Coverd 8 vernable security bugs
           </div>
           <div className="hidden sm:block">•</div>
           <div className="flex items-center gap-2">
