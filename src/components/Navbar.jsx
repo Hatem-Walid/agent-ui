@@ -19,7 +19,7 @@ const Navbar = () => {
       textColor: "#fff",
       links: [
         { label: "Home", href: "/" },
-        { label: "Pricing Plans", href: "/pricing" }, // تأكد ان الرابط مطابق للراوتر عندك
+        { label: "Pricing Plans", href: "/plan" }, // تأكد ان الرابط مطابق للراوتر عندك
         { label: "AI Chat / Assistant", href: "/ai" } // عدلت الرابط لصفحة الشات
       ]
     },

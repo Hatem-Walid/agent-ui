@@ -19,8 +19,8 @@ export default function AuthPage() {
   useEffect(() => {
     if (tab === "register" && !planId) {
        // لو عايز تجبره يختار خطة فعل السطر ده، لو مش عايز سيبه
-       // showToast("Please choose a plan first", "warning");
-       // navigate("/pricing"); 
+       showToast("Please choose a plan first", "warning");
+       navigate("/plan"); 
     }
   }, [tab, planId, navigate]);
 
