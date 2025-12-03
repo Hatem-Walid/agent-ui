@@ -164,8 +164,8 @@ export default function Docs() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-purple-300 mb-12 text-center">
+      <main className="flex-1 p-6 mt-20 ml-20 max-w-5xl mx-auto">
+        <h1 className="text-4xl pr-25 font-bold text-purple-300 mb-12 text-center">
           VulunSneak Documentation
         </h1>
 

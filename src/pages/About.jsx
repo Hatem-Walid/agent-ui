@@ -11,22 +11,22 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
 
   const demo = [
     {
-      image: '/assets/ibrahem.png',
-      title: 'Alex Rivera',
-      subtitle: 'Full Stack Developer',
-      handle: '@alexrivera',
+      image: '/assets/team_pics/S7S.jpg',
+      title: 'Mohamed Hussien',
+      subtitle: 'Cybersecurity developer',
+      handle: '@S7S',
       borderColor: '#4F46E5',
       gradient: 'linear-gradient(145deg,#4F46E5,#000)',
       url: 'https://github.com/'
     },
     {
-      image: '/assets/ibrahem.png',
-      title: 'Jordan Chen',
-      subtitle: 'DevOps Engineer',
-      handle: '@jordanchen',
+      image: '/assets/team_pics/ibrahem.png',
+      title: 'Ibrahim Mahmoud',
+      subtitle: 'Cybersecurity developer',
+      handle: '@im8114630',
       borderColor: '#10B981',
       gradient: 'linear-gradient(210deg,#10B981,#000)',
-      url: 'https://linkedin.com/in/'
+      url: 'https://www.linkedin.com/in/ibrahim-mahmoud-80b1a5358?utm_source=share_via&utm_content=profile&utm_medium=member_android'
     },
     {
       image: 'https://i.pravatar.cc/300?img=3',
@@ -38,13 +38,13 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://dribbble.com/'
     },
     {
-      image: 'https://i.pravatar.cc/300?img=16',
-      title: 'Casey Park',
-      subtitle: 'Data Scientist',
-      handle: '@caseypark',
+      image: '/assets/team_pics/khaled.jpg',
+      title: 'Mohamed Khaled',
+      subtitle: 'ML Engineer',
+      handle: '@mohamedkhalid',
       borderColor: '#EF4444',
       gradient: 'linear-gradient(195deg,#EF4444,#000)',
-      url: 'https://kaggle.com/'
+      url: 'https://www.linkedin.com/in/mohamed-khalid-mk/'
     },
     {
       image: 'https://i.pravatar.cc/300?img=25',
@@ -56,13 +56,13 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://github.com/'
     },
     {
-      image: 'https://i.pravatar.cc/300?img=60',
-      title: 'Tyler Rodriguez',
-      subtitle: 'Cloud Architect',
-      handle: '@tylerrod',
+      image: '/assets/team_pics/zoz.png',
+      title: 'Ziad Awad',
+      subtitle: 'Backend Developer',
+      handle: '@ziad.awad.9210',
       borderColor: '#06B6D4',
       gradient: 'linear-gradient(135deg,#06B6D4,#000)',
-      url: 'https://aws.amazon.com/'
+      url: 'https://www.linkedin.com/in/ziad-awad-2450a4318'
     },
     {
       image: 'https://i.pravatar.cc/300?img=11',
@@ -159,7 +159,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       />
       
       {/* المحتوى الرئيسي */}
-      <div className={`relative w-full pt-10 pb-22 flex flex-wrap justify-center items-start gap-3 ${className}`}>
+      <div className={`relative w-full pt-30 pb-22 flex flex-wrap justify-center items-start gap-5 ${className}`}>
         {data.map((c, i) => (
           <article
             key={i}

@@ -10,31 +10,32 @@ const Navbar = () => {
 
   const items = [
     {
-      label: "About",
+      label: "Platform ",
       bgColor: "#0D0716",
       textColor: "#fff",
       links: [
-        { label: "Company", href: "/About" },
-        { label: "Careers", href: "/About" }
+        { label: "Home", href: "/" },
+        { label: "Pricing Plans", href: "/plan" },
+        { label: "AI Chat / Assistant", href: "/ai" }
       ]
     },
     {
-      label: "Projects",
+      label: "Features & Resources",
       bgColor: "#170D27",
       textColor: "#fff",
       links: [
-        { label: "Featured", href: "/" },
-        { label: "Case Studies", href: "/" }
+        { label: "FAQ", href: "/faq" },
+        { label: "Blog", href: "/blog" },
+        { label: "Documentation", href: "/doc" } 
       ]
     },
     {
-      label: "Contact",
+      label: "Company",
       bgColor: "#271E37",
       textColor: "#fff",
       links: [
-        { label: "Email", href: "/auth" },
-        { label: "Twitter", href: "#" },
-        { label: "LinkedIn", href: "#" }
+        { label: "About Us", href: "/About" },
+        { label: "Contact Us", href: "/contact" },
       ]
     }
   ];

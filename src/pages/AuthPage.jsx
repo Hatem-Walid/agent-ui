@@ -251,8 +251,8 @@ export default function AuthPage() {
               <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
               <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
                 <option value="">Select Gender</option>
-                <option value="male" className="text-gray-900">Male</option>
-                <option value="female" className="text-gray-900">Female</option>
+                <option value="male" className="text-white/900">Male</option>
+                <option value="female" className="text-white/900">Female</option>
               </select>
               <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
               <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />
