@@ -163,7 +163,7 @@ const Navbar = () => {
             <img 
               src="public\assets\vuln-logo.png" 
               alt="Logo" 
-              className="h-30 w-auto" // يمكنك تعديل حجم الصورة هنا
+              className="h-10 w-auto" // يمكنك تعديل حجم الصورة هنا
             />
           </div>
 
