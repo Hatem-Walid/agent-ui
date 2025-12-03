@@ -1,7 +1,11 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // 1. استدعاء الكونتكست
+
 const Navbar = () => {
+  const { user, logout, isAuthenticated } = useAuth(); // 2. استخراج البيانات
+  
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const navRef = useRef(null);
@@ -15,8 +19,8 @@ const Navbar = () => {
       textColor: "#fff",
       links: [
         { label: "Home", href: "/" },
-        { label: "Pricing Plans", href: "/plan" },
-        { label: "AI Chat / Assistant", href: "/ai" }
+        { label: "Pricing Plans", href: "/pricing" }, // تأكد ان الرابط مطابق للراوتر عندك
+        { label: "AI Chat / Assistant", href: "/ai" } // عدلت الرابط لصفحة الشات
       ]
     },
     {
@@ -158,14 +162,31 @@ const Navbar = () => {
             🌟 MyLogo
           </div>
 
-          {/* Get Started button */}
-            <Link
-            id="Get-Started"
-            to="/auth"
-            className="navbar-cta-button bg-black text-amber-100 hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 items-center h-full font-medium cursor-pointer transition-colors duration-300"
-          >
-            Login
-          </Link>
+          {/* 3. Get Started button area - AUTH LOGIC ADDED HERE */}
+          <div className="hidden md:flex h-full items-center">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-1.5 border border-white/10">
+                <span className="text-purple-200 text-sm font-semibold truncate max-w-[100px]">
+                  {/* التعديل هنا: استخدام .name مباشرة لأننا خزننا الاسم الكامل */}
+                  Hi, {user?.name || "User"}
+                </span>
+                <button
+                  onClick={logout}
+                  className="text-xs bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20 px-2 py-1 rounded transition-all duration-300"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                id="Get-Started"
+                to="/auth"
+                className="navbar-cta-button bg-black text-amber-100 border-0 rounded-[calc(0.75rem-0.2rem)] px-4 inline-flex items-center h-full font-medium cursor-pointer transition-colors duration-300 hover:bg-black/80"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
 
         <div
@@ -184,13 +205,14 @@ const Navbar = () => {
               <div className="nav-card-label font-normal tracking-[-0.5px] text-[18px] md:text-[22px]">{item.label}</div>
               <div className="nav-card-links mt-auto flex flex-col gap-[2px]">
                 {item.links.map((lnk, i) => (
-                  <a
+                  <Link // 4. استخدمت Link بدل a عشان يبقى SPA
                     key={`${lnk.label}-${i}`}
                     className="nav-card-link inline-flex items-center gap-[6px] no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
-                    href={lnk.href}
+                    to={lnk.href}
+                    style={{color: "inherit"}}
                   >
                     ➤ {lnk.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

@@ -1,19 +1,20 @@
 import { useState, useRef, useEffect } from "react";
 import Spline from "@splinetool/react-spline";
 import { motion, AnimatePresence } from "framer-motion";
- import apiClient from "../api/apiClient"; // استورد ملف الـ axios اللي انت عاملها
-// مكون ShinyText مع إمكانية تعديل الألوان
+import apiClient from "../api/apiClient"; 
+import { useAuth } from "../context/AuthContext"; // 1. استدعاء هوك المصادقة
+
+// --- ShinyText Component (زي ما هو) ---
 const ShinyText = ({ 
   text, 
   disabled = false, 
   speed = 5, 
   className = '',
-  textColor = "#b5b5b5a4", // لون النص الأساسي
-  shineColor = "rgba(255, 255, 255, 0.8)", // لون اللمعة
-  gradientAngle = 120 // زاوية التدرج
+  textColor = "#b5b5b5a4", 
+  shineColor = "rgba(255, 255, 255, 0.8)", 
+  gradientAngle = 120 
 }) => {
   const animationDuration = `${speed}s`;
-
   return (
     <div
       className={`bg-clip-text inline-block ${disabled ? '' : 'animate-shine'} ${className}`}
@@ -30,7 +31,7 @@ const ShinyText = ({
   );
 };
 
-// تأكد أن مكون ShinyInput به textClassName prop
+// --- ShinyInput Component (زي ما هو) ---
 const ShinyInput = ({ 
   value, 
   onChange, 
@@ -43,7 +44,6 @@ const ShinyInput = ({
   textClassName = "" 
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-
   return (
     <div className={`relative ${className}`}>
       <input
@@ -55,7 +55,6 @@ const ShinyInput = ({
         onBlur={() => setIsFocused(false)}
         className="w-full bg-transparent outline-none text-white relative z-10"
       />
-      
       {!value && !isFocused && (
         <div className="absolute inset-0 flex items-center pointer-events-none z-0">
           <ShinyText 
@@ -71,7 +70,9 @@ const ShinyInput = ({
   );
 };
 
+// --- Main Component ---
 export default function SplineAgentPage() {
+  const { user, logout } = useAuth(); // 2. استخدام بيانات اليوزر
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -86,32 +87,25 @@ export default function SplineAgentPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-// /////////////////////////////////////////////////////////////////////////////////////////////////////
-  // --- الدالة المعدلة للتوافق مع C# Backend ---
-const handleFileUpload = async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
 
-  // ✅ التحقق من التوكن
-  const token = sessionStorage.getItem("token");
-  if (!token) {
-    console.warn("No token found in sessionStorage");
-  }
+  // --- File Upload Logic ---
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  if (!started) setStarted(true);
+    if (!started) setStarted(true);
 
-  setMessages((prev) => [...prev, { sender: "user", text: `📎 Uploading: ${file.name}...` }]);
+    setMessages((prev) => [...prev, { sender: "user", text: `📎 Uploading: ${file.name}...` }]);
 
-  try {
-    const formData = new FormData();
-    formData.append('formFile', file); // الاسم لازم يكون زي السيرفر
+    try {
+      const formData = new FormData();
+      formData.append('formFile', file); 
 
-    // نستخدم apiClient اللي فيه interceptor للتوكن
-    const response = await apiClient.post("/api/v1/Chat/Message", formData);
+      // الـ apiClient المفروض يكون فيه Interceptor بيحط التوكن اوتوماتيك
+      const response = await apiClient.post("/api/v1/Chat/Message", formData);
 
-    const data = response.data;
-
-    const formattedReply = `
+      const data = response.data;
+      const formattedReply = `
 🔍 Analysis Result for ${data.filename || "File"}:
 
 • Status: ${data.status || "N/A"}
@@ -120,57 +114,54 @@ const handleFileUpload = async (event) => {
 
 📝 Comment:
 ${data.comment || "No comments provided."}
-    `.trim();
+      `.trim();
 
-    setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
+      setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
 
-  } catch (err) {
-    console.error("Upload Error:", err);
-
-    let msg = "❌ Failed to process file.";
-    if (err.response) {
-      // عرض تفاصيل الخطأ لو السيرفر رجع response
-      msg += `\nStatus: ${err.response.status}\nData: ${JSON.stringify(err.response.data)}`;
-    } else {
-      msg += `\nError: ${err.message}`;
+    } catch (err) {
+      console.error("Upload Error:", err);
+      let msg = "❌ Failed to process file.";
+      if (err.response) {
+        msg += `\nStatus: ${err.response.status}`;
+      } else {
+        msg += `\nError: ${err.message}`;
+      }
+      setMessages((prev) => [...prev, { sender: "bot", text: msg }]);
     }
+    event.target.value = null;
+  };
 
-    setMessages((prev) => [...prev, { sender: "bot", text: msg }]);
-  }
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
-  event.target.value = null;
-};
+  const sendMessage = () => {
+    if (!input.trim()) return;
+    if (!started) setStarted(true);
 
-const triggerFileInput = () => {
-  fileInputRef.current?.click();
-};
+    const userMessage = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
 
-const sendMessage = () => {
-  if (!input.trim()) return;
-  if (!started) setStarted(true);
+    setTimeout(() => {
+      const botResponses = [
+        "Processing your request...",
+        "I'm analyzing the security parameters based on your input.",
+        "Could you provide more details about the target system?",
+        "Log entry recorded. Awaiting further commands."
+      ];
+      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+      setMessages((prev) => [...prev, { sender: "bot", text: randomResponse }]);
+    }, 1000);
+  };
 
-  const userMessage = { sender: "user", text: input };
-  setMessages((prev) => [...prev, userMessage]);
-  setInput("");
+  // تجهيز اسم المستخدم للعرض
+  const firstName = user?.firstName || user?.Name || "User";
+  const userInitial = firstName.charAt(0).toUpperCase();
 
-  setTimeout(() => {
-    const botResponses = [
-      "I understand your question about the project timeline. Let me check the latest updates...",
-      "Based on the current progress, we're on track to deliver by next Friday.",
-      "Would you like me to schedule a meeting with the development team to discuss this further?",
-      "I've analyzed the data and found some interesting patterns you should consider."
-    ];
-    const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-    setMessages((prev) => [...prev, { sender: "bot", text: randomResponse }]);
-  }, 1000);
-};
-
-
-// /////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div className="w-full h-screen relative overflow-hidden bg-black ">
 
-      {/* Input مخفي للتعامل مع الملفات */}
       <input
         type="file"
         ref={fileInputRef}
@@ -178,12 +169,11 @@ const sendMessage = () => {
         className="hidden"
       />
 
-      {/* Background Spline */}
       <div className="absolute inset-0 z-0">
         <Spline scene="https://prod.spline.design/u6UUd9ny38gtOZtR/scene.splinecode" />
       </div>
 
-      {/* Sidebar toggle button */}
+      {/* Sidebar toggle */}
       <AnimatePresence>
         {!sidebarOpen && (
           <motion.button
@@ -205,11 +195,10 @@ const sendMessage = () => {
         )}
       </AnimatePresence>
 
-      {/* Enhanced Sidebar with Fade Effect */}
+      {/* Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
-            {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -218,7 +207,6 @@ const sendMessage = () => {
               className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
             />
             
-            {/* Sidebar */}
             <motion.div
               initial={{ opacity: 0, x: -320 }}
               animate={{ opacity: 1, x: 0 }}
@@ -227,15 +215,15 @@ const sendMessage = () => {
               className="fixed top-0 left-0 h-full w-77 z-50 pointer-events-auto overflow-y-auto"
             >
               <div className="h-full bg-gradient-to-b from-purple-900/40 to-black/95 backdrop-blur-2xl border-r border-white/10 p-6 flex flex-col shadow-2xl">
-                {/* Sidebar Header with Close Button */}
+                {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
-                      Vuln
+                      V
                     </div>
                     <div>
                       <h2 className="text-white font-bold text-xl">VULN SNEAK</h2>
-                      <p className="text-gray-400 text-sm">AI cyber Agent</p>
+                      <p className="text-gray-400 text-sm">AI Agent</p>
                     </div>
                   </div>
                   <button
@@ -246,52 +234,43 @@ const sendMessage = () => {
                   </button>
                 </div>
 
-                {/* Quick Stats */}
+                {/* Stats */}
                 <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/10">
-                  <h3 className="text-white font-semibold mb-3">Quick Stats</h3>
+                  <h3 className="text-white font-semibold mb-3">Session Stats</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-purple-500/20 rounded-xl p-3 text-center">
-                      <div className="text-purple-300 text-sm">Projects</div>
-                      <div className="text-white font-bold text-lg">12</div>
+                      <div className="text-purple-300 text-sm">Scans</div>
+                      <div className="text-white font-bold text-lg">Active</div>
                     </div>
                     <div className="bg-blue-500/20 rounded-xl p-3 text-center">
-                      <div className="text-blue-300 text-sm">Tasks</div>
-                      <div className="text-white font-bold text-lg">47</div>
+                      <div className="text-blue-300 text-sm">Status</div>
+                      <div className="text-white font-bold text-lg">Secure</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Recent Chats */}
+                {/* Menu / Chats */}
                 <div className="flex-1">
-                  <h3 className="text-white font-semibold mb-4">Recent Chats</h3>
+                  <h3 className="text-white font-semibold mb-4">History</h3>
                   <div className="space-y-3">
-                    {[{ name: "Project Analysis", time: "2 min ago", unread: true },
-                      { name: "Team Meeting Notes", time: "1 hour ago", unread: false },
-                      { name: "Budget Planning", time: "3 hours ago", unread: false },
-                      { name: "Design Review", time: "Yesterday", unread: false }
-                    ].map((chat, index) => (
-                      <div key={index} className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer group border border-transparent hover:border-white/10">
-                        <div className="flex justify-between items-center">
-                          <span className="text-white font-medium group-hover:text-purple-300 transition-colors">{chat.name}</span>
-                          {chat.unread && <span className="w-2 h-2 bg-green-400 rounded-full"></span>}
-                        </div>
-                        <p className="text-gray-400 text-sm mt-1">{chat.time}</p>
-                      </div>
-                    ))}
+                     <p className="text-gray-500 text-sm">No recent history...</p>
                   </div>
                 </div>
 
-                {/* User Profile */}
+                {/* User Profile - 3. عرض بيانات اليوزر ديناميكياً */}
                 <div className="pt-6 border-t border-white/10">
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer">
                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center text-white font-bold">
-                      H
+                      {userInitial}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-white font-medium">Hatem</p>
-                      <p className="text-gray-400 text-sm">Premium Plan</p>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-white font-medium truncate">{user?.name}</p>
+                      <p className="text-gray-400 text-xs truncate">{user?.Email || "User Email"}</p>
                     </div>
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    {/* Logout Button inside Sidebar (Optional) */}
+                    <button onClick={logout} className="text-red-400 hover:text-red-300 text-sm ml-2">
+                        ➔
+                    </button>
                   </div>
                 </div>
               </div>
@@ -300,10 +279,9 @@ const sendMessage = () => {
         )}
       </AnimatePresence>
 
-      {/* Main Content Area - Always Centered */}
+      {/* Main Content */}
       <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
         
-        {/* Initial screen */}
         {!started && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
@@ -317,10 +295,11 @@ const sendMessage = () => {
               className="text-center mb-12"
             >
               <h1 className="text-6xl text-shadow-purple-950 font-light bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent mb-4">
-                Hello, Hatem
+                {/* 4. تغيير التحية لتكون ديناميكية */}
+                Hello,{user?.name || "None"}
               </h1>
               <p className="text-gray-300 text-xl max-w-md mx-auto">
-                Your AI assistant is ready to help with projects, cyber analytics, and team coordination.
+                Ready to analyze vulnerabilities and secure your projects?
               </p>
             </motion.div>
 
@@ -330,7 +309,6 @@ const sendMessage = () => {
               transition={{ delay: 0.4 }} 
               className="w-full max-w-2xl bg-black/50 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-2xl flex items-center pointer-events-auto gap-2"
             >
-               {/* زر المشبك في الشاشة الأولى */}
                <button
                 onClick={triggerFileInput}
                 className="p-3 text-white/70 hover:text-white transition-colors duration-200"
@@ -359,7 +337,7 @@ const sendMessage = () => {
           </motion.div>
         )}
 
-        {/* Full chat UI */}
+        {/* Chat UI */}
         <AnimatePresence>
           {started && (
             <motion.div 
@@ -367,7 +345,6 @@ const sendMessage = () => {
               animate={{ opacity: 1, y: 0 }} 
               className="w-full h-full pt-24 max-w-6xl mx-auto flex flex-col pointer-events-none"
             >
-              {/* Messages Container */}
               <div className="flex-1 p-6 overflow-y-auto space-y-4">
                 {messages.map((msg, i) => (
                   <motion.div 
@@ -388,15 +365,15 @@ const sendMessage = () => {
                           </div>
                         )}
                         <div className="flex-1">
-                          {/* هنا نقوم بمعالجة الأسطر الجديدة في الرد */}
                           <div className="leading-relaxed whitespace-pre-wrap">{msg.text}</div>
                           <p className="text-xs opacity-70 mt-2">
                             {msg.sender === "user" ? "You" : "Spline Agent"} • Just now
                           </p>
                         </div>
                         {msg.sender === "user" && (
+                          // 5. الحرف الأول من اسم اليوزر
                           <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white text-sm font-bold mt-1">
-                            S
+                            {userInitial}
                           </div>
                         )}
                       </div>
@@ -406,10 +383,8 @@ const sendMessage = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input bar مع ShinyInput وزر المشبك */}
-            <div className="p-8 flex gap-4 pointer-events-auto bg-black/70 rounded-full items-center">
-                
-                {/* زر المشبك في واجهة الشات */}
+              {/* Bottom Input Bar */}
+              <div className="p-8 flex gap-4 pointer-events-auto bg-black/70 rounded-full items-center">
                 <button
                     onClick={triggerFileInput}
                     className="p-3 text-white/70 hover:text-white transition-colors duration-200 border border-white/20 rounded-full hover:bg-white/10"
