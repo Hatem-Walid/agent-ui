@@ -6,43 +6,49 @@ const DEFAULT_SPOTLIGHT_RADIUS = 300;
 const DEFAULT_GLOW_COLOR = '132, 0, 255';
 const MOBILE_BREAKPOINT = 768;
 
-// البيانات المعدلة للمشروع الأمني
+// البيانات الاحترافية
 const cardData = [
   {
     color: '#060010',
-    title: 'Frontend Security Scan',
-    description: 'Detect vulnerabilities in HTML, CSS, and JavaScript code',
-    label: 'Frontend'
+    title: 'Zero-Day Defense',
+    description: 'Autonomous AI agents detecting previously unknown vulnerabilities.',
+    label: 'AI Protection',
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'
   },
   {
     color: '#060010',
-    title: 'Backend API Audit',
-    description: 'Identify security issues in server-side code and APIs',
-    label: 'Backend'
+    title: 'Cloud Infrastructure',
+    description: 'Hardening AWS/Azure environments with automated compliance benchmarks.',
+    label: 'InfraSec',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop'
   },
   {
     color: '#060010',
-    title: 'Vulnerability Detection',
-    description: 'Automated scanning for common security vulnerabilities',
-    label: 'Security'
+    title: 'Penetration Testing',
+    description: 'Simulated cyber-attacks to identify exploitable points in system architecture.',
+    label: 'Offensive Ops',
+    image: 'https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   },
   {
     color: '#060010',
-    title: 'Code Analysis Report',
-    description: 'Detailed reports with actionable security recommendations',
-    label: 'Reports'
+    title: 'End-to-End Encryption',
+    description: 'Military-grade AES-256 bit encryption for data at rest and in transit.',
+    label: 'Cryptography',
+    image: 'https://plus.unsplash.com/premium_photo-1681426687411-21986b0626a8?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   },
   {
     color: '#060010',
-    title: 'Real-time Monitoring',
-    description: 'Continuous security monitoring for web applications',
-    label: 'Monitoring'
+    title: 'Real-time SOC',
+    description: '24/7 Security Operations Center dashboard with live telemetry.',
+    label: 'Observability',
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop'
   },
   {
     color: '#060010',
-    title: 'Threat Intelligence',
-    description: 'Advanced threat detection using machine learning',
-    label: 'AI Powered'
+    title: 'Identity Access (IAM)',
+    description: 'Biometric and multi-factor authentication protocols for zero-trust access.',
+    label: 'Access Control',
+    image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=1000&auto=format&fit=crop'
   }
 ];
 
@@ -494,21 +500,20 @@ const MagicBento = ({
   return (
     <>
       <style>
-  {`.bento-section {
+  {`
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+  .bento-section {
+    font-family: 'Outfit', sans-serif;
     --glow-x: 50%;
     --glow-y: 50%;
     --glow-intensity: 0;
     --glow-radius: 200px;
     --glow-color: ${glowColor};
-    --border-color: #392e4e;
+    --border-color: rgba(255, 255, 255, 0.1);
     --background-dark: #060010;
-    --white: hsl(0, 0%, 100%);
-    --purple-primary: rgba(132, 0, 255, 1);
-    --purple-glow: rgba(132, 0, 255, 0.2);
-    --purple-border: rgba(132, 0, 255, 0.8);
-
-    /* الخلفية */
-    background: linear-gradient(135deg, #060010 0%, #1b0033 100%);
+    --white: #ffffff;
+    background: #03000a;
     width: 100%;
     min-height: 100%;
     padding: 2rem 0;
@@ -516,9 +521,33 @@ const MagicBento = ({
     overflow: hidden;
   }
 
+  .card__title {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+  
+  .card__label {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    background: rgba(132, 0, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(132, 0, 255, 0.3);
+    backdrop-filter: blur(4px);
+  }
+
+  .card__description {
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+  }
+
   .card-responsive {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
     width: 95%;
     margin: 0 auto;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -534,17 +563,14 @@ const MagicBento = ({
     .card-responsive {
       grid-template-columns: repeat(4, 1fr);
     }
-    
     .card-responsive .card:nth-child(3) {
       grid-column: span 2;
       grid-row: span 2;
     }
-    
     .card-responsive .card:nth-child(4) {
       grid-column: 1 / span 2;
       grid-row: 2 / span 2;
     }
-    
     .card-responsive .card:nth-child(6) {
       grid-column: 4;
       grid-row: 3;
@@ -555,11 +581,11 @@ const MagicBento = ({
     content: '';
     position: absolute;
     inset: 0;
-    padding: 6px;
+    padding: 2px;
     background: radial-gradient(var(--glow-radius) circle at var(--glow-x) var(--glow-y),
-        rgba(${glowColor}, calc(var(--glow-intensity) * 0.8)) 0%,
-        rgba(${glowColor}, calc(var(--glow-intensity) * 0.4)) 30%,
-        transparent 60%);
+        rgba(${glowColor}, 1) 0%,
+        rgba(${glowColor}, 0.5) 20%,
+        transparent 50%);
     border-radius: inherit;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: subtract;
@@ -567,15 +593,11 @@ const MagicBento = ({
     -webkit-mask-composite: xor;
     pointer-events: none;
     transition: opacity 0.3s ease;
-    z-index: 1;
-  }
-
-  .card--border-glow:hover::after {
-    opacity: 1;
+    z-index: 10;
   }
 
   .card--border-glow:hover {
-    box-shadow: 0 4px 20px rgba(46, 24, 78, 0.4), 0 0 30px rgba(${glowColor}, 0.2);
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
   }
 
   .particle::before {
@@ -590,17 +612,12 @@ const MagicBento = ({
     z-index: -1;
   }
 
-  .particle-container:hover {
-    box-shadow: 0 4px 20px rgba(46, 24, 78, 0.2), 0 0 30px rgba(${glowColor}, 0.2);
-  }
-
   .text-clamp-1 {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     line-clamp: 1;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .text-clamp-2 {
@@ -609,7 +626,6 @@ const MagicBento = ({
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   @media (max-width: 599px) {
@@ -619,7 +635,6 @@ const MagicBento = ({
       margin: 0 auto;
       padding: 0.5rem;
     }
-    
     .card-responsive .card {
       width: 100%;
       min-height: 180px;
@@ -627,7 +642,6 @@ const MagicBento = ({
   }
   `}
 </style>
-
 
       {enableSpotlight && (
         <GlobalSpotlight
@@ -642,10 +656,11 @@ const MagicBento = ({
       <BentoCardGrid gridRef={gridRef}>
         <div className="card-responsive grid gap-2">
           {cardData.map((card, index) => {
-            const baseClassName = `card flex flex-col justify-between relative aspect-[4/3] min-h-[200px] w-full max-w-full p-5 rounded-[20px] border border-solid font-light overflow-hidden  duration-150 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] ${
+            const baseClassName = `card flex flex-col justify-between relative aspect-[4/3] min-h-[200px] w-full max-w-full p-5 rounded-[20px] border border-solid font-light overflow-hidden duration-150 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] ${
               enableBorderGlow ? 'card--border-glow' : ''
             }`;
 
+            // 1. شلنا الصورة من هنا وخلينا ده مجرد "حاوية" للكارت
             const cardStyle = {
               backgroundColor: card.color || 'var(--background-dark)',
               borderColor: 'var(--border-color)',
@@ -655,6 +670,46 @@ const MagicBento = ({
               '--glow-intensity': '0',
               '--glow-radius': '200px'
             };
+
+            // 2. دمجنا الصورة مع التدرج اللوني في طبقة واحدة منفصلة
+            const CardBackgroundLayer = () => (
+              <div 
+                style={{
+                  position: 'absolute',
+                  // التريك هنا: inset 1px بيخلي الصورة تدخل لجوة 1 بيكسل من كل ناحية
+                  // عشان تدي مساحة للبوردر المضيء إنه يبان من غير ما الصورة تغطيه
+                  inset: '1px', 
+                  borderRadius: '19px', // قللنا الـ Radius سنة بسيطة عشان يمشي مع الإطار
+                  // دمجنا التدرج (فوق) مع الصورة (تحت) في نفس الخاصية
+                  backgroundImage: `
+                    linear-gradient(to bottom, rgba(6,0,16,0) 0%, rgba(6,0,16,0.3) 50%, rgba(6,0,16,0.95) 100%),
+                    ${card.image ? `url(${card.image})` : 'none'}
+                  `,
+                  backgroundSize: 'cover, cover',
+                  backgroundPosition: 'center, center',
+                  backgroundRepeat: 'no-repeat, no-repeat',
+                  zIndex: 0, // الصورة في الخلفية
+                  pointerEvents: 'none'
+                }} 
+              />
+            );
+
+            // 3. المحتوى زي ما هو
+            const CardContent = () => (
+              <div className="relative z-10 flex flex-col justify-between h-full w-full">
+                <div className="card__header flex justify-between gap-3 text-white">
+                  <span className="card__label">{card.label}</span>
+                </div>
+                <div className="card__content flex flex-col text-white">
+                  <h3 className={`card__title text-lg m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
+                    {card.title}
+                  </h3>
+                  <p className={`card__description leading-5 opacity-90 ${textAutoHide ? 'text-clamp-2' : ''}`}>
+                    {card.description}
+                  </p>
+                </div>
+              </div>
+            );
 
             if (enableStars) {
               return (
@@ -669,19 +724,8 @@ const MagicBento = ({
                   clickEffect={clickEffect}
                   enableMagnetism={enableMagnetism}
                 >
-                  <div className="card__header flex justify-between gap-3 relative text-white">
-                    <span className="card__label text-base">{card.label}</span>
-                  </div>
-                  <div className="card__content flex flex-col relative text-white">
-                    <h3 className={`card__title font-normal text-base m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
-                      {card.title}
-                    </h3>
-                    <p
-                      className={`card__description text-xs leading-5 opacity-90 ${textAutoHide ? 'text-clamp-2' : ''}`}
-                    >
-                      {card.description}
-                    </p>
-                  </div>
+                  <CardBackgroundLayer />
+                  <CardContent />
                 </ParticleCard>
               );
             }
@@ -693,10 +737,9 @@ const MagicBento = ({
                 style={cardStyle}
                 ref={el => {
                   if (!el) return;
-
+                  
                   const handleMouseMove = e => {
                     if (shouldDisableAnimations) return;
-
                     const rect = el.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
@@ -706,94 +749,30 @@ const MagicBento = ({
                     if (enableTilt) {
                       const rotateX = ((y - centerY) / centerY) * -10;
                       const rotateY = ((x - centerX) / centerX) * 10;
-
-                      gsap.to(el, {
-                        rotateX,
-                        rotateY,
-                        duration: 0.1,
-                        ease: 'power2.out',
-                        transformPerspective: 1000
-                      });
+                      gsap.to(el, { rotateX, rotateY, duration: 0.1, ease: 'power2.out', transformPerspective: 1000 });
                     }
-
                     if (enableMagnetism) {
-                      const magnetX = (x - centerX) * 0.05;
-                      const magnetY = (y - centerY) * 0.05;
-
-                      gsap.to(el, {
-                        x: magnetX,
-                        y: magnetY,
-                        duration: 0.3,
-                        ease: 'power2.out'
-                      });
+                      gsap.to(el, { x: (x - centerX) * 0.05, y: (y - centerY) * 0.05, duration: 0.3, ease: 'power2.out' });
                     }
                   };
 
                   const handleMouseLeave = () => {
                     if (shouldDisableAnimations) return;
-
-                    if (enableTilt) {
-                      gsap.to(el, {
-                        rotateX: 0,
-                        rotateY: 0,
-                        duration: 0.3,
-                        ease: 'power2.out'
-                      });
-                    }
-
-                    if (enableMagnetism) {
-                      gsap.to(el, {
-                        x: 0,
-                        y: 0,
-                        duration: 0.3,
-                        ease: 'power2.out'
-                      });
-                    }
+                    if (enableTilt) gsap.to(el, { rotateX: 0, rotateY: 0, duration: 0.3, ease: 'power2.out' });
+                    if (enableMagnetism) gsap.to(el, { x: 0, y: 0, duration: 0.3, ease: 'power2.out' });
                   };
 
                   const handleClick = e => {
                     if (!clickEffect || shouldDisableAnimations) return;
-
                     const rect = el.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-
-                    const maxDistance = Math.max(
-                      Math.hypot(x, y),
-                      Math.hypot(x - rect.width, y),
-                      Math.hypot(x, y - rect.height),
-                      Math.hypot(x - rect.width, y - rect.height)
-                    );
-
+                    const maxDist = Math.max(x, rect.width - x, y, rect.height - y);
+                    
                     const ripple = document.createElement('div');
-                    ripple.style.cssText = `
-                      position: absolute;
-                      width: ${maxDistance * 2}px;
-                      height: ${maxDistance * 2}px;
-                      border-radius: 50%;
-                      background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%);
-                      left: ${x - maxDistance}px;
-                      top: ${y - maxDistance}px;
-                      pointer-events: none;
-                      z-index: 1000;
-                    `;
-
+                    ripple.style.cssText = `position: absolute; width: ${maxDist * 4}px; height: ${maxDist * 4}px; border-radius: 50%; background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, transparent 70%); left: ${x - maxDist * 2}px; top: ${y - maxDist * 2}px; pointer-events: none; z-index: 1000;`;
                     el.appendChild(ripple);
-
-                    gsap.fromTo(
-                      ripple,
-                      {
-                        scale: 0,
-                        opacity: 1
-                      },
-                      {
-                        scale: 1,
-                        opacity: 0,
-                        duration: 0.8,
-                        ease: 'power2.out',
-                        onComplete: () => ripple.remove()
-                      }
-                    );
+                    gsap.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.8, ease: 'power2.out', onComplete: () => ripple.remove() });
                   };
 
                   el.addEventListener('mousemove', handleMouseMove);
@@ -801,17 +780,8 @@ const MagicBento = ({
                   el.addEventListener('click', handleClick);
                 }}
               >
-                <div className="card__header flex justify-between gap-3 relative text-white">
-                  <span className="card__label text-base">{card.label}</span>
-                </div>
-                <div className="card__content flex flex-col relative text-white">
-                  <h3 className={`card__title font-normal text-base m-0 mb-1 ${textAutoHide ? 'text-clamp-1' : ''}`}>
-                    {card.title}
-                  </h3>
-                  <p className={`card__description text-xs leading-5 opacity-90 ${textAutoHide ? 'text-clamp-2' : ''}`}>
-                    {card.description}
-                  </p>
-                </div>
+                <CardBackgroundLayer />
+                <CardContent />
               </div>
             );
           })}
