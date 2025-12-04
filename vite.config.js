@@ -7,7 +7,16 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      three: path.resolve('./node_modules/three')
-    }
-  }
+      three: path.resolve('./node_modules/three'),
+    },
+  },
+  server: {
+    port: 5173,
+    strictPort: true, // يمنع تغييرات على البورت لو مش فاضي
+    hmr: {
+      protocol: 'ws', // لو السيرفر http
+      host: 'localhost',
+      port: 5173,
+    },
+  },
 });
