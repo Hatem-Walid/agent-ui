@@ -243,13 +243,13 @@ export default function TestimonialsSection() {
             <div className="flex items-center gap-4">
               <button
                 onClick={handlePrev}
-                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-11 min-w-11 flex items-center justify-center"
               >
                 <ChevronLeft size={18} color="white" />
               </button>
               <button
                 onClick={handleNext}
-                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-11 min-w-11 flex items-center justify-center"
               >
                 <ChevronRight size={18} color="white" />
               </button>
@@ -261,7 +261,7 @@ export default function TestimonialsSection() {
                     initial={{ width: 0 }}
                     animate={{ width: `${((index + 1) / testimonials.length) * 100}%` }}
                     transition={{ duration: 0.6, ease: "easeIn" }}
-                    className="h-2 bg-gradient-to-r to-purple-500 from-blue-900"
+                    className="h-2 bg-linear-to-r to-purple-500 from-blue-900"
                   />
                 </div>
               </div>
@@ -296,7 +296,7 @@ export default function TestimonialsSection() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="w-full max-w-xl relative"
               >
-                <div className={`backdrop-blur-sm bg-gradient-to-r from-white/5 to-white/2 border border-white/1 rounded-4xl p-10 shadow-2xl transition-all duration-300
+                <div className={`backdrop-blur-sm bg-linear-to-r from-white/5 to-white/2 border border-white/1 rounded-4xl p-10 shadow-2xl transition-all duration-300
                   ${isTouching ? 'scale-95 bg-white/5' : ''}
                 `}>
                   <blockquote className="text-lg text-white/50 leading-relaxed mb-6">

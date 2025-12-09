@@ -40,7 +40,7 @@ function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-[100vh] flex flex-col items-center justify-center text-center overflow-visible px-6 lg:px-8 bg-transparent"
+      className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-visible px-6 lg:px-8 bg-transparent"
     >
       {/* Liquid Ether Background */}
       <Suspense fallback={<div className="absolute inset-0 -z-10 bg-black"></div>}>
@@ -60,7 +60,7 @@ function Hero() {
         </div>
 
         {/* Main Heading */}
-        <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-bold mb-1 block text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 leading-snug md:leading-normal">
+        <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-bold mb-1 block text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-500 leading-snug md:leading-normal">
           Improve Your Security with AI
         </h1>
 
