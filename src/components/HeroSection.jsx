@@ -3,8 +3,9 @@ import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 
+
 // Lazy load LiquidEther
-const LiquidEther = lazy(() => import("./LiquidEther"));
+const LiquidEther = lazy(() => import("./DarkVeil"));
 
 function Hero() {
   const navigate = useNavigate();

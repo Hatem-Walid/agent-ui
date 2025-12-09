@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        roboto: ['Roboto', 'sans-serif'],
+      },
       keyframes: {
         shine: {
           "0%": { backgroundPositionX: "200%" },

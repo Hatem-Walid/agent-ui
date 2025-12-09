@@ -187,7 +187,7 @@ const CheckmarkOneSection = () => {
             </div>
 
             {/* تأثير اضافي للكارد عند الضغط */}
-            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
+            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-auto transition-opacity duration-300 ${
               activeCard === 2 ? 'opacity-100' : 'opacity-0'
             }`} />
           </motion.div>
@@ -293,7 +293,7 @@ const CheckmarkOneSection = () => {
             }}
           >
             {/* Overlay علشان النص يفضل واضح */}
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
             
             <div className="relative z-10 max-w-2xl">
               <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">

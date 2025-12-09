@@ -10,13 +10,9 @@ export default defineConfig({
       three: path.resolve('./node_modules/three'),
     },
   },
-  server: {
+   server: {
+    host: true,     // مهم جداً!!!
     port: 5173,
-    strictPort: true, // يمنع تغييرات على البورت لو مش فاضي
-    hmr: {
-      protocol: 'ws', // لو السيرفر http
-      host: 'localhost',
-      port: 5173,
-    },
+    strictPort: false,
   },
 });
