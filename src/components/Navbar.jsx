@@ -158,12 +158,11 @@ const Navbar = () => {
           </div>
 
           {/* Logo */}
-         <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
-            {/* استخدام وسم <img> لعرض الصورة داخل الصفحة */}
+          <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
             <img 
-              src="\assets\vuln-logo.png" 
+              src="src\assets\final .svg"  
               alt="Logo" 
-              className="h-10 w-auto" // يمكنك تعديل حجم الصورة هنا
+              className="h-14 w-auto" 
             />
           </div>
 
