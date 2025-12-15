@@ -160,7 +160,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
             <img 
-              src="src/assets/main .svg"
+              src="public\assets\main.svg"
               alt="Logo"
               className="h-14 w-auto"
             />
