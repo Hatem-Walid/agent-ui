@@ -2,14 +2,24 @@ import { useLayoutEffect, useRef, Suspense, lazy, memo } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
-
+import { useAuth } from '../context/AuthContext'; // 1. استيراد الكونتكست
 
 // Lazy load LiquidEther
 const LiquidEther = lazy(() => import("./DarkVeil"));
 
 function Hero() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth(); // 2. استخراج حالة تسجيل الدخول
   const heroRef = useRef(null);
+
+  // 3. دالة التحقق والتوجيه
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate("/ai");   // لو مسجل، يروح للشات
+    } else {
+      navigate("/auth"); // لو مش مسجل، يروح يسجل دخول
+    }
+  };
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -53,7 +63,8 @@ function Hero() {
 
       {/* Content */}
       <div className="relative z-20 max-w-6xl px-4 w-full flex flex-col items-center">
-        {/* Badge + logo
+        
+           {/* Badge + logo
         <div className="badge inline-flex items-center gap-2 bg-purple-100/15 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 backdrop-blur-sm border border-white/20 cursor-default">
          <img 
               src="\assets\icon 1.svg"
@@ -78,7 +89,7 @@ function Hero() {
         <div className="flex justify-center items-center gap-6 text-center relative z-50">
           <button
             id="get-started"
-            onClick={() => navigate("/ai")}
+            onClick={handleGetStarted} // 4. استخدام الدالة الجديدة هنا
             className="relative px-9 py-2 rounded-full font-semibold text-white text-base md:text-lg
               backdrop-blur-2xl bg-purple-500/20 border border-purple-300/20
               hover:bg-purple-500/30 transition-all duration-300 
@@ -91,7 +102,7 @@ function Hero() {
 
           <button
             id="learn-more"
-            onClick={() => navigate("/blog")}
+            onClick={() => navigate("/doc")}
             className="relative px-9 py-2 rounded-full font-semibold text-white text-base md:text-lg
               backdrop-blur-2xl bg-white/10 border border-white/20
               hover:bg-white/20 transition-all duration-300 
@@ -109,7 +120,6 @@ function Hero() {
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             Coverd 8 vernable security bugs
           </div>
-          <div className="hidden sm:block">•</div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
             Enterprise-grade security

@@ -1,9 +1,11 @@
 // src/components/CheckmarkOneSection.jsx
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom'; // 1. استدعاء الملاحة
+import { useAuth } from '../context/AuthContext'; // 2. استدعاء الكونتكست
+
 import { 
   Shield, 
-  Cloud, 
   Code, 
   GitBranch, 
   BarChart3, 
@@ -13,43 +15,59 @@ import {
   Cpu,
   Lock,
   Zap,
-  Globe
+  Globe,
+  Settings
 } from "lucide-react";
 
 const CheckmarkOneSection = () => {
   const [activeCard, setActiveCard] = useState(null);
+  
+  // 3. تعريف الهوكس
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  // 4. دالة التعامل مع الزر
+  const handleStartTrial = () => {
+    if (isAuthenticated) {
+      navigate("/ai");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   const userEnablement = [
-    { icon: Users, label: "Confidential", value: "Enterprise" },
-    { icon: GitBranch, label: "DevOps/CI/CD", value: "Full Integration" },
-    { icon: Code, label: "Languages", value: "360+" },
-    { icon: Server, label: "Frameworks", value: "5000+" },
-    { icon: Cpu, label: "Technologies", value: "360+" },
-    { icon: Workflow, label: "Integration", value: "8000+" }
+  { icon: Users, label: "Target Users", value: "Developers" },
+  { icon: GitBranch, label: "DevOps / CI-CD", value: "Pipeline" },
+  { icon: Code, label: "Supported Languages", value: "JS, PHP, Python, C#" },
+  { icon: Server, label: "Framework Awareness", value: "Enabled" },
+  { icon: Cpu, label: "AI Models", value: "Transformer-Based" },
+  { icon: Workflow, label: "Workflow Integration", value: "Local & CI/CD" }
   ];
 
-  const dashboardFeatures = [
-    { icon: BarChart3, label: "Application Security Posture Management (ASPM)" },
-    { icon: Cpu, label: "AI Powered Security" },
-    { icon: Code, label: "Code Security" },
-    { icon: Shield, label: "SAST & DAST" },
-    { icon: Lock, label: "API Security" },
-    { icon: Zap, label: "AI Security" }
-  ];
+ const dashboardFeatures = [
+  { icon: BarChart3, label: "Vulnerability Classification" },
+  { icon: Cpu, label: "Transformer-Based Detection" },
+  { icon: Code, label: "Source Code Analysis" },
+  { icon: Shield, label: "Static Security Analysis (SAST)" },
+  { icon: Lock, label: "API & Input Validation Checks" },
+  { icon: Zap, label: "Automated Repair Suggestions" }
+];
 
-  const supplyChain = [
-    { icon: Globe, label: "Software Composition Analysis (SCA)" },
-    { icon: Users, label: "Multi-user/Partner Protection" },
-    { icon: Cpu, label: "AI Security" },
-    { icon: Shield, label: "Secure Execution" },
-    { icon: BarChart3, label: "Regulatory Health" }
-  ];
+const supplyChain = [
+  { icon: Globe, label: "OWASP & CWE Alignment" },
+  { icon: Users, label: "Human-in-the-Loop Validation" },
+  { icon: Cpu, label: "AI Detection & Repair Models" },
+  { icon: Shield, label: "Privilege Isolation Layer" },
+  { icon: BarChart3, label: "Security Reporting & Traceability" }
+];
 
-  const services = [
-    { icon: Users, label: "Premium Support" },
-    { icon: Server, label: "Premium Services" },
-    { icon: Shield, label: "Security Assessment" }
-  ];
+const services = [
+  { icon: Users, label: "Interactive Code Review" },
+  { icon: Server, label: "Automated Secure Fix Generation" },
+  { icon: Shield, label: "Detailed Security Reports" },
+  { icon: GitBranch, label: "CI/CD Friendly Output" },
+  { icon: Settings, label: "Developer-Controlled Fixes" }
+];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -143,7 +161,6 @@ const CheckmarkOneSection = () => {
               ))}
             </div>
 
-            {/* تأثير اضافي للكارد عند الضغط */}
             <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
               activeCard === 1 ? 'opacity-100' : 'opacity-0'
             }`} />
@@ -186,7 +203,6 @@ const CheckmarkOneSection = () => {
               ))}
             </div>
 
-            {/* تأثير اضافي للكارد عند الضغط */}
             <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-auto transition-opacity duration-300 ${
               activeCard === 2 ? 'opacity-100' : 'opacity-0'
             }`} />
@@ -227,7 +243,6 @@ const CheckmarkOneSection = () => {
               ))}
             </div>
 
-            {/* تأثير اضافي للكارد عند الضغط */}
             <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
               activeCard === 3 ? 'opacity-100' : 'opacity-0'
             }`} />
@@ -268,14 +283,13 @@ const CheckmarkOneSection = () => {
               ))}
             </div>
 
-            {/* تأثير اضافي للكارد عند الضغط */}
             <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-fuchsia-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
               activeCard === 4 ? 'opacity-100' : 'opacity-0'
             }`} />
           </motion.div>
         </motion.div>
 
-        {/* CTA Section مع صورة خلفية */}
+        {/* CTA Section */}
         <motion.div 
           className="text-center mt-16"
           initial={{ opacity: 0, y: 30 }}
@@ -292,25 +306,30 @@ const CheckmarkOneSection = () => {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            {/* Overlay علشان النص يفضل واضح */}
             <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
             
             <div className="relative z-10 max-w-2xl">
               <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
-                <Shield className="w-4 h-4" />
-                Ready for Smarter AppSec?
+                <img 
+                  src="\assets\icon 1.svg"
+                  alt="Logo"
+                  className="h-7 w-auto"
+                />
+                Ready for Secure your site ?
               </div>
               <h3 className="text-2xl md:text-3xl font-bold mb-4">Request a Demo</h3>
               <p className="text-purple-100 mb-6 text-sm md:text-base">
                 Meet your always-on security partner. See how Developer Assist enables developers to ship faster, safer, and with confidence.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button className="bg-white text-purple-700 px-6 py-3 rounded-xl hover:bg-purple-600 hover:text-purple-100 transition-all duration-300 font-semibold active:scale-95 min-h-[44px] shadow-lg shadow-purple-500/30">
+                {/* 5. زر Start Free Trial المعدل */}
+                <button 
+                  onClick={handleStartTrial}
+                  className="bg-white text-purple-700 px-6 py-3 rounded-xl hover:bg-purple-600 hover:text-purple-100 transition-all duration-300 font-semibold active:scale-95 min-h-[44px] shadow-lg shadow-purple-500/30"
+                >
                   Start Free Trial
                 </button>
-                <button className="border border-white text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 hover:text-blue-800 transition-all duration-300 active:scale-95 min-h-[44px] shadow-lg shadow-white/20">
-                  Schedule Demo
-                </button>
+                {/* تم حذف زر Schedule Demo */}
               </div>
             </div>
           </div>

@@ -1,10 +1,11 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // 1. استدعاء useNavigate
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate(); // 2. تفعيل الهوك للتنقل اليدوي
   
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -20,7 +21,7 @@ const Navbar = () => {
       links: [
         { label: "Home", href: "/" },
         { label: "Pricing Plans", href: "/plan" },
-        { label: "AI Chat / Assistant", href: "/ai" }
+        { label: "AI Chat / Assistant", href: "/ai" } // هذا الرابط الذي نريد حمايته
       ]
     },
     {
@@ -46,10 +47,22 @@ const Navbar = () => {
 
   const ease = "power3.out";
 
-  // دالة حساب الارتفاع المعدلة
+  // دالة التعامل مع الضغط على الروابط
+  const handleLinkClick = (e, href) => {
+    // أولاً: نقفل القائمة في كل الأحوال
+    toggleMenu();
+
+    // ثانياً: لو الرابط هو صفحة الـ AI والمستخدم مش مسجل دخول
+    if (href === '/ai' && !isAuthenticated) {
+      e.preventDefault(); // نمنع الذهاب لصفحة الـ AI
+      navigate('/auth');  // نوجهه لصفحة الدخول
+    }
+    // لو مسجل دخول أو الرابط مش ai، الـ Link هيكمل شغله طبيعي
+  };
+
   const calculateHeight = () => {
     const navEl = navRef.current;
-    if (!navEl) return 220; 
+    if (!navEl) return 235; 
     
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     if (isMobile) {
@@ -78,7 +91,7 @@ const Navbar = () => {
         return topBar + contentHeight + padding;
       }
     }
-    return 220; 
+    return 235; 
   };
 
   const createTimeline = () => {
@@ -214,7 +227,8 @@ const Navbar = () => {
                     key={`${lnk.label}-${i}`}
                     className="nav-card-link inline-flex items-center gap-[6px] no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
                     to={lnk.href}
-                    onClick={toggleMenu} // <--- تم التعديل هنا: إضافة حدث النقر لإغلاق القائمة
+                    // هنا التغيير الأساسي: نمرر الحدث e والرابط للدالة الخاصة بنا
+                    onClick={(e) => handleLinkClick(e, lnk.href)} 
                     style={{color: "inherit"}}
                   >
                     ➤ {lnk.label}

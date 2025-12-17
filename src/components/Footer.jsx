@@ -135,7 +135,7 @@ export default function Footer() {
       {/* Copyright */}
       <div className="relative z-10 text-center py-4 sm:py-6 text-sm text-gray-400 px-4">
         © {new Date().getFullYear()}{" "}
-        <span className="text-purple-400 font-semibold">Golden Platform</span> — All
+        <span className="text-purple-400 font-semibold">VulnSneak</span> — All
         Rights Reserved.
       </div>
     </footer>
