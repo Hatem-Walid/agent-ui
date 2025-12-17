@@ -53,11 +53,15 @@ function Hero() {
 
       {/* Content */}
       <div className="relative z-20 max-w-6xl px-4 w-full flex flex-col items-center">
-        {/* Badge */}
+        {/* Badge + logo
         <div className="badge inline-flex items-center gap-2 bg-purple-100/15 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 backdrop-blur-sm border border-white/20 cursor-default">
-          <Shield className="w-4 h-4" />
+         <img 
+              src="\assets\icon 1.svg"
+              alt="Logo"
+              className="h-7 w-auto"
+            />
           VulnSneak
-        </div>
+        </div> */}
 
         {/* Main Heading */}
         <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-bold mb-1 block text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-500 leading-snug md:leading-normal">

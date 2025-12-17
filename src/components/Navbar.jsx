@@ -49,7 +49,6 @@ const Navbar = () => {
   // دالة حساب الارتفاع المعدلة
   const calculateHeight = () => {
     const navEl = navRef.current;
-    // تعديل 1: القيمة الافتراضية
     if (!navEl) return 220; 
     
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -79,8 +78,6 @@ const Navbar = () => {
         return topBar + contentHeight + padding;
       }
     }
-    // تعديل 2: القيمة الخاصة بالكمبيوتر (Desktop)
-    // هنا تحكم في الطول الكلي للناف بار عند الفتح
     return 220; 
   };
 
@@ -217,6 +214,7 @@ const Navbar = () => {
                     key={`${lnk.label}-${i}`}
                     className="nav-card-link inline-flex items-center gap-[6px] no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
                     to={lnk.href}
+                    onClick={toggleMenu} // <--- تم التعديل هنا: إضافة حدث النقر لإغلاق القائمة
                     style={{color: "inherit"}}
                   >
                     ➤ {lnk.label}
