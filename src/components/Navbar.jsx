@@ -1,10 +1,10 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // 1. استدعاء الكونتكست
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { user, logout, isAuthenticated } = useAuth(); // 2. استخراج البيانات
+  const { user, logout, isAuthenticated } = useAuth();
   
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -19,8 +19,8 @@ const Navbar = () => {
       textColor: "#fff",
       links: [
         { label: "Home", href: "/" },
-        { label: "Pricing Plans", href: "/plan" }, // تأكد ان الرابط مطابق للراوتر عندك
-        { label: "AI Chat / Assistant", href: "/ai" } // عدلت الرابط لصفحة الشات
+        { label: "Pricing Plans", href: "/plan" },
+        { label: "AI Chat / Assistant", href: "/ai" }
       ]
     },
     {
@@ -46,9 +46,12 @@ const Navbar = () => {
 
   const ease = "power3.out";
 
+  // دالة حساب الارتفاع المعدلة
   const calculateHeight = () => {
     const navEl = navRef.current;
-    if (!navEl) return 260;
+    // تعديل 1: القيمة الافتراضية
+    if (!navEl) return 220; 
+    
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     if (isMobile) {
       const contentEl = navEl.querySelector('.nav-content');
@@ -76,7 +79,9 @@ const Navbar = () => {
         return topBar + contentHeight + padding;
       }
     }
-    return 260;
+    // تعديل 2: القيمة الخاصة بالكمبيوتر (Desktop)
+    // هنا تحكم في الطول الكلي للناف بار عند الفتح
+    return 220; 
   };
 
   const createTimeline = () => {
@@ -139,7 +144,7 @@ const Navbar = () => {
         ref={navRef}
         className="navbar block h-[60px] p-0 rounded-xl shadow-md relative overflow-hidden will-change-[height]"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.1)', // Glass blur color
+          backgroundColor: 'rgba(255, 255, 255, 0.1)', 
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)'
         }}
@@ -166,12 +171,11 @@ const Navbar = () => {
             />
           </div>
 
-          {/* 3. Get Started button area - AUTH LOGIC ADDED HERE */}
+          {/* User / Login */}
           <div className="hidden md:flex h-full items-center">
             {isAuthenticated ? (
               <div className="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-1.5 border border-white/10">
                 <span className="text-purple-200 text-sm font-semibold truncate max-w-[100px]">
-                  {/* التعديل هنا: استخدام .name مباشرة لأننا خزننا الاسم الكامل */}
                   Hi, {user?.name || "User"}
                 </span>
                 <button
@@ -202,14 +206,14 @@ const Navbar = () => {
           {items.map((item, idx) => (
             <div
               key={`${item.label}-${idx}`}
-              className="nav-card select-none relative flex flex-col gap-2 p-[12px_16px] rounded-[12px] min-w-0 flex-[1_1_auto] h-auto min-h-[60px] md:h-full md:min-h-0 md:flex-[1_1_0%]"
+              className="nav-card select-none relative flex flex-col gap-[2px] p-[5px_12px] rounded-[10px] min-w-0 flex-[1_1_auto] h-auto min-h-[35px] md:h-[calc(100%-4px)] md:min-h-0 md:flex-[1_1_0%]"
               ref={setCardRef(idx)}
               style={{ backgroundColor: item.bgColor, color: item.textColor }}
             >
               <div className="nav-card-label font-normal tracking-[-0.5px] text-[18px] md:text-[22px]">{item.label}</div>
               <div className="nav-card-links mt-auto flex flex-col gap-[2px]">
                 {item.links.map((lnk, i) => (
-                  <Link // 4. استخدمت Link بدل a عشان يبقى SPA
+                  <Link 
                     key={`${lnk.label}-${i}`}
                     className="nav-card-link inline-flex items-center gap-[6px] no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
                     to={lnk.href}
