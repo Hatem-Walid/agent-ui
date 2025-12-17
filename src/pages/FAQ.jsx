@@ -1,67 +1,108 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
-  ShieldCheck, 
+  Target, 
+  BrainCircuit, 
+  Layers, 
+  Sparkles, 
   Database, 
-  Code2, 
-  Lock, 
-  FileCode, 
-  FolderOpen, 
-  ShieldAlert, 
-  Zap,
+  Wrench, 
+  CheckCircle2, 
+  GitFork, 
+  Cpu, 
+  RefreshCw, 
+  FileText, 
+  UserCheck, 
+  AlertTriangle, 
+  Rocket,
   ExternalLink 
 } from "lucide-react";
 
-// قمت بإضافة أيقونة لكل سؤال ليتطابق مع ستايل الصورة
+// تم تحديث البيانات والأيقونات لتناسب المحتوى الجديد
 const faqs = [
   {
-    icon: ShieldCheck,
-    question: "What is VulunSneak?",
+    icon: Target,
+    question: "What problem does VulnSneak aim to solve?",
     answer:
-      "VulunSneak is a specialized AI security agent trained to detect and automatically patch vulnerabilities in software applications. It actively analyzes code and traffic to identify SQL Injection, XSS, CSRF, and more, providing detailed analysis and safe remediation steps.",
+      "VulnSneak addresses the lack of intelligent, automated solutions that can both detect and repair security vulnerabilities in web application source code. Traditional tools often suffer from high false positives, limited contextual understanding, and lack of automated remediation, especially for small teams and academic environments.",
+  },
+  {
+    icon: BrainCircuit,
+    question: "How is VulnSneak different from traditional SAST tools?",
+    answer:
+      "Unlike rule-based static analysis tools, VulnSneak uses Transformer-based AI models to analyze the semantic and structural meaning of source code. This allows the system to detect vulnerabilities based on insecure behavior patterns rather than fixed rules, improving adaptability and reducing noise.",
+  },
+  {
+    icon: Layers,
+    question: "Does VulnSneak analyze both frontend and backend code?",
+    answer:
+      "Yes. VulnSneak is designed to analyze both frontend and backend source code, reflecting real-world web application architectures where vulnerabilities may exist across multiple layers.",
+  },
+  {
+    icon: Sparkles,
+    question: "What role does machine learning play in VulnSneak?",
+    answer:
+      "Machine learning is central to VulnSneak. The system uses fine-tuned Transformer models trained on labeled datasets of vulnerable and fixed code samples to classify vulnerabilities and generate secure repair suggestions.",
   },
   {
     icon: Database,
-    question: "How does VulunSneak detect SQL Injection?",
+    question: "How is the training dataset constructed?",
     answer:
-      "VulunSneak monitors input fields, query parameters, and API calls. It uses AI models trained on real-world attacks to identify injection patterns. It pinpoints the vulnerable line of code and automatically suggests a sanitized version of the query.",
+      "The dataset is curated from public sources such as Hugging Face and Kaggle, enriched with manually reviewed examples, and aligned with OWASP Top 10 and CWE vulnerability standards. Each vulnerable code sample is linked to a corresponding secure fix to support both detection and repair tasks.",
   },
   {
-    icon: Code2,
-    question: "Can VulunSneak prevent XSS attacks?",
+    icon: Wrench,
+    question: "How does VulnSneak generate secure code fixes?",
     answer:
-      "Yes. VulunSneak scans all user input points for XSS patterns. It categorizes them into stored, reflected, and DOM-based types, recommending proper escaping and CSP techniques to neutralize the threat without breaking functionality.",
+      "After a vulnerability is detected, a secondary AI model generates context-aware repair suggestions using sequence-to-sequence learning. The goal is to produce syntactically valid fixes that preserve the original functionality while improving security.",
   },
   {
-    icon: Lock,
-    question: "Does VulunSneak help with CSRF vulnerabilities?",
+    icon: CheckCircle2,
+    question: "How does the system ensure that fixes do not break functionality?",
     answer:
-      "Absolutely. It identifies endpoints vulnerable to CSRF by checking for missing tokens and weak authentication flows. It guides developers to add synchronized tokens or SameSite cookie attributes to mitigate the risk.",
+      "VulnSneak includes a validation stage where generated fixes can be reviewed, tested, or approved by the developer. This human-in-the-loop approach ensures that automated repairs do not introduce regressions or unintended behavior.",
   },
   {
-    icon: FileCode,
-    question: "How does it handle insecure deserialization?",
+    icon: GitFork,
+    question: "Why does VulnSneak use a dual-model architecture?",
     answer:
-      "VulunSneak inspects serialized objects and incoming data streams. It flags unsafe practices and guides developers on using secure libraries or implementing strict input validation and integrity checks.",
+      "The system separates vulnerability detection and repair into two specialized models. This design improves modularity, allows independent optimization of each task, and supports future experimentation with alternative detection or repair strategies.",
   },
   {
-    icon: FolderOpen,
-    question: "Can VulunSneak detect path traversal attacks?",
+    icon: Cpu,
+    question: "What is the purpose of the Raspberry Pi in the system architecture?",
     answer:
-      "Yes. It analyzes file access points to detect relative and absolute path manipulations. It provides instructions on sanitizing paths and implementing secure file access controls.",
+      "The Raspberry Pi acts as a secure proxy that isolates AI services from the main backend. It protects sensitive API keys, enforces privilege separation, and adds an extra security layer for handling external AI communications.",
   },
   {
-    icon: ShieldAlert,
-    question: "How secure is VulunSneak itself?",
+    icon: RefreshCw,
+    question: "Is VulnSneak suitable for CI/CD integration?",
     answer:
-      "Built with security-first principles. All logs are encrypted (AES-256), temporary data is cleared post-analysis, and access is secured via API keys. The system is continuously updated against evolving threats.",
+      "Yes. VulnSneak is designed to integrate into local development workflows and CI/CD pipelines, enabling continuous vulnerability detection and repair during the software development lifecycle.",
   },
   {
-    icon: Zap,
-    question: "Can VulunSneak run in real-time?",
+    icon: FileText,
+    question: "How are vulnerabilities reported to the user?",
     answer:
-      "Yes. It features a real-time monitoring mode inspecting incoming requests. Suspicious activities trigger instant alerts, and malicious requests can be blocked automatically based on configuration.",
+      "The system generates a detailed report that includes the vulnerability type, affected code section, and suggested secure fix. This report is designed to be understandable even for users with limited security expertise.",
+  },
+  {
+    icon: UserCheck,
+    question: "Is VulnSneak intended to replace security experts?",
+    answer:
+      "No. VulnSneak is designed to assist developers, not replace human expertise. It provides intelligent recommendations while keeping developers in control of final decisions.",
+  },
+  {
+    icon: AlertTriangle,
+    question: "What are the limitations of VulnSneak?",
+    answer:
+      "As an academic research project, VulnSneak currently focuses on a subset of common web vulnerabilities. Some complex, context-dependent security issues may require further validation or manual review.",
+  },
+  {
+    icon: Rocket,
+    question: "What future improvements are planned for VulnSneak?",
+    answer:
+      "Future work includes expanding supported vulnerability types, improving automated fix validation, supporting additional programming languages, and enhancing integration with real-world development pipelines.",
   },
 ];
 
@@ -71,7 +112,7 @@ export default function FAQ() {
       <div className="max-w-7xl mx-auto">
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 mt-10 gap-6">
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

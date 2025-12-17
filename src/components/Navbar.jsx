@@ -62,7 +62,7 @@ const Navbar = () => {
 
   const calculateHeight = () => {
     const navEl = navRef.current;
-    if (!navEl) return 235; 
+    if (!navEl) return 220; 
     
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     if (isMobile) {
@@ -91,7 +91,7 @@ const Navbar = () => {
         return topBar + contentHeight + padding;
       }
     }
-    return 235; 
+    return 220; 
   };
 
   const createTimeline = () => {

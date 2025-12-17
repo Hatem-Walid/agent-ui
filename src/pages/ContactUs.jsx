@@ -35,7 +35,7 @@ const ContactUs = () => {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[120px]" />
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10 mt-10">
         
         {/* Header */}
         <motion.div 
@@ -75,7 +75,7 @@ const ContactUs = () => {
                   </div>
                   <div>
                     <h3 className="text-white font-medium mb-1">Our Location</h3>
-                    <p className="text-gray-400">127 Balm Street, ZAG City, Egypt</p>
+                    <p className="text-gray-400">127 Qaomia Street, ZAG City, Egypt</p>
                   </div>
                 </div>
 
