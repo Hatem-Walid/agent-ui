@@ -38,10 +38,10 @@ const CheckmarkOneSection = () => {
   const userEnablement = [
   { icon: Users, label: "Target Users", value: "Developers" },
   { icon: GitBranch, label: "DevOps / CI-CD", value: "Pipeline" },
-  { icon: Code, label: "Supported Languages", value: "JS, PHP, Python, C#" },
+  { icon: Code, label: "Supported Languages", value: "JS,PHP,...etc" },
   { icon: Server, label: "Framework Awareness", value: "Enabled" },
   { icon: Cpu, label: "AI Models", value: "Transformer-Based" },
-  { icon: Workflow, label: "Workflow Integration", value: "Local & CI/CD" }
+  { icon: Workflow, label: "Workflow Integration", value: " CI/CD" }
   ];
 
  const dashboardFeatures = [
