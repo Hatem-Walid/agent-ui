@@ -7,67 +7,67 @@ const AUTOPLAY_MS = 6000;
 const testimonials = [
   {
     id: 1,
-    name: "Matthew Hurewitz",
-    role: "VP, AppSec",
-    company: "Best Buy",
+    name: "AI-Based Vulnerability Detection",
+    role: "Detection Engine",
+    company: "Frontend & Backend Code",
     quote:
-      "CyberAgentX gave us continuous visibility across our CI/CD pipelines — the AI findings are actionable and have accelerated our triage time.",
+      "Uses fine-tuned Transformer-based models to perform static code analysis and accurately detect security vulnerabilities, including XSS, SQL Injection, CSRF, and broken access control.",
   },
   {
     id: 2,
-    name: "Amira Soliman",
-    role: "Head of DevSecOps",
-    company: "Netflix",
+    name: "Context-Aware Automated Repair",
+    role: "Repair Engine",
+    company: "Source Code Level",
     quote:
-      "Integration was seamless and the agent footprint is tiny. We now scan PRs earlier and ship with more confidence.",
+      "Generates secure, context-aware code patches using sequence-to-sequence learning, ensuring syntactic correctness while preserving original application behavior.",
   },
   {
     id: 3,
-    name: "Ravi Patel",
-    role: "SRE Lead",
-    company: "Amazon",
+    name: "Semantic Code Understanding",
+    role: "Analysis Layer",
+    company: "Code Semantics",
     quote:
-      "Real-time scanning and cloud posture checks reduced incidents in production significantly — great tooling for distributed teams.",
+      "Goes beyond rule-based pattern matching by understanding the semantic and structural representation of source code using pretrained language models.",
   },
   {
     id: 4,
-    name: "Sofia Garcia",
-    role: "Security Architect",
-    company: "Google",
+    name: "Curated & Labeled Training Dataset",
+    role: "Training Foundation",
+    company: "OWASP & CWE Standards",
     quote:
-      "The AI-driven detection removed noise and highlighted important changes. Our security reviews are now faster and more focused.",
+      "Trained on a high-quality dataset of vulnerable and fixed code samples enriched using OWASP Top 10 and CWE vulnerability classifications.",
   },
   {
     id: 5,
-    name: "Liam O'Connor",
-    role: "Chief Information Security Officer",
-    company: "IBM",
+    name: "Dual-Model Architecture",
+    role: "System Design",
+    company: "Detection & Repair Pipeline",
     quote:
-      "Enterprise features, SSO integration and policy enforcement made rollout across our org painless.",
+      "Separates vulnerability detection and automated repair into two independent AI models, enabling better optimization, evaluation, and future extensibility.",
   },
   {
     id: 6,
-    name: "Hana Kim",
-    role: "Platform Engineer",
-    company: "Microsoft",
+    name: "Secure Deployment via Isolation Layer",
+    role: "Security Architecture",
+    company: "Raspberry Pi Proxy",
     quote:
-      "The dashboards and reporting give exec-level clarity plus deep developer insights — a rare combination.",
+      "Implements a Raspberry Pi–based proxy to enforce privilege isolation, protect sensitive API keys, and secure communication between AI services and the backend.",
   },
   {
     id: 7,
-    name: "Diego Alvarez",
-    role: "CTO",
-    company: "Meta",
+    name: "Validation & Human-in-the-Loop Control",
+    role: "Safety Mechanism",
+    company: "Validation & Testing Phase",
     quote:
-      "Automated scans integrated into our CI reduced manual QA time and caught tricky dependency issues before release.",
+      "Includes a validation phase where generated fixes are reviewed or tested to ensure functional correctness and prevent unsafe or regressive changes.",
   },
   {
     id: 8,
-    name: "Noor Abdullah",
-    role: "Security Ops",
-    company: "Cloudflare",
+    name: "Scalable Research-Oriented Design",
+    role: "System Scalability",
+    company: "Extensible Architecture",
     quote:
-      "The platform scales well and the alerting integrates with our incident workflows — overall huge ROI.",
+      "Designed as a research-ready platform that supports experimentation with new models, vulnerability categories, and advanced repair validation techniques.",
   },
 ];
 
@@ -229,14 +229,12 @@ export default function TestimonialsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* LEFT */}
           <div>
-            <h3 className="text-sm uppercase tracking-wider text-purple-300 mb-4">
-              What Our Customers Say
-            </h3>
-            <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
-              Trusted by Security & Engineering Teams Worldwide
+            
+            <h2 className="text-4xl font-extrabold text-gray-300 leading-tight mb-4">
+             AI-powered vulnerability detection and automated code repair.
             </h2>
-            <p className="text-gray-300 mb-6">
-              Real stories from teams using CyberAgentX to secure their entire lifecycle.
+            <p className=" text-purple-300 mb-6">
+              built to support secure development workflows
             </p>
 
             {/* Controls + Progress */}
