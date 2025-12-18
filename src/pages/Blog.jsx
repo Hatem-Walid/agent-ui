@@ -2,23 +2,12 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Calendar, 
-  Clock, 
   ArrowLeft, 
   Heart, 
   Share2,
 } from "lucide-react";
 
 const BlogPage = () => {
-  // دالة لحساب وقت القراءة بناءً على المحتوى
-  const calculateReadTime = (htmlContent) => {
-    const wordsPerMinute = 200;
-    // إزالة وسوم HTML لاستخراج النص فقط
-    const plainText = htmlContent.replace(/<[^>]*>?/gm, '');
-    const numberOfWords = plainText.split(/\s+/).length;
-    const minutes = Math.ceil(numberOfWords / wordsPerMinute);
-    return `${minutes} min read`;
-  };
-
   const [posts, setPosts] = useState([
     {
       id: 1,
@@ -261,10 +250,6 @@ const BlogPage = () => {
                         <Calendar className="w-4 h-4" />
                         {featuredPost.date}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        {calculateReadTime(featuredPost.content)}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -306,10 +291,6 @@ const BlogPage = () => {
                             <span className="text-xs">{post.likes}</span>
                           </button>
                         </div>
-                        <div className="flex items-center gap-1 text-gray-500">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-xs">{calculateReadTime(post.content)}</span>
-                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -348,10 +329,6 @@ const BlogPage = () => {
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-purple-400" />
                       {selectedPost.date}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-purple-400" />
-                      {calculateReadTime(selectedPost.content)}
                     </div>
                   </div>
                 </div>
