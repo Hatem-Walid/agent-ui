@@ -16,13 +16,13 @@ export default function AuthPage() {
 
   const [tab, setTab] = useState("login"); 
 
-  useEffect(() => {
-    if (tab === "register" && !planId) {
-       // لو عايز تجبره يختار خطة فعل السطر ده، لو مش عايز سيبه
-       showToast("Please choose a plan first", "warning");
-       navigate("/plan"); 
-    }
-  }, [tab, planId, navigate]);
+  // useEffect(() => {
+  //   if (tab === "register" && !planId) {
+  //      // لو عايز تجبره يختار خطة فعل السطر ده، لو مش عايز سيبه
+  //      showToast("Please choose a plan first", "warning");
+  //      navigate("/plan"); 
+  //   }
+  // }, [tab, planId, navigate]);
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({

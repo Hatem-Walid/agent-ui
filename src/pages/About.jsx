@@ -47,13 +47,13 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://www.linkedin.com/in/mohamed-khalid-mk/'
     },
     {
-      image: 'https://i.pravatar.cc/300?img=25',
-      title: 'Sam Kim',
-      subtitle: 'Mobile Developer',
-      handle: '@thesamkim',
+      image: 'public/assets/team_pics/joo.jpg',
+      title: 'Youssef Amr',
+      subtitle: 'CyberSecurity',
+      handle: '@youssif3mr437',
       borderColor: '#8B5CF6',
       gradient: 'linear-gradient(225deg,#8B5CF6,#000)',
-      url: 'https://github.com/'
+      url: 'https://www.linkedin.com/in/youssif-amr-312a64284/'
     },
     {
       image: '/assets/team_pics/zoz.png',
@@ -65,22 +65,22 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://www.linkedin.com/in/ziad-awad-2450a4318'
     },
     {
-      image: 'https://i.pravatar.cc/300?img=11',
-      title: 'Jordan Chen',
-      subtitle: 'DevOps Engineer',
-      handle: '@jordanchen',
+      image: 'public/assets/team_pics/mnss.png',
+      title: 'Mohamed Mansour',
+      subtitle: 'Backend Developer',
+      handle: '@mm7736533',
       borderColor: '#10B981',
       gradient: 'linear-gradient(210deg,#10B981,#000)',
-      url: 'https://linkedin.com/in/'
+      url: 'public/assets/team_pics/mnss.png'
     },
     {
-      image: 'https://i.pravatar.cc/300?img=16',
-      title: 'Casey Park',
-      subtitle: 'Data Scientist',
-      handle: '@caseypark',
+      image: 'public/assets/team_pics/saber.jpg',
+      title: 'Mahmoud Saber',
+      subtitle: 'CyberSecurity',
+      handle: '@mahmoud332',
       borderColor: '#EF4444',
       gradient: 'linear-gradient(195deg,#EF4444,#000)',
-      url: 'https://kaggle.com/'
+      url: 'https://www.linkedin.com/in/mahmoud-saber-013b54315?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
     }
   ];
 

@@ -95,7 +95,7 @@ const ContactUs = () => {
                   </div>
                   <div>
                     <h3 className="text-white font-medium mb-1">Email Address</h3>
-                    <p className="text-gray-400">contact@vulunsneak.com</p>
+                    <p className="text-gray-400">noter1500@gmail.com</p>
                   </div>
                 </div>
               </div>
@@ -139,7 +139,7 @@ const ContactUs = () => {
                   <input
                     type="text"
                     name="name"
-                    placeholder="John Doe"
+                    placeholder="enter your name ..."
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -153,7 +153,7 @@ const ContactUs = () => {
                   <input
                     type="email"
                     name="email"
-                    placeholder="john@example.com"
+                    placeholder="email@gmail.com"
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -175,7 +175,7 @@ const ContactUs = () => {
                   ></textarea>
                 </div>
 
-                {/* Submit Button */}
+                {/* Submit Button (add an targted email) */}
                 <button
                   type="submit"
                   disabled={isSubmitting}

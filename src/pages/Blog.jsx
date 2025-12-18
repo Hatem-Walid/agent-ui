@@ -6,113 +6,224 @@ import {
   User, 
   ArrowLeft, 
   Heart, 
-  MessageCircle, 
   Share2,
-  Tag 
 } from "lucide-react";
 
 const BlogPage = () => {
+  // تم تحديث البيانات بناءً على الروابط والتعريفات المرسلة
   const [posts, setPosts] = useState([
     {
       id: 1,
-      title: "Introduction to VulunSneak: The Future of AI Security",
-      excerpt: "Discover how our specialized AI agent is revolutionizing web vulnerability detection by combining deep learning with automated patching.",
+      title: "SQL Injection (SQLi): The Database Breach",
+      excerpt: "SQL Injection allows an attacker to inject or modify SQL queries, often leading to unauthorized access, modification, or deletion of data in the database.",
       content: `
-        <p class="mb-4">In the rapidly evolving landscape of cybersecurity, traditional scanning tools often fall short. They generate high rates of false positives and lack the context needed to understand complex attack vectors. This is where VulunSneak enters the picture.</p>
-        <h3 class="text-2xl font-bold text-white mb-3 mt-6">What is VulunSneak?</h3>
-        <p class="mb-4">VulunSneak is an advanced AI security agent designed to not just detect, but actively understand and remediate vulnerabilities in web applications. Unlike static analysis tools, it uses a transformer-based architecture to analyze code semantics and traffic patterns simultaneously.</p>
-        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Key Capabilities</h3>
+        <p class="mb-4 text-gray-300">
+          SQL Injection (SQLi) is a web security vulnerability that allows an attacker to interfere with the queries that an application makes to its database. It generally allows an attacker to view data that they are not normally able to retrieve.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">How it Works</h3>
+        <p class="mb-4 text-gray-300">
+          This vulnerability occurs when user input is passed unsafely into backend SQL queries. Attackers can manipulate these queries to bypass authentication, access sensitive data, or even modify/delete the database structure.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Prevention</h3>
         <ul class="list-disc pl-5 mb-4 space-y-2 text-gray-300">
-          <li><strong>Context-Aware Detection:</strong> Reduces false positives by 60% compared to legacy scanners.</li>
-          <li><strong>Auto-Patching:</strong> Generates safe, ready-to-deploy code fixes for identified issues.</li>
-          <li><strong>Real-Time Monitoring:</strong> Inspects live traffic to block exploitation attempts instantly.</li>
+          <li>Use <strong>Prepared Statements</strong> (Parameterized Queries).</li>
+          <li>Use Stored Procedures.</li>
+          <li>Perform Allow-list Input Validation.</li>
         </ul>
-        <p>By integrating VulunSneak into your CI/CD pipeline, you ensure that security is not a bottleneck but an accelerator for your development lifecycle.</p>
+        <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+          <p class="italic text-sm">For a complete guide on prevention, check the <a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html" target="_blank" class="text-purple-400 hover:underline">OWASP SQL Injection Prevention Cheat Sheet</a>.</p>
+        </div>
       `,
-      author: "Ahmed Mahmoud",
-      role: "Lead Security Researcher",
-      date: "March 15, 2024",
-      readTime: "5 min read",
-      tags: ["AI Security", "Innovation", "AppSec"],
-      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
-      likes: 142,
-      comments: 28,
+      author: "Ibrahim Mahmoud",
+      role: "Security Researcher",
+      date: "Dec 17, 2025",
+      readTime: "8 min read",
+      tags: ["OWASP", "SQLi", "Injection"],
+      image: "https://plus.unsplash.com/premium_photo-1664297989345-f4ff2063b212?q=80&w=798&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      likes: 245,
       featured: true
     },
     {
       id: 2,
-      title: "Inside the Brain: How Transformer Models Detect SQLi",
-      excerpt: "A technical deep dive into how VulunSneak's neural networks analyze SQL queries to pinpoint injection flaws with high precision.",
-      content: "Vulun Sneak uses an advanced architecture combining deep learning and natural language processing...",
+      title: "Cross-Site Scripting (XSS): Client-Side Attacks",
+      excerpt: "XSS is an injection flaw where attackers inject malicious scripts (usually JavaScript) into web pages viewed by others, leading to session theft or content tampering.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          Cross-Site Scripting (XSS) attacks occur when an attacker uses a web application to send malicious code, generally in the form of a browser side script, to a different end user.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Impact</h3>
+        <p class="mb-4 text-gray-300">
+          Flaws that allow these attacks are quite widespread and occur anywhere a web application uses input from a user within the output it generates without validating or encoding it. The end user's browser has no way to know that the script should not be trusted, and will execute the script.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Mitigation Strategies</h3>
+        <ul class="list-disc pl-5 mb-4 space-y-2 text-gray-300">
+          <li><strong>Output Encoding:</strong> Convert untrusted input into a safe form where the input is displayed as data to the user without executing as code.</li>
+          <li><strong>Content Security Policy (CSP):</strong> Restrict the sources of executable scripts.</li>
+        </ul>
+          <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+        <p class="italic text-sm"><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html" target="_blank" class="text-purple-400 hover:underline flex items-center gap-1">Read the OWASP XSS Cheat Sheet <ExternalLink class="w-3 h-3"/></a></p>
+      </div> 
+      `,
       author: "Sara Ali",
-      role: "AI Engineer",
-      date: "March 10, 2024",
-      readTime: "7 min read",
-      tags: ["Machine Learning", "SQL Injection", "Deep Learning"],
-      image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?crop=entropy&cs=tinysrgb&w=1200&q=80",
-      likes: 89,
-      comments: 15,
+      role: "Frontend Security",
+      date: "Dec 16, 2025",
+      readTime: "6 min read",
+      tags: ["XSS", "JavaScript", "Client-Side"],
+      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop",
+      likes: 189,
       featured: false
     },
     {
       id: 3,
-      title: "Top 10 Critical Vulnerabilities We Detected in 2024",
-      excerpt: "We analyzed over 1 million lines of code. Here are the most common security flaws found in modern web applications.",
-      content: "Vulun Sneak can detect SQL injections, XSS, CSRF, buffer overflow, and many more...",
-      author: "Mohamed Hassan",
-      role: "Data Analyst",
-      date: "March 5, 2024",
-      readTime: "6 min read",
-      tags: ["Report", "OWASP Top 10", "Stats"],
-      image: "https://images.unsplash.com/photo-1563206767-5b1d97299337?q=80&w=2070&auto=format&fit=crop",
-      likes: 65,
-      comments: 12,
+      title: "OS Command Injection: Arbitrary Execution",
+      excerpt: "Occurs when user input is passed unsafely into system commands, allowing attackers to execute arbitrary OS commands on the server.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          OS Command Injection (also known as Shell Injection) is a web security vulnerability that allows an attacker to execute arbitrary operating system (OS) commands on the server that is running an application.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">The Risk</h3>
+        <p class="mb-4 text-gray-300">
+          This typically compromises the application and all its data. Often, an attacker can leverage an OS command injection vulnerability to compromise other parts of the hosting infrastructure, exploiting trust relationships to pivot the attack to other systems.
+        </p>
+        <div class="mt-6 p-4 bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+          <p class="italic text-sm">CISA Alert: <a href="https://www.cisa.gov/resources-tools/resources/secure-design-alert-eliminating-os-command-injection-vulnerabilities" target="_blank" class="text-purple-400 hover:underline">Eliminating OS Command Injection Vulnerabilities</a>.</p>
+        </div>
+      `,
+      author: "Khaled Abdullah",
+      role: "System Admin",
+      date: "Dec 15, 2025",
+      readTime: "5 min read",
+      tags: ["RCE", "Shell", "CISA"],
+      image: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2074&auto=format&fit=crop",
+      likes: 134,
       featured: false
     },
     {
       id: 4,
-      title: "Automating Security in CI/CD Pipelines",
-      excerpt: "Stop shipping bugs. Learn how to integrate VulunSneak into GitHub Actions and GitLab CI for automated security gates.",
-      content: "Vulun Sneak integrates easily with Jenkins, GitLab CI, GitHub Actions...",
-      author: "Khaled Abdullah",
-      role: "DevSecOps Engineer",
-      date: "Feb 28, 2024",
-      readTime: "8 min read",
-      tags: ["DevOps", "CI/CD", "Automation"],
-      image: "https://images.unsplash.com/photo-1667372393119-c81c0cda0a29?q=80&w=2070&auto=format&fit=crop",
-      likes: 45,
-      comments: 8,
+      title: "Insufficient Cryptography: Weak Protections",
+      excerpt: "Using weak, outdated, or misconfigured cryptographic algorithms, keys, or protocols can let attackers read or tamper with sensitive data.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          Insufficient cryptography involves using algorithms that are known to be weak (like MD5 or SHA1 for passwords) or implementing custom crypto algorithms instead of standard libraries.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Mobile Top 10 Risk</h3>
+        <p class="mb-4 text-gray-300">
+          This is a critical issue in mobile and web apps where sensitive data (PII, passwords, health data) is stored. If the encryption is weak, attackers with physical access or network access can easily decrypt the data.
+        </p>
+          <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+
+        <p class="italic text-sm"><a href="https://owasp.org/www-project-mobile-top-10/2023-risks/m10-insufficient-cryptography" target="_blank" class="text-purple-400 hover:underline flex items-center gap-1">OWASP Mobile Top 10: Insufficient Cryptography <ExternalLink class="w-3 h-3"/></a></p>
+      </div> 
+      `,
+      author: "Nora Said",
+      role: "Cryptography Expert",
+      date: "Dec 14, 2025",
+      readTime: "7 min read",
+      tags: ["Crypto", "Encryption", "Mobile"],
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=2070&auto=format&fit=crop",
+      likes: 98,
       featured: false
     },
     {
       id: 5,
-      title: "VulunSneak vs. Traditional SAST Tools",
-      excerpt: "Benchmark comparison: Why context-aware AI outperforms static analysis in speed, accuracy, and remediation.",
-      content: "The AI model outperforms traditional tools in speed, accuracy...",
-      author: "Nora Said",
-      role: "Product Manager",
-      date: "Feb 20, 2024",
-      readTime: "9 min read",
-      tags: ["Comparison", "Tools", "Tech"],
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
-      likes: 31,
-      comments: 7,
+      title: "XML Injection & Security Risks",
+      excerpt: "XML Injection is when attackers inject or modify XML content or structure so that the application processes unexpected data or behavior.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          XML vulnerabilities often arise from parsing untrusted XML data. The most common form is XML External Entity (XXE) attacks, where an attacker interferes with an application's processing of XML data.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Prevention</h3>
+        <p class="mb-4 text-gray-300">
+          The safest way to prevent XML Injection and XXE is to disable DTDs (External Entities) completely in your XML parser configuration.
+        </p>
+          <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+
+        <p class="italic text-sm"><a href="https://cheatsheetseries.owasp.org/cheatsheets/XML_Security_Cheat_Sheet.html" target="_blank" class="text-purple-400 hover:underline flex items-center gap-1">OWASP XML Security Cheat Sheet <ExternalLink class="w-3 h-3"/></a></p>
+      </div> 
+      `,
+      author: "Mohamed Hassan",
+      role: "Backend Dev",
+      date: "Dec 12, 2025",
+      readTime: "6 min read",
+      tags: ["XML", "XXE", "Parsers"],
+      image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?q=80&w=2128&auto=format&fit=crop",
+      likes: 76,
       featured: false
     },
     {
       id: 6,
-      title: "The Future of Web Security is Autonomous",
-      excerpt: "Predicting the next 5 years of cybersecurity. Will AI agents replace manual penetration testing?",
-      content: "With AI evolving, systems like Vulun Sneak are expected to become a standard...",
-      author: "Omar Farouk",
-      role: "CTO",
-      date: "Feb 15, 2024",
-      readTime: "10 min read",
-      tags: ["Future", "Predictions", "Vision"],
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop",
+      title: "Path Traversal: Accessing Restricted Files",
+      excerpt: "Also known as Directory Traversal, this lets attackers manipulate file paths (e.g., using ../) to access files outside the intended directory.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          A Path Traversal attack (also known as directory traversal) aims to access files and directories that are stored outside the web root folder. By manipulating variables that reference files with "dot-dot-slash" (../) sequences and its variations or by using absolute file paths, it may be possible to access arbitrary files.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Example</h3>
+        <code class="block bg-black p-3 rounded mb-4 text-green-400">
+          https://example.com/loadImage?filename=../../../etc/passwd
+        </code>
+          <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+        <p class="italic text-sm"><a href="https://owasp.org/www-community/attacks/Path_Traversal" target="_blank" class="text-purple-400 hover:underline flex items-center gap-1">Learn more at OWASP Path Traversal <ExternalLink class="w-3 h-3"/></a></p>
+      </div> 
+      `,
+      author: "Ibrahim Mahmoud",
+      role: "Security Researcher",
+      date: "Dec 10, 2025",
+      readTime: "5 min read",
+      tags: ["LFI", "FileSystem", "Access"],
+      image: "https://images.unsplash.com/photo-1590494165264-1ebe3602eb80?q=80&w=2070&auto=format&fit=crop",
       likes: 112,
-      comments: 45,
-      featured: true
+      featured: false
+    },
+    {
+      id: 7,
+      title: "Cross-Site Request Forgery (CSRF)",
+      excerpt: "CSRF tricks a victim’s browser into sending unintended requests using the victim’s existing session or credentials without their consent.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          Cross-Site Request Forgery (CSRF) forces an end user to execute unwanted actions on a web application in which they are currently authenticated. With a little help of social engineering (like sending a link via email or chat), an attacker may trick the users of a web application into executing actions of the attacker's choosing.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Defense</h3>
+        <p class="mb-4 text-gray-300">
+          The most common defense is using <strong>Anti-CSRF Tokens</strong>—unique, unpredictable secrets submitted with every state-changing request.
+        </p>
+          <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+        <p class="italic text-sm"><a href="https://owasp.org/www-community/attacks/csrf" target="_blank" class="text-purple-400 hover:underline flex items-center gap-1">OWASP CSRF Explanation <ExternalLink class="w-3 h-3"/></a></p>
+          </div>
+       `,
+      author: "Omar Farouk",
+      role: "Web Security",
+      date: "Dec 08, 2025",
+      readTime: "7 min read",
+      tags: ["CSRF", "Auth", "Session"],
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      likes: 88,
+      featured: false
+    },
+    {
+      id: 8,
+      title: "Insecure Deserialization: Object Manipulation",
+      excerpt: "Happens when the application deserializes untrusted data, allowing attackers to manipulate objects or even execute arbitrary code.",
+      content: `
+        <p class="mb-4 text-gray-300">
+          Insecure Deserialization is a vulnerability which occurs when untrusted data is used to abuse the logic of an application, inflict a denial of service (DoS) attack, or even execute arbitrary code upon it being deserialized.
+        </p>
+        <h3 class="text-2xl font-bold text-white mb-3 mt-6">Why is it dangerous?</h3>
+        <p class="mb-4 text-gray-300">
+          It effectively allows an attacker to replace the data in an object with malicious data. If the application then uses this data, it can lead to critical remote code execution (RCE) vulnerabilities.
+        </p>
+         <div class="mt-6 p-4 bg-purple-900/30 border-l-4 border-purple-500 rounded-r-lg">
+        <p class="italic text-sm"><a href="https://owasp.org/www-community/vulnerabilities/Insecure_Deserialization" target="_blank" class="text-purple-400 hover:underline flex items-center gap-1">OWASP Insecure Deserialization <ExternalLink class="w-3 h-3"/></a></p>
+         </div>
+        `,
+      author: "Ibrahim Mahmoud",
+      role: "Security Researcher",
+      date: "Dec 05, 2025",
+      readTime: "9 min read",
+      tags: ["Java", "Serialization", "RCE"],
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
+      likes: 156,
+      featured: false
     }
   ]);
 
@@ -132,7 +243,7 @@ const BlogPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#05020D] text-white py-20 px-4 font-sans selection:bg-purple-500/30">
+    <div className="min-h-screen md-7 bg-[#05020D] text-white py-30 px-4 font-sans selection:bg-purple-500/30">
       
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none">
@@ -157,15 +268,15 @@ const BlogPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                 >
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
-                    Security Insights
+                    Vulnerability Database
                   </h1>
                   <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                    Expert articles, deep dives, and tutorials on AI-driven application security.
+                    A comprehensive guide to critical web vulnerabilities, their mechanisms, and how to prevent them.
                   </p>
                 </motion.div>
               </div>
 
-              {/* Featured Post */}
+              {/* Featured Post (SQLi) */}
               {posts.filter(p => p.featured)[0] && (
                 <div 
                   onClick={() => handlePostClick(posts.filter(p => p.featured)[0])}
@@ -178,7 +289,7 @@ const BlogPage = () => {
                     className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 z-20">
-                    <span className="inline-block px-3 py-1 bg-purple-600 rounded-full text-xs font-bold mb-4">FEATURED</span>
+                    <span className="inline-block px-3 py-1 bg-purple-600 rounded-full text-xs font-bold mb-4">CRITICAL RISK</span>
                     <h2 className="text-3xl md:text-5xl font-bold mb-4 group-hover:text-purple-300 transition-colors">
                       {posts.filter(p => p.featured)[0].title}
                     </h2>
@@ -240,7 +351,7 @@ const BlogPage = () => {
                         {post.title}
                       </h3>
                       
-                      <p className="text-gray-400 text-sm mb-4 line-clamp-2 flex-grow">
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">
                         {post.excerpt}
                       </p>
                       
@@ -279,7 +390,7 @@ const BlogPage = () => {
                 className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 group transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                Back to Articles
+                Back to Vulnerabilities
               </button>
 
               <div className="relative rounded-3xl overflow-hidden mb-8 shadow-2xl shadow-purple-900/20">

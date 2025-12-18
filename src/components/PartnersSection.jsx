@@ -4,9 +4,9 @@ import { useState } from "react";
 
 const logos = [
   // "public/logos/mama-removebg-preview.png",
-  "public/logos/cs3.png",
-  "public/logos/cs.png",
-  "public/logos/cs2.png",
+  "/logos/cs3.png",
+  "/logos/cs.png",
+  "/logos/cs2.png",
   // "public/logos/circle-removebg-preview.png",
   // "public/logos/compatia-removebg-preview.png",
   // "public/logos/hacker-removebg-preview.png",

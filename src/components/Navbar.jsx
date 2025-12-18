@@ -20,7 +20,7 @@ const Navbar = () => {
       textColor: "#fff",
       links: [
         { label: "Home", href: "/" },
-        { label: "Pricing Plans", href: "/plan" },
+        // { label: "Pricing Plans", href: "/plan" },
         { label: "AI Chat / Assistant", href: "/ai" } // هذا الرابط الذي نريد حمايته
       ]
     },
