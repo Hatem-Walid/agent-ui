@@ -26,14 +26,14 @@ export default function AuthPage() {
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    password: "",
-    age: "",
-    gender: "",
-    phone: "",
-    address: "",
+    Email: "",
+    FName: "",
+    LName: "",
+    Password: "",
+    Age: "",
+    Gender: "",
+    Phone: "",
+    Address: "",
   });
 
   const [passwordStrength, setPasswordStrength] = useState(0);
