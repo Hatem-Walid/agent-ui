@@ -31,7 +31,7 @@ function App() {
          <Route path="/blog" element={<Blog />} />
         <Route path="/contact" element={<ContactUs />} />  
         <Route path="*" element={<Page404 />} />
-       <Route path="*" element={<Page404joke />} /> 
+       {/* <Route path="*" element={<Page404joke />} />  */}
       </Routes>
     </>
   );
