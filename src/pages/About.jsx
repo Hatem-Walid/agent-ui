@@ -47,7 +47,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://www.linkedin.com/in/mohamed-khalid-mk/'
     },
     {
-      image: 'public/assets/team_pics/joo.jpg',
+      image: '/assets/team_pics/joo.jpg',
       title: 'Youssef Amr',
       subtitle: 'CyberSecurity',
       handle: '@youssif3mr437',
@@ -65,16 +65,16 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://www.linkedin.com/in/ziad-awad-2450a4318'
     },
     {
-      image: 'public/assets/team_pics/mnss.png',
+      image: '/assets/team_pics/mnss.png',
       title: 'Mohamed Mansour',
       subtitle: 'Backend Developer',
       handle: '@mm7736533',
       borderColor: '#10B981',
       gradient: 'linear-gradient(210deg,#10B981,#000)',
-      url: 'public/assets/team_pics/mnss.png'
+      url: 'https://www.linkedin.com/in/mohamed-masnour/'
     },
     {
-      image: 'public/assets/team_pics/saber.jpg',
+      image: '/assets/team_pics/saber.jpg',
       title: 'Mahmoud Saber',
       subtitle: 'CyberSecurity',
       handle: '@mahmoud332',
