@@ -10,31 +10,91 @@ const docs = [
     title: "Getting Started",
     topics: [
       {
-        title: "Installation",
-        content: `Install VulunSneak via npm or yarn. Make sure to set your API key in environment variables.\nThe agent supports all major backend frameworks. Once installed, the agent can scan your application automatically or via API calls.`
+        title: "Introduction",
+        content: `VulnSneak is an AI-driven application security platform designed to assist developers in identifying and repairing security vulnerabilities directly at the source code level.
+                  The system focuses on static analysis enhanced with machine learning, allowing it to understand the semantic behavior of code rather than relying solely on predefined rules.
+                  VulnSneak is developed as an academic research project, aiming to bridge the gap between modern AI techniques and practical software security needs.`
       },
       {
-        title: "Configuration",
-        content: `Configure scanning rules based on your project requirements. Enable or disable detection for specific vulnerabilities like SQL Injection or XSS.\nSet severity thresholds to filter low-risk findings and focus on critical vulnerabilities.`
+        title: "System Overview",
+        content: `At a high level, VulnSneak operates as an intelligent security agent that:
+                  Accepts frontend and backend source code as input
+                  Analyzes the code using AI-based models
+                  Detects potential security vulnerabilities
+                  Generates secure repair suggestions
+                  Provides structured security reports
+                  Keeps the developer in full control of final decisions
+                  The system is designed to integrate naturally into existing development workflows.`
       },
       {
-        title: "First Scan",
-        content: `Run your first scan with VulunSneak. The scan will analyze your codebase, identify potential security flaws, and provide remediation suggestions.\nResults are displayed with severity levels, example payloads, and code fixes.`
+        title: "Installation & Setup",
+        content: `VulnSneak can be deployed in a local or development environment.
+                  The setup includes:
+                  Backend service for handling code uploads and processing
+                  AI models for detection and repair
+                  Secure communication layer for external AI services
+                  Configuration typically involves defining environment variables, enabling or disabling specific analysis features, and preparing the system for local or CI/CD usage.`
+      },
+      {
+        title: "Automated Repair Model",
+        content: `Once a vulnerability is identified, the repair model generates a secure alternative for the affected code segment.
+                  This model uses sequence-to-sequence learning to map vulnerable code to a corrected version.
+                  `
+      },
+      {
+        title: "Key goals of the repair model",
+        content: `Preserve original functionality
+                  Improve security posture
+                  Maintain readability and maintainability
+                  Fixes are presented as recommendations, not automatic enforcement.
+                  `
+      },
+      {
+        title: "Dual-Model Design Rationale",
+        content: `Separating detection and repair into two models allows:
+                  Independent training and evaluation
+                  Better control over error propagation
+                  Easier experimentation and future improvements
+                  This design choice is explicitly intended to support research flexibility.
+                  `
       }
     ]
   },
   {
     id: "api-reference",
-    category: "CORE CONCEPTS",
-    title: "API Reference",
+    category: "System Architecture",
+    title: "System Architecture",
     topics: [
       {
-        title: "Authentication",
-        content: `All API requests require an API key passed in the Authorization header.\nSecure your key and rotate it regularly to prevent unauthorized access.`
+        title: "Architectural Overview",
+        content: `Unlike traditional static analysis tools, VulnSneak treats source code as a structured language.
+                  Using Transformer-based models, the system analyzes both syntax and semantics to identify insecure behavior patterns.
+
+                  This approach allows VulnSneak to:
+
+                  Detect vulnerabilities even when code structure varies
+
+                  Reduce dependence on hardcoded rules
+
+                  Adapt more easily to new coding styles
+                  `
       },
       {
-        title: "Scanning Endpoints",
-        content: `POST /api/v1/scan - Start a new scan\nGET /api/v1/scan/{id} - Retrieve scan results\nEach endpoint provides detailed JSON responses including vulnerabilities, affected files, and remediation steps.`
+        title: "Vulnerability Detection Model",
+        content: `The detection model is trained to classify code snippets into vulnerable or secure categories.
+                  It focuses on vulnerabilities commonly found in web applications, including but not limited
+                  to:
+
+                  SQL Injection
+
+                  Cross-Site Scripting (XSS)
+
+                  Improper input validation
+
+                  Authentication and authorization weaknesses
+
+                  The model produces both a classification result and contextual metadata used in reporting.
+                  `
       }
     ]
   },

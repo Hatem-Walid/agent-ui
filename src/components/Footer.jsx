@@ -8,29 +8,29 @@ export default function Footer() {
 
   const sections = {
     Company: [
-      { name: "About Us", href: "#" },
-      { name: "Careers", href: "#" },
-      { name: "Press", href: "#" },
-      { name: "Partners", href: "#" },
+      { name: "About Us", href: "/about" },
+      // { name: "Careers", href: "#" },
+      // { name: "Press", href: "#" },
+      { name: "Partners", href: "/" },
     ],
     Products: [
       { name: "Platform Overview", href: "#" },
-      { name: "AppSec Agent", href: "#" },
-      { name: "Cloud Scanner", href: "#" },
-      { name: "Integrations", href: "#" },
+      // { name: "AppSec Agent", href: "#" },
+      // { name: "Cloud Scanner", href: "#" },
+      // { name: "Integrations", href: "#" },
     ],
     Resources: [
-      { name: "Documentation", href: "#" },
-      { name: "Blog", href: "#" },
-      { name: "API Reference", href: "#" },
-      { name: "Community", href: "#" },
+      { name: "Documentation", href: "/doc" },
+      { name: "Blog", href: "/blog" },
+      // { name: "API Reference", href: "#" },
+      // { name: "Community", href: "#" },
     ],
-    Legal: [
-      { name: "Privacy Policy", href: "#" },
-      { name: "Terms of Service", href: "#" },
-      { name: "Cookies", href: "#" },
-      { name: "Security", href: "#" },
-    ],
+    // Legal: [
+      // { name: "Privacy Policy", href: "#" },
+      // { name: "Terms of Service", href: "#" },
+      // { name: "Cookies", href: "#" },
+      // { name: "Security", href: "#" },
+    // ],
   };
 
   const socials = [

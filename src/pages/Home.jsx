@@ -6,7 +6,8 @@ const Highlights = lazy(() => import("../components/Highlights"));
 const AnimatedCards = lazy(() => import("../components/AnimatedCards"));
 const Footer = lazy(() => import("../components/Footer"));
 const PartnersSection = lazy(() => import("../components/PartnersSection"));
-const PlatformOverview = lazy(() => import("../components/PlatformOverview"));
+// const PlatformOverview = lazy(() => import("../components/PlatformOverview"));
+const AIWorkflow = lazy(() => import("../components/AIWorkflow"));
 
 const Home = () => {
   return (
@@ -15,7 +16,10 @@ const Home = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <HeroSection />
         <PartnersSection />
-        <PlatformOverview
+        <section style={{ background: 'transparent' }}>
+          <AIWorkflow />
+        </section>
+        {/* <PlatformOverview
           textAutoHide={true}
           enableStars={true}
           enableSpotlight={true}
@@ -26,7 +30,7 @@ const Home = () => {
           spotlightRadius={300}
           particleCount={100}
           glowColor="132, 0, 255"
-        />
+        /> */}
         <AnimatedCards />
         <Highlights />
         <Footer />

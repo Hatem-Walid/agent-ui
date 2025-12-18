@@ -3,14 +3,13 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 const logos = [
-  "/logos/pngwing.com (1).png",
-  "/logos/pngwing.com (2).png",
-  "/logos/pngwing.com (3).png",
-  "/logos/pngwing.com (4).png",
-  "/logos/pngwing.com (5).png",
-  "/logos/pngwing.com(6).png",
-  "/logos/pngwing.com (7).png",
-  "/logos/pngwing.com.png",
+  // "public/logos/mama-removebg-preview.png",
+  "public/logos/cs3.png",
+  "public/logos/cs.png",
+  "public/logos/cs2.png",
+  // "public/logos/circle-removebg-preview.png",
+  // "public/logos/compatia-removebg-preview.png",
+  // "public/logos/hacker-removebg-preview.png",
 ];
 
 export default function PartnersSection() {
