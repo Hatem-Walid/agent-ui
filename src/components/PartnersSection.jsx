@@ -3,13 +3,15 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 const logos = [
-  // "public/logos/mama-removebg-preview.png",
   "/logos/cs3.png",
   "/logos/cs.png",
   "/logos/cs2.png",
-  // "public/logos/circle-removebg-preview.png",
-  // "public/logos/compatia-removebg-preview.png",
-  // "public/logos/hacker-removebg-preview.png",
+  "/logos/cs3.png",
+  "/logos/cs.png",
+  "/logos/cs2.png",
+  "/logos/cs3.png",
+  "/logos/cs.png",
+  "/logos/cs2.png",
 ];
 
 export default function PartnersSection() {
@@ -40,7 +42,7 @@ export default function PartnersSection() {
               <img
                 src={logo}
                 alt="Partner Logo"
-                className={`h-8 md:h-10 lg:h-12 object-contain opacity-80 group-hover:opacity-100 transition-all duration-300 grayscale group-hover:grayscale-0
+                className={`h-8 md:h-10 lg:h-25 object-contain opacity-80 group-hover:opacity-100 transition-all duration-300 grayscale group-hover:grayscale-0
                   ${activeLogo === i ? 'opacity-100 grayscale-0 scale-110' : ''}
                 `}
               />

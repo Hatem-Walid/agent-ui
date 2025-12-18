@@ -81,6 +81,15 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       borderColor: '#EF4444',
       gradient: 'linear-gradient(195deg,#EF4444,#000)',
       url: 'https://www.linkedin.com/in/mahmoud-saber-013b54315?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
+    },
+       {
+      image: '/assets/team_pics/osama.png',
+      title: 'Prof. Dr. Osama Sheta',
+      subtitle: 'Superviser',
+      handle: '@Osama',
+      borderColor: '#EF4444',
+      gradient: 'linear-gradient(195deg,#EF4444,#000)',
+      url: 'https://www.linkedin.com/in/osama-sheta-bb086484/'
     }
   ];
 

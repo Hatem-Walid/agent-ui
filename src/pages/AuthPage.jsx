@@ -26,14 +26,14 @@ export default function AuthPage() {
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({
-    Email: "",
-    FName: "",
-    LName: "",
-    Password: "",
-    Age: "",
-    Gender: "",
-    Phone: "",
-    Address: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    age: "",
+    gender: "",
+    phone: "",
+    address: "",
   });
 
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -110,7 +110,7 @@ export default function AuthPage() {
       Email: registerForm.email,      // C# Property: Email
       Password: registerForm.password, // C# Property: Password
       Age: Number(registerForm.age),  // C# Property: Age (int)
-      Gender: registerForm.gender,    // C# Property: Gender (string) - بعتناها زي ما هي "male" مش boolean
+      Gender: registerForm.gender==="male",    // C# Property: Gender (boolean) - بعتناها زي ما هي "male" مش boolean
       Phone: registerForm.phone,      // C# Property: Phone
       Address: registerForm.address,  // C# Property: Address
       // PlanId: planId // بما ان الباك إند مغيرناهوش ومش بيستقبل PlanId، السطر ده مش هيأثر بس مش هيتحفظ
@@ -212,8 +212,8 @@ export default function AuthPage() {
               <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
               <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
                 <option value="">Select Gender</option>
-                <option value="Male" className="text-black">Male</option> {/* القيمة بقت String Capitalized زي ما C# بتحب */}
-                <option value="Female" className="text-black">Female</option>
+                <option value="Male" className="text-blue-500">Male</option> {/* القيمة بقت String Capitalized زي ما C# بتحب */}
+                <option value="Female" className="text-blue-500">Female</option>
               </select>
               <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
               <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />

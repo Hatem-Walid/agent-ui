@@ -173,6 +173,9 @@ const Navbar = () => {
           </div>
 
           {/* Logo */}
+         <Link
+          to="/"
+          >
           <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
             <img 
               src="\assets\main.svg"
@@ -180,6 +183,7 @@ const Navbar = () => {
               className="h-14 w-auto"
             />
           </div>
+          </Link>
 
           {/* User / Login */}
           <div className="hidden md:flex h-full items-center">
