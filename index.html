@@ -5,7 +5,7 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/assets/icon-7.svg" />
-   <link rel="icon" type="image/png" sizes="48x48" href="/logos/og-image.png" />
+   <link rel="icon" type="image/png" sizes="48x48" href="/logos/favicon.png" />
 
     <!-- Manifest for PWA -->
     <link rel="manifest" href="/manifest.json" />
@@ -27,7 +27,7 @@
     />
 
     <meta name="author" content="Hatem Waleed" />
-
+    
     <!-- Open Graph (WhatsApp / Facebook) -->
     <meta property="og:title" content="VulnSneak-AI | Secure your site" />
     <meta
@@ -64,13 +64,34 @@
         font-family: system-ui, sans-serif;
       }
     </style>
+          <!-- 🔥 Structured Data (SEO Boost) -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "VulnSneak-AI",
+          "applicationCategory": "Cybersecurity",
+          "operatingSystem": "Web",
+          "url": "https://vulnsneak-ai.site",
+          "description": "AI-powered cybersecurity and vulnerability scanning platform."
+        }
+        </script>
   </head>
 
   <body>
     <!-- Skeleton مكان React -->
+      
     <div id="root">
+      <h1>VulnSneak-AI – AI Cybersecurity & Vulnerability Scanning Platform</h1>
+
+      <p>
+        VulnSneak-AI is an AI-powered cybersecurity platform for intelligent
+        vulnerability detection, real-time security scanning, and threat analysis.
+      </p>
+
       <div id="initial-loader">Loading...</div>
     </div>
+
 
     <!-- React / Vite Entry -->
     <script type="module" src="/src/main.jsx"></script>
