@@ -1,6 +1,6 @@
 {
-  "name": "Agent UI Beta",
-  "short_name": "AgentUI",
+  "name": "VulnSneak-AI",
+  "short_name": "VulnSneak",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -8,14 +8,19 @@
   "theme_color": "#0d1117",
   "icons": [
     {
-      "src": "/icons/vite.svg",
-      "sizes": "192x192",
-      "type": "image/svg"
+      "src": "/og-image.png",
+      "sizes": "48x48",
+      "type": "image/png"
     },
     {
-      "src": "/icons/vite.svg",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg"
+      "type": "image/png"
     }
   ]
 }
