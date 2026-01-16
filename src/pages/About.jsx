@@ -16,7 +16,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       subtitle: 'Cybersecurity developer',
       handle: '@S7S',
       borderColor: '#4F46E5',
-      gradient: 'linear-gradient(145deg,#4F46E5,#000)',
+      gradient: 'linear-gradient(165deg,#F59E0B,#000)',
       url: 'https://github.com/'
     },
     {
@@ -29,12 +29,12 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://www.linkedin.com/in/ibrahim-mahmoud-80b1a5358?utm_source=share_via&utm_content=profile&utm_medium=member_android'
     },
     {
-      image: 'https://i.pravatar.cc/300?img=3',
-      title: 'Morgan Blake',
-      subtitle: 'UI/UX Designer',
-      handle: '@morganblake',
+      image: '/assets/team_pics/Tomy.png',
+      title: 'Hatem Waleed ',
+      subtitle: 'Front-End Developer',
+      handle: '@Tommy_225',
       borderColor: '#F59E0B',
-      gradient: 'linear-gradient(165deg,#F59E0B,#000)',
+      gradient: 'linear-gradient(145deg,#4F46E5,#000)',
       url: 'https://dribbble.com/'
     },
     {
@@ -61,7 +61,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       subtitle: 'Backend Developer',
       handle: '@ziad.awad.9210',
       borderColor: '#06B6D4',
-      gradient: 'linear-gradient(135deg,#06B6D4,#000)',
+      gradient: 'linear-gradient(195deg,#EF4444,#000)',
       url: 'https://www.linkedin.com/in/ziad-awad-2450a4318'
     },
     {
@@ -79,7 +79,7 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       subtitle: 'CyberSecurity',
       handle: '@mahmoud332',
       borderColor: '#EF4444',
-      gradient: 'linear-gradient(195deg,#EF4444,#000)',
+      gradient: 'linear-gradient(135deg,#06B6D4,#000)',
       url: 'https://www.linkedin.com/in/mahmoud-saber-013b54315?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app'
     },
        {

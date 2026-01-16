@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { RetellWebClient } from 'retell-client-js-sdk';
 
-// Initialize the Retell Client
 const retellWebClient = new RetellWebClient();
 
 const RetellAgent = () => {
   const [isCalling, setIsCalling] = useState(false);
 
-  // --- Configuration ---
+  // البيانات الخاصة بك
   const AGENT_ID = "agent_9b47b3e56823c52808c6519818";
   const API_KEY = "key_b7f5ec9e816de552dd7a0892e3bd"; 
 
@@ -29,63 +28,52 @@ const RetellAgent = () => {
       });
 
       if (!response.ok) throw new Error("Failed to get access token");
-      
       const data = await response.json();
+
       await retellWebClient.startCall({ accessToken: data.access_token });
       setIsCalling(true);
 
-      retellWebClient.on("call_ended", () => {
-        setIsCalling(false);
-      });
+      retellWebClient.on("call_ended", () => setIsCalling(false));
     } catch (error) {
       console.error("Error:", error);
-      alert("حدث خطأ في الاتصال بالاجينت");
+      alert("حدث خطأ في الاتصال");
     }
   };
 
-  // Helper to split text into animated spans
-  const renderLetters = (text) => {
-    return text.split("").map((char, index) => (
-      <span 
-        key={index} 
-        className="btn-letter" 
-        style={{ animationDelay: `${index * 0.05}s` }}
-      >
-        {char === " " ? "\u00A0" : char}
-      </span>
-    ));
-  };
+  const StarSVG = () => (
+    <svg
+      viewBox="0 0 784.11 815.53"
+      style={{ shapeRendering: "geometricPrecision", fillRule: "evenodd" }}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M392.05 0c-20.9,210.08 -184.06,378.41 -392.05,407.78 207.96,29.37 371.12,197.68 392.05,407.74 20.93,-210.06 184.09,-378.37 392.05,-407.74 -207.98,-29.38 -371.16,-197.69 -392.06,-407.78z"
+        fill="#fffdef"
+      ></path>
+    </svg>
+  );
 
   return (
-    <>
+    <div className="agent-container">
       <style>{cssStyles}</style>
-      <div className="agent-container">
-        <div className="btn-wrapper">
-          <button 
-            className={`retell-btn ${isCalling ? 'active-call' : ''}`} 
-            onClick={toggleCall}
-          >
-            <svg className="btn-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-              ></path>
-            </svg>
+      
+      <button 
+        className={`ai-agent-btn ${isCalling ? 'is-calling' : ''}`} 
+        onClick={toggleCall}
+      >
+        {isCalling ? "End Connection" : "Talk to VulnSneak"}
+        
+        {/* Stars Container */}
+        <div className="star-1"><StarSVG /></div>
+        <div className="star-2"><StarSVG /></div>
+        <div className="star-3"><StarSVG /></div>
+        <div className="star-4"><StarSVG /></div>
+        <div className="star-5"><StarSVG /></div>
+        <div className="star-6"><StarSVG /></div>
+      </button>
 
-            <div className="txt-wrapper">
-              <div className="txt-1">
-                {renderLetters("Talk to VulnSneak")}
-              </div>
-              <div className="txt-2">
-                {renderLetters("End Call Now")}
-              </div>
-            </div>
-          </button>
-        </div>
-        {isCalling && <p className="status-label">جاري التحدث الآن...</p>}
-      </div>
-    </>
+      {isCalling && <p className="voice-status">AI is listening...</p>}
+    </div>
   );
 };
 
@@ -100,145 +88,133 @@ const cssStyles = `
   align-items: center;
 }
 
-.status-label {
-  margin-top: 10px;
-  font-family: sans-serif;
-  font-size: 12px;
-  color: #fff;
-  opacity: 0.8;
-  animation: flicker 2s infinite;
-}
-
-.btn-wrapper {
+/* ================= BUTTON ================= */
+.ai-agent-btn {
+  --navy: #0a0b1e;
+  --violet: #8b5cf6;
+  --silver: #e1e1e1;
+  
   position: relative;
-  display: inline-block;
-}
-
-.retell-btn {
-  --border-radius: 24px;
-  --padding: 4px;
-  --transition: 0.4s;
-  --button-color: #101010;
-  --highlight-color-hue: 210deg; /* Blue tint */
-
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6em 1.2em 0.6em 1em;
-  font-family: "Poppins", "Inter", sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  background-color: var(--button-color);
-  border: solid 1px #fff2;
-  border-radius: var(--border-radius);
+  padding: 12px 26px;          /* ⬅ أصغر */
+  background: var(--navy);
+  font-size: 15px;             /* ⬅ أصغر */
+  font-weight: 700;
+  color: white;
+  border-radius: 999px;        /* ⬅ نص دايرة حقيقي */
+  border: none;
+  transition: all 0.3s ease-in-out;
   cursor: pointer;
-  position: relative;
-  transition: box-shadow var(--transition), border var(--transition), background-color var(--transition);
-  box-shadow:
-    inset 0px 1px 1px rgba(255, 255, 255, 0.2),
-    0px 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Red theme when calling */
-.retell-btn.active-call {
-  --highlight-color-hue: 0deg; /* Red tint */
-  border: solid 1px rgba(255, 50, 50, 0.5);
-}
-
-.retell-btn::before {
-  content: "";
+/* ===== Animated Border ===== */
+.ai-agent-btn:before,
+.ai-agent-btn:after {
+  content: '';
   position: absolute;
-  top: calc(0px - var(--padding));
-  left: calc(0px - var(--padding));
-  width: calc(100% + var(--padding) * 2);
-  height: calc(100% + var(--padding) * 2);
-  border-radius: calc(var(--border-radius) + var(--padding));
-  pointer-events: none;
-  background-image: linear-gradient(0deg, #0004, #000a);
+  inset: -2px;
+  border-radius: 999px;        /* ⬅ نفس شكل الزر */
+  background: linear-gradient(
+    45deg,
+    var(--navy),
+    #1b1b1b,
+    #2e2e2e,
+    var(--violet),
+    var(--silver),
+    var(--violet),
+    #2e2e2e,
+    #1b1b1b,
+    var(--navy)
+  );
+  background-size: 400%;
   z-index: -1;
-  box-shadow: 1px 1px 1px #fff2, -1px -1px 1px #0002;
+  animation: steam 20s linear infinite;
 }
 
-.retell-btn::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  border-radius: inherit;
-  pointer-events: none;
-  background-image: linear-gradient(0deg, #fff, hsl(var(--highlight-color-hue), 100%, 70%), transparent 10%);
-  opacity: 0;
-  transition: opacity var(--transition);
-}
-
-.retell-btn:hover::after, .retell-btn.active-call::after {
+.ai-agent-btn:after {
+  filter: blur(20px);
   opacity: 0.6;
 }
 
-.txt-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 140px;
-  height: 24px;
-}
-
-.txt-1, .txt-2 {
+/* ================= STARS ================= */
+.star-1, .star-2, .star-3, .star-4, .star-5, .star-6 {
   position: absolute;
-  white-space: nowrap;
-  transition: 0.4s ease-in-out;
+  width: 14px;
+  height: auto;
+  z-index: -5;
+  transition: all 0.8s cubic-bezier(0.05, 0.83, 0.43, 0.96);
+  opacity: 0;
 }
 
-.txt-2 { opacity: 0; transform: translateY(10px); }
+.star-1 { top: 20%; left: 20%; width: 18px; }
+.star-2 { top: 45%; left: 45%; width: 14px; }
+.star-3 { top: 40%; left: 40%; width: 9px; }
+.star-4 { top: 20%; left: 40%; width: 11px; }
+.star-5 { top: 25%; left: 45%; width: 14px; }
+.star-6 { top: 5%; left: 50%; width: 9px; }
 
-/* Toggle visibility between the two texts */
-.retell-btn.active-call .txt-1 { opacity: 0; transform: translateY(-10px); }
-.retell-btn.active-call .txt-2 { opacity: 1; transform: translateY(0); }
-
-.btn-letter {
-  position: relative;
-  display: inline-block;
-  color: #fff5;
-  animation: letter-anim 2s ease-in-out infinite;
+/* ================= ANIMATION ================= */
+@keyframes steam {
+  0% { background-position: 0 0; }
+  50% { background-position: 400% 0; }
+  100% { background-position: 0 0; }
 }
 
-@keyframes letter-anim {
-  50% { text-shadow: 0 0 3px #fff8; color: #fff; }
+/* ================= HOVER / CALLING ================= */
+.ai-agent-btn:hover,
+.ai-agent-btn.is-calling {
+  background: #000;
+  box-shadow: 0 0 35px rgba(139, 92, 246, 0.35);
 }
 
-/* SVG Styling */
-.btn-svg {
-  height: 22px;
-  width: 22px;
-  margin-right: 10px;
-  fill: #e8e8e8;
-  transition: 0.4s;
+.ai-agent-btn.is-calling:before,
+.ai-agent-btn.is-calling:after {
+  animation-duration: 5s;
+  background: linear-gradient(
+    45deg,
+    var(--navy),
+    var(--violet),
+    #fff,
+    var(--violet),
+    var(--navy)
+  );
+  background-size: 400%;
 }
 
-.retell-btn.active-call .btn-svg {
-  fill: #ff4d4d;
-  filter: drop-shadow(0 0 5px #ff4d4d);
+/* ===== Star Motion ===== */
+.ai-agent-btn:hover .star-1,
+.ai-agent-btn.is-calling .star-1 { top: -35%; left: -15%; opacity: 1; z-index: 2; }
+
+.ai-agent-btn:hover .star-2,
+.ai-agent-btn.is-calling .star-2 { top: 30%; left: -25%; opacity: 1; z-index: 2; }
+
+.ai-agent-btn:hover .star-3,
+.ai-agent-btn.is-calling .star-3 { top: 90%; left: 10%; opacity: 1; z-index: 2; }
+
+.ai-agent-btn:hover .star-4,
+.ai-agent-btn.is-calling .star-4 { top: -30%; left: 100%; opacity: 1; z-index: 2; }
+
+.ai-agent-btn:hover .star-5,
+.ai-agent-btn.is-calling .star-5 { top: 40%; left: 110%; opacity: 1; z-index: 2; }
+
+.ai-agent-btn:hover .star-6,
+.ai-agent-btn.is-calling .star-6 { top: 90%; left: 90%; opacity: 1; z-index: 2; }
+
+/* ================= STATUS ================= */
+.voice-status {
+  margin-top: 12px;
+  color: var(--violet);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: pulse 1.5s infinite alternate;
 }
 
-.retell-btn:hover .btn-svg {
-  fill: #fff;
-}
-
-/* Call Animation effect on letters */
-.retell-btn.active-call .btn-letter {
-  animation: focused-letter-anim 1s ease-in-out infinite;
-}
-
-@keyframes focused-letter-anim {
-  50% {
-    transform: scale(1.1);
-    filter: brightness(150%);
-    color: hsl(var(--highlight-color-hue), 100%, 80%);
-  }
-}
-
-@keyframes flicker {
-  50% { opacity: 0.4; }
+@keyframes pulse {
+  from { opacity: 0.5; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 `;
 
