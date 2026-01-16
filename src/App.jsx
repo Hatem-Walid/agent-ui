@@ -12,6 +12,7 @@ import ContactUs from "./pages/ContactUs";
 import Page404 from "./pages/Page404";
 // import Page404joke from "./pages/Page404joke";
 import './App.css';
+import RetellAgent from './components/RetellAgent';
 
 function App() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function App() {
   return (
     <>
     {!hideNavbarRoutes.includes(location.pathname) && <Navbar />} 
+    <RetellAgent />
       <Routes>
        <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />

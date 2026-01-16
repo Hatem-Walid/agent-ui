@@ -42,7 +42,7 @@ export default function PartnersSection() {
               <img
                 src={logo}
                 alt="Partner Logo"
-                className={`h-8 md:h-10 lg:h-25 object-contain opacity-80 group-hover:opacity-100 transition-all duration-300 grayscale group-hover:grayscale-0
+                className={`h-8 md:h-10 lg:h-18 object-contain opacity-80 group-hover:opacity-100 transition-all duration-300 grayscale group-hover:grayscale-0
                   ${activeLogo === i ? 'opacity-100 grayscale-0 scale-110' : ''}
                 `}
               />
