@@ -23,16 +23,16 @@ function App() {
     {!hideNavbarRoutes.includes(location.pathname) && <Navbar />} 
     <RetellAgent />
       <Routes>
-       <Route path="/" element={<Home />} />
+       {/* <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/About" element={<About />} />
         <Route path="/ai" element={<SplineChatPage />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/doc" element={<Docs />} />
-        {/* <Route path="/plan" element={<PlanPage />} />  */}
          <Route path="/blog" element={<Blog />} />
-        <Route path="/contact" element={<ContactUs />} />  
+        <Route path="/contact" element={<ContactUs />} />   */}
         <Route path="*" element={<Page404 />} />
+        {/* <Route path="/plan" element={<PlanPage />} />  */}
        {/* <Route path="*" element={<Page404joke />} />  */}
       </Routes>
     </>
