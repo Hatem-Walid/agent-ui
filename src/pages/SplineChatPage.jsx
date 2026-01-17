@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import Spline from "@splinetool/react-spline";
 import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "../api/apiClient"; 
-import { useAuth } from "../context/AuthContext"; // 1. استدعاء هوك المصادقة
+import { useAuth } from "../context/AuthContext"; 
 
 // --- ShinyText Component (زي ما هو) ---
 const ShinyText = ({ 
@@ -72,13 +72,16 @@ const ShinyInput = ({
 
 // --- Main Component ---
 export default function SplineAgentPage() {
-  const { user, logout } = useAuth(); // 2. استخدام بيانات اليوزر
+  const { user, logout } = useAuth(); 
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  
+  // --- المرجع الجديد للتحكم في السكرول يدوياً ---
+  const chatContainerRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -87,6 +90,17 @@ export default function SplineAgentPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // --- منطق تمرير السكرول يدوياً لتمرير التفاعل للخلفية ---
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop += e.deltaY;
+      }
+    };
+    window.addEventListener("wheel", handleWheel);
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
 
   // --- File Upload Logic ---
   const handleFileUpload = async (event) => {
@@ -101,7 +115,6 @@ export default function SplineAgentPage() {
       const formData = new FormData();
       formData.append('formFile', file); 
 
-      // الـ apiClient المفروض يكون فيه Interceptor بيحط التوكن اوتوماتيك
       const response = await apiClient.post("/api/v1/Chat/Message", formData);
 
       const data = response.data;
@@ -155,7 +168,6 @@ ${data.comment || "No comments provided."}
     }, 1000);
   };
 
-  // تجهيز اسم المستخدم للعرض
   const firstName = user?.firstName || user?.Name || "User";
   const userInitial = firstName.charAt(0).toUpperCase();
 
@@ -173,7 +185,6 @@ ${data.comment || "No comments provided."}
         <Spline scene="https://prod.spline.design/u6UUd9ny38gtOZtR/scene.splinecode" />
       </div>
 
-      {/* Sidebar toggle */}
       <AnimatePresence>
         {!sidebarOpen && (
           <motion.button
@@ -195,7 +206,6 @@ ${data.comment || "No comments provided."}
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -215,14 +225,13 @@ ${data.comment || "No comments provided."}
               className="fixed top-0 left-0 h-full w-77 z-50 pointer-events-auto overflow-y-auto"
             >
               <div className="h-full bg-gradient-to-b from-purple-900/40 to-black/95 backdrop-blur-2xl border-r border-white/10 p-6 flex flex-col shadow-2xl">
-                {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
                       V
                     </div>
                     <div>
-                      <h2 className="text-white font-bold text-xl">VULN SNEAK</h2>
+                      <h2 className="text-white font-bold text-xl">VulnSneak</h2>
                       <p className="text-gray-400 text-sm">AI Agent</p>
                     </div>
                   </div>
@@ -234,7 +243,6 @@ ${data.comment || "No comments provided."}
                   </button>
                 </div>
 
-                {/* Stats */}
                 <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/10">
                   <h3 className="text-white font-semibold mb-3">Session Stats</h3>
                   <div className="grid grid-cols-2 gap-3">
@@ -249,15 +257,13 @@ ${data.comment || "No comments provided."}
                   </div>
                 </div>
 
-                {/* Menu / Chats */}
                 <div className="flex-1">
                   <h3 className="text-white font-semibold mb-4">History</h3>
                   <div className="space-y-3">
-                     <p className="text-gray-500 text-sm">No recent history...</p>
+                     <p className="text-gray-500 text-sm">This Model Using Temporary Chat . . .</p>
                   </div>
                 </div>
 
-                {/* User Profile - 3. عرض بيانات اليوزر ديناميكياً */}
                 <div className="pt-6 border-t border-white/10">
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer">
                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center text-white font-bold">
@@ -267,7 +273,6 @@ ${data.comment || "No comments provided."}
                       <p className="text-white font-medium truncate">{user?.name}</p>
                       <p className="text-gray-400 text-xs truncate">{user?.Email || "User Email"}</p>
                     </div>
-                    {/* Logout Button inside Sidebar (Optional) */}
                     <button onClick={logout} className="text-red-400 hover:text-red-300 text-sm ml-2">
                         ➔
                     </button>
@@ -279,9 +284,7 @@ ${data.comment || "No comments provided."}
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
       <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
-        
         {!started && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
@@ -295,11 +298,10 @@ ${data.comment || "No comments provided."}
               className="text-center mb-12"
             >
               <h1 className="text-6xl text-shadow-purple-950 font-light bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent mb-4">
-                {/* 4. تغيير التحية لتكون ديناميكية */}
-                Hello,{user?.name || "None"}
+                Hello {user?.name || ""}
               </h1>
-              <p className="text-gray-300 text-xl max-w-md mx-auto">
-                Ready to analyze vulnerabilities and secure your projects?
+              <p className="text-gray-300 text-xl max-w-xl mx-auto text-xl">
+                Ready to analyze vulnerabilities & secure your projects . . . ?
               </p>
             </motion.div>
 
@@ -307,110 +309,139 @@ ${data.comment || "No comments provided."}
               initial={{ y: 30, opacity: 0 }} 
               animate={{ y: 0, opacity: 1 }} 
               transition={{ delay: 0.4 }} 
-              className="w-full max-w-2xl bg-black/50 backdrop-blur-sm border border-white/20 rounded-3xl p-6 shadow-2xl flex items-center pointer-events-auto gap-2"
+              className="relative w-full max-w-2xl p-[1.5px] overflow-hidden rounded-3xl shadow-2xl pointer-events-auto"
             >
-               <button
-                onClick={triggerFileInput}
-                className="p-3 text-white/70 hover:text-white transition-colors duration-200"
-                title="Upload file"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-                </svg>
-              </button>
-
-              <ShinyInput
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                placeholder="Ask your AI agent..."
-                className="flex-1 p-3 text-lg"
-                shinySpeed={3}
+              <span 
+                className="absolute inset-[-1000%] animate-[spin_6s_linear_infinite] 
+                [background:conic-gradient(from_90deg_at_50%_50%,transparent_0%,#8b5cf6_50%,transparent_100%)]" 
               />
-              <button 
-                onClick={sendMessage} 
-                className="px-8 py-3 bg-black/70 backdrop-blur-sm text-white font-semibold rounded-2xl hover:bg-black transition-all duration-300 border border-gray-700/50"
-              >
-                Send
-              </button>
+              <div className="relative z-10 flex items-center gap-2 w-full h-full bg-black/80 backdrop-blur-md rounded-[calc(1.5rem-1.5px)] p-6 border border-white/10">
+                <button
+                  onClick={triggerFileInput}
+                  className="p-3 text-white/70 hover:text-white transition-colors duration-200"
+                  title="Upload file"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                  </svg>
+                </button>
+                <ShinyInput
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                  placeholder="Ask your AI agent..."
+                  className="flex-1 p-3 text-lg bg-transparent border-none outline-none text-white"
+                  shinySpeed={3}
+                />
+                <button
+                  onClick={sendMessage}
+                  className="relative group p-[1px] overflow-hidden rounded-2xl transition-all duration-300 shadow-lg"
+                >
+                  <span 
+                    className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] 
+                    [background:conic-gradient(from_90deg_at_50%_50%,transparent_0%,#8b5cf6_50%,transparent_100%)]" 
+                  />
+                  <span className="relative z-10 flex items-center justify-center px-8 py-3 bg-black/90 backdrop-blur-sm text-white font-semibold rounded-[calc(1rem-1px)] group-hover:bg-black transition-all duration-300">
+                    Send
+                  </span>
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
 
-        {/* Chat UI */}
         <AnimatePresence>
           {started && (
             <motion.div 
               initial={{ opacity: 0, y: 30 }} 
               animate={{ opacity: 1, y: 0 }} 
-              className="w-full h-full pt-24 max-w-6xl mx-auto flex flex-col pointer-events-none"
+              className="w-full h-full pt-24 max-w-6xl mx-auto flex flex-col pointer-events-none relative"
             >
-              <div className="flex-1 p-6 overflow-y-auto space-y-4">
-                {messages.map((msg, i) => (
-                  <motion.div 
-                    key={i} 
-                    initial={{ opacity: 0, y: 20 }} 
-                    animate={{ opacity: 1, y: 0 }} 
-                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div className={`max-w-[70%] p-4 rounded-3xl backdrop-blur-xl ${
-                      msg.sender === "user" 
-                        ? " bg-white/50 backdrop-blur-xl text-black shadow-2xl shadow-black/45 border-b-black" 
-                        : "bg-black/40 border border-white/20 text-white"
-                    }`}>
-                      <div className="flex items-start gap-3">
-                        {msg.sender === "bot" && (
-                          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mt-1">
-                            AI
+              {/* منطقة الرسائل مع السكرول بار المخصص - pointer-events-none تسمح بالتفاعل مع الخلفية في الفراغات */}
+              <div className="flex-1 flex justify-center overflow-hidden">
+                <div 
+                  ref={chatContainerRef}
+                  className="w-full max-w-3xl p-6 overflow-y-auto space-y-4 pointer-events-none 
+                  /* تخصيص السكرول بار بـ Tailwind */
+                  [&::-webkit-scrollbar]:w-1.5
+                  [&::-webkit-scrollbar-track]:bg-transparent 
+                  [&::-webkit-scrollbar-thumb]:bg-black
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  hover:[&::-webkit-scrollbar-thumb]:bg-zinc-800
+                  [scrollbar-width:_thin]
+                  [scrollbar-color:_black_transparent]
+                  "
+                >
+                  {messages.map((msg, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, y: 20 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      {/* الكروت تأخذ pointer-events-auto لكي تستطيع الضغط عليها */}
+                      <div className={`max-w-[75%] p-4 rounded-3xl backdrop-blur-xl pointer-events-auto shadow-2xl ${
+                        msg.sender === "user" 
+                          ? " bg-white/50 text-black shadow-black/45" 
+                          : "bg-black/40 border border-white/20 text-white"
+                      }`}>
+                        <div className="flex items-start gap-3">
+                          {msg.sender === "bot" && (
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold mt-1">
+                              AI
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="leading-relaxed whitespace-pre-wrap text-sm">{msg.text}</div>
+                            <p className="text-[10px] opacity-70 mt-2">
+                              {msg.sender === "user" ? "You" : "Spline Agent"} • Just now
+                            </p>
                           </div>
-                        )}
-                        <div className="flex-1">
-                          <div className="leading-relaxed whitespace-pre-wrap">{msg.text}</div>
-                          <p className="text-xs opacity-70 mt-2">
-                            {msg.sender === "user" ? "You" : "Spline Agent"} • Just now
-                          </p>
+                          {msg.sender === "user" && (
+                            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold mt-1">
+                              {userInitial}
+                            </div>
+                          )}
                         </div>
-                        {msg.sender === "user" && (
-                          // 5. الحرف الأول من اسم اليوزر
-                          <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white text-sm font-bold mt-1">
-                            {userInitial}
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
-                <div ref={messagesEndRef} />
+                    </motion.div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
               </div>
+              
+              {/* شريط الإدخال */}
+              <div className="w-full max-w-3xl mx-auto px-4 pb-8 pointer-events-none">
+                <div className="p-2 flex gap-2 pointer-events-auto bg-black/60 backdrop-blur-xl rounded-full items-center border border-white/10 shadow-2xl">
+                  <button
+                      onClick={triggerFileInput}
+                      className="p-3 text-white/60 hover:text-white transition-all duration-200 rounded-full hover:bg-white/10 flex-shrink-0"
+                      title="Upload file"
+                  >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                      </svg>
+                  </button>
 
-              {/* Bottom Input Bar */}
-              <div className="p-8 flex gap-4 pointer-events-auto bg-black/70 rounded-full items-center">
-                <button
-                    onClick={triggerFileInput}
-                    className="p-3 text-white/70 hover:text-white transition-colors duration-200 border border-white/20 rounded-full hover:bg-white/10"
-                    title="Upload file"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-                    </svg>
-                </button>
+                  <div className="flex-1 relative">
+                      <ShinyInput
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                          placeholder="Message your AI agent..."
+                          className="w-full bg-transparent border-none py-2 px-4 text-white focus:outline-none placeholder:text-white/20"
+                          shinySpeed={3}
+                          textClassName="ml-2" 
+                      />
+                  </div>
 
-                <ShinyInput
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    placeholder="Message your AI agent..."
-                    className="flex-1 bg-black/70 border border-white/20 p-5 rounded-full"
-                    shinySpeed={3}
-                    textClassName="ml-9" 
-                />
-
-                <button 
-                  onClick={sendMessage} 
-                  className="px-8 bg-black/70 text-white font-semibold rounded-full hover:bg-black/90 transition-all duration-300 border border-white/50"
-                >
-                  Send
-                </button>
+                  <button 
+                    onClick={sendMessage} 
+                    className="h-10 px-6 bg-white text-black text-sm font-bold rounded-full hover:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center justify-center shadow-lg"
+                  >
+                    Send
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
