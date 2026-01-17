@@ -38,14 +38,14 @@ function App() {
     <Routes>
       {/* 1. المسارات التي يظهر فيها الـ RetellAgent والـ Navbar */}
       <Route element={<MainLayout hideNavbarRoutes={hideNavbarRoutes} />}>
-        {/* <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/ai" element={<SplineChatPage />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/doc" element={<Docs />} />
         <Route path="/blog" element={<Blog />} />
-        <Route path="/contact" element={<ContactUs />} /> */}
+        <Route path="/contact" element={<ContactUs />} />
 
         {/* <Route path="/plan" element={<PlanPage />} />  */}
         {/* <Route path="*" element={<Page404joke />} />  */}
