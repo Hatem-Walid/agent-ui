@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "../api/apiClient"; 
 import { useAuth } from "../context/AuthContext"; 
 
-// --- ShinyText Component (زي ما هو) ---
+// --- ShinyText Component ---
 const ShinyText = ({ 
   text, 
   disabled = false, 
@@ -31,7 +31,7 @@ const ShinyText = ({
   );
 };
 
-// --- ShinyInput Component (زي ما هو) ---
+// --- ShinyInput Component ---
 const ShinyInput = ({ 
   value, 
   onChange, 
@@ -79,8 +79,6 @@ export default function SplineAgentPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
-  
-  // --- المرجع الجديد للتحكم في السكرول يدوياً ---
   const chatContainerRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -91,7 +89,6 @@ export default function SplineAgentPage() {
     scrollToBottom();
   }, [messages]);
 
-  // --- منطق تمرير السكرول يدوياً لتمرير التفاعل للخلفية ---
   useEffect(() => {
     const handleWheel = (e) => {
       if (chatContainerRef.current) {
@@ -116,8 +113,23 @@ export default function SplineAgentPage() {
       formData.append('formFile', file); 
 
       const response = await apiClient.post("/api/v1/Chat/Message", formData);
-
       const data = response.data;
+      
+      console.log("API Data received:", data);
+
+      // --- استخراج الكود من vulnSnippets (الذي يأتي كـ String JSON) ---
+      let extractedSnippet = "";
+      if (data.vulnSnippets) {
+        try {
+          const parsedSnippets = JSON.parse(data.vulnSnippets);
+          if (Array.isArray(parsedSnippets) && parsedSnippets.length > 0) {
+            extractedSnippet = parsedSnippets[0].snippet;
+          }
+        } catch (e) {
+          console.error("Error parsing snippets array:", e);
+        }
+      }
+
       const formattedReply = `
 🔍 Analysis Result for ${data.filename || "File"}:
 
@@ -129,17 +141,17 @@ export default function SplineAgentPage() {
 ${data.comment || "No comments provided."}
       `.trim();
 
-      setMessages((prev) => [...prev, { sender: "bot", text: formattedReply }]);
+      setMessages((prev) => [...prev, { 
+        sender: "bot", 
+        text: formattedReply,
+        label: data.label, // مثل "XSS Injection"
+        snippet: extractedSnippet // الكود البرمجي الصافي
+      }]);
 
     } catch (err) {
       console.error("Upload Error:", err);
       let msg = "❌ Failed to process file.";
-      if (err.response) {
-        msg += `\nStatus: ${err.response.status}`;
-      } else {
-        msg += `\nError: ${err.message}`;
-      }
-      setMessages((prev) => [...prev, { sender: "bot", text: msg }]);
+      setMessages((prev) => [...prev, { sender: "bot", text: msg, label: "Safe" }]);
     }
     event.target.value = null;
   };
@@ -158,13 +170,11 @@ ${data.comment || "No comments provided."}
 
     setTimeout(() => {
       const botResponses = [
-        "Processing your request...",
-        "I'm analyzing the security parameters based on your input.",
-        "Could you provide more details about the target system?",
-        "Log entry recorded. Awaiting further commands."
+        "The server is down, please try again later..",
+        "Could you provide the file of the target system...?"
       ];
       const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      setMessages((prev) => [...prev, { sender: "bot", text: randomResponse }]);
+      setMessages((prev) => [...prev, { sender: "bot", text: randomResponse, label: "Safe" }]);
     }, 1000);
   };
 
@@ -357,19 +367,17 @@ ${data.comment || "No comments provided."}
               animate={{ opacity: 1, y: 0 }} 
               className="w-full h-full pt-24 max-w-6xl mx-auto flex flex-col pointer-events-none relative"
             >
-              {/* منطقة الرسائل مع السكرول بار المخصص - pointer-events-none تسمح بالتفاعل مع الخلفية في الفراغات */}
               <div className="flex-1 flex justify-center overflow-hidden">
                 <div 
                   ref={chatContainerRef}
                   className="w-full max-w-3xl p-6 overflow-y-auto space-y-4 pointer-events-none 
-                  /* تخصيص السكرول بار بـ Tailwind */
                   [&::-webkit-scrollbar]:w-1.5
                   [&::-webkit-scrollbar-track]:bg-transparent 
-                  [&::-webkit-scrollbar-thumb]:bg-black
+                  [&::-webkit-scrollbar-thumb]:bg-zinc-800
                   [&::-webkit-scrollbar-thumb]:rounded-full
-                  hover:[&::-webkit-scrollbar-thumb]:bg-zinc-800
+                  hover:[&::-webkit-scrollbar-thumb]:bg-zinc-600
                   [scrollbar-width:_thin]
-                  [scrollbar-color:_black_transparent]
+                  [scrollbar-color:_#27272a_transparent]
                   "
                 >
                   {messages.map((msg, i) => (
@@ -379,8 +387,7 @@ ${data.comment || "No comments provided."}
                       animate={{ opacity: 1, y: 0 }} 
                       className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      {/* الكروت تأخذ pointer-events-auto لكي تستطيع الضغط عليها */}
-                      <div className={`max-w-[75%] p-4 rounded-3xl backdrop-blur-xl pointer-events-auto shadow-2xl ${
+                      <div className={`max-w-[85%] p-4 rounded-3xl backdrop-blur-xl pointer-events-auto shadow-2xl ${
                         msg.sender === "user" 
                           ? " bg-white/50 text-black shadow-black/45" 
                           : "bg-black/40 border border-white/20 text-white"
@@ -391,8 +398,31 @@ ${data.comment || "No comments provided."}
                               AI
                             </div>
                           )}
-                          <div className="flex-1">
+                          <div className="flex-1 overflow-hidden">
                             <div className="leading-relaxed whitespace-pre-wrap text-sm">{msg.text}</div>
+
+                            {/* --- Code Block: يظهر فقط في حال الرد غير Safe ووجود الكود --- */}
+                            {msg.sender === "bot" && 
+                             msg.label && 
+                             msg.label.toLowerCase().trim() !== "safe" && 
+                             msg.snippet && (
+                              <div className="mt-4 rounded-xl overflow-hidden border border-white/10 bg-black/70 shadow-2xl">
+                                <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+                                  <span className="text-[10px] text-purple-300 font-mono font-bold uppercase tracking-wider">Vulnerable Code Snippet</span>
+                                  <div className="flex gap-1.5">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                                  </div>
+                                </div>
+                                <div className="p-4 overflow-x-auto bg-black/30">
+                                  <pre className="text-xs font-mono text-cyan-300/90 leading-relaxed whitespace-pre select-all">
+                                    {msg.snippet}
+                                  </pre>
+                                </div>
+                              </div>
+                            )}
+
                             <p className="text-[10px] opacity-70 mt-2">
                               {msg.sender === "user" ? "You" : "Spline Agent"} • Just now
                             </p>
@@ -410,7 +440,6 @@ ${data.comment || "No comments provided."}
                 </div>
               </div>
               
-              {/* شريط الإدخال */}
               <div className="w-full max-w-3xl mx-auto px-4 pb-8 pointer-events-none">
                 <div className="p-2 flex gap-2 pointer-events-auto bg-black/60 backdrop-blur-xl rounded-full items-center border border-white/10 shadow-2xl">
                   <button

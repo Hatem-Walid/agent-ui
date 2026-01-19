@@ -129,7 +129,7 @@ const AIWorkflow = () => {
             initial={{ height: 0 }}
             whileInView={{ height: '100%' }}
             viewport={{ once: true }}
-            transition={{ duration: 5, ease: "easeInOut" }}
+            transition={{ duration: 10, ease: "easeInOut" }}
           />
 
           {/* 3. الخطوات (Steps) */}
