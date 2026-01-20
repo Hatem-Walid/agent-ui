@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useToast } from "../components/ToastProvider";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "../components/ToastProvider";
 import { login, register } from "../api/apiClient.js";
 import { useAuth } from "../context/AuthContext";
 
@@ -11,36 +11,17 @@ export default function AuthPage() {
   const location = useLocation();
   const { login: authLogin } = useAuth();
 
-  const planId = location.state?.planId;
   const from = location.state?.from?.pathname || "/ai";
 
-  const [tab, setTab] = useState("login"); 
-
-  // useEffect(() => {
-  //   if (tab === "register" && !planId) {
-  //      // لو عايز تجبره يختار خطة فعل السطر ده، لو مش عايز سيبه
-  //      showToast("Please choose a plan first", "warning");
-  //      navigate("/plan"); 
-  //   }
-  // }, [tab, planId, navigate]);
+  const [tab, setTab] = useState("login");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    password: "",
-    age: "",
-    gender: "",
-    phone: "",
-    address: "",
+    email: "", firstName: "", lastName: "", password: "", age: "", gender: "", phone: "", address: "",
   });
 
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // --- Handlers ---
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginForm((prev) => ({ ...prev, [name]: value }));
@@ -49,218 +30,171 @@ export default function AuthPage() {
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm((prev) => ({ ...prev, [name]: value }));
-    if (name === "password") setPasswordStrength(getPasswordStrength(value));
   };
-  
-  const togglePassword = () => setShowPassword((prev) => !prev);
-
-  const getPasswordStrength = (pass) => {
-    let score = 0;
-    if (pass.length >= 6) score++;
-    if (/[A-Z]/.test(pass)) score++;
-    if (/[0-9]/.test(pass)) score++;
-    if (/[^A-Za-z0-9]/.test(pass)) score++;
-    return score;
-  };
-
-  // --- Submit Logic (تم التعديل لمطابقة الباك إند) ---
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (!loginForm.email || !loginForm.password) return showToast("Required fields", "error");
-
     setIsSubmitting(true);
     try {
-      // 1. الداتا بتتبعت للباك إند
-      const response = await login(loginForm); 
-      console.log("Full login response:", response);
-      // الـ login function عندك في الـ apiClient غالباً بترجع response.data
-      const data = response.data || response; 
-    console.log("Login response data:", data);
- const userName = data.Name || data.name || data.FullName || "User";
- const email = data.Email || data.email || "email not get";
-      // 2. حسب كود الباك إند، الرد فيه: { token: "...", Name: "Hatem Ali", expiration: "..." }
-      // لاحظ إن الاسم جاي في مفتاح اسمه "Name" والحرف الأول Capital
-      
-      authLogin(data.token, userName, email); // استخدمنا Name من الباك إند
-
-      showToast("Login successful! 🎉");
+      const response = await login(loginForm);
+      const data = response.data || response;
+      const userName = data.Name || data.name || "User";
+      authLogin(data.token, userName, data.email);
+      showToast("Welcome back! 🎉");
       navigate(from, { replace: true });
-
     } catch (err) {
-      console.error(err);
       showToast(err.response?.data?.message || "Login failed", "error");
-    } finally {
-      setIsSubmitting(false);
-    }
+    } finally { setIsSubmitting(false); }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (!registerForm.email) return showToast("Email required", "error");
-
     setIsSubmitting(true);
-
-    // 🔴🔴 أهم خطوة: تحويل البيانات لنفس أسماء الـ DTO في C#
     const payload = {
-      Fname: registerForm.firstName,  // C# Property: Fname
-      Lname: registerForm.lastName,   // C# Property: Lname
-      Email: registerForm.email,      // C# Property: Email
-      Password: registerForm.password, // C# Property: Password
-      Age: Number(registerForm.age),  // C# Property: Age (int)
-      Gender: registerForm.gender==="male",    // C# Property: Gender (boolean) - بعتناها زي ما هي "male" مش boolean
-      Phone: registerForm.phone,      // C# Property: Phone
-      Address: registerForm.address,  // C# Property: Address
-      // PlanId: planId // بما ان الباك إند مغيرناهوش ومش بيستقبل PlanId، السطر ده مش هيأثر بس مش هيتحفظ
+      Fname: registerForm.firstName, Lname: registerForm.lastName, Email: registerForm.email,
+      Password: registerForm.password, Age: Number(registerForm.age), Gender: registerForm.gender === "Male",
+      Phone: registerForm.phone, Address: registerForm.address,
     };
-
     try {
       await register(payload);
-      showToast("Registration successful! Please Login.");
-      setTab("login"); // نقلبه لصفحة اللوجن عشان يدخل
-      setRegisterForm({ email: "", firstName: "", lastName: "", password: "", age: "", gender: "", phone: "", address: "" });
-      setPasswordStrength(0);
+      showToast("Registration successful! Please login.");
+      setTab("login");
     } catch (err) {
-      console.error(err);
       showToast(err.response?.data?.message || "Registration failed", "error");
-    } finally {
-      setIsSubmitting(false);
-    }
+    } finally { setIsSubmitting(false); }
   };
 
-  const formVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -40 },
-  };
-
-  // --- UI ---
-  // نفس الـ JSX بتاعك بالظبط
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#0f0f1a]">
-      <div className="w-full max-w-lg bg-[#151525]/90 backdrop-blur-xl border border-purple-700/30 p-8 rounded-3xl shadow-2xl">
-        <h2 className="text-3xl font-bold text-purple-400 text-center mb-6">
-          {tab === "login" ? "Welcome Back" : "Create Account"}
-        </h2>
+    <div className="min-h-screen w-full flex items-center justify-center p-6 relative overflow-hidden bg-black">
+      
+      {/* 1. الصورة كخلفية مع زيادة الإضاءة */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
+        style={{ backgroundImage: `url('public/assets/AUTH_BG.png')` }} // تأكد أن الصورة في مجلد public
+      >
+        {/* طبقة لزيادة الإضاءة (Light Overlay) */}
+        <div className="absolute inset-0 bg-purple-500/10 backdrop-brightness-110"></div>
+      </div>
 
-        <AnimatePresence mode="wait">
-          {tab === "login" ? (
+      <style>{`
+        @keyframes rotate-beam { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .border-beam-calm::before {
+          content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+          background: conic-gradient(transparent, transparent, transparent, rgba(168, 85, 247, 0.3), rgba(255, 255, 255, 0.1), transparent);
+          animation: rotate-beam 8s linear infinite;
+        }
+      `}</style>
+
+      {/* 2. الكرت الزجاجي (Glass) */}
+      <div className="relative z-10 w-full max-w-[450px] rounded-[40px] overflow-hidden p-[1.5px] border-beam-calm shadow-2xl shadow-purple-900/20">
+        <div className="relative z-20 w-full bg-white/[0.05] backdrop-blur-[30px] rounded-[38.5px] p-8 md:p-10 border border-white/10">
+          
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-semibold text-white tracking-tight mb-2">
+              {tab === "login" ? "Welcome" : "Get Started"}
+            </h2>
+            <p className="text-white/40 text-[10px] uppercase tracking-[0.4em]">For designers</p>
+          </div>
+
+          <AnimatePresence mode="wait">
             <motion.form
-              key="login"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={formVariants}
-              onSubmit={handleLoginSubmit}
+              key={tab}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onSubmit={tab === "login" ? handleLoginSubmit : handleRegisterSubmit}
               className="space-y-4"
             >
-              <Input label="Email *" name="email" type="email" value={loginForm.email} onChange={handleLoginChange} required />
-              <PasswordInput
-                label="Password *"
-                name="password"
-                value={loginForm.password}
-                onChange={handleLoginChange}
-                showPassword={showPassword}
-                togglePassword={togglePassword}
+              <Input
+                label="Email"
+                name="email"
+                type="email"
+                placeholder="email@example.com"
+                value={tab === "login" ? loginForm.email : registerForm.email}
+                onChange={tab === "login" ? handleLoginChange : handleRegisterChange}
+                required
               />
-              <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
-                {isSubmitting ? "Processing..." : "Login"}
-              </button>
-              <div className="text-center text-gray-400 text-sm mt-2">
-                Don’t have an account?{" "}
-                <button type="button" onClick={() => setTab("register")} className="text-purple-400 hover:text-purple-300">
-                  Register here
-                </button>
-              </div>
-            </motion.form>
-          ) : (
-            <motion.form
-              key="register"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={formVariants}
-              onSubmit={handleRegisterSubmit}
-              className="space-y-4"
-            >
-              <Input label="Email *" name="email" type="email" value={registerForm.email} onChange={handleRegisterChange} required />
-              <Input label="First Name *" name="firstName" value={registerForm.firstName} onChange={handleRegisterChange} required />
-              <Input label="Last Name" name="lastName" value={registerForm.lastName} onChange={handleRegisterChange} />
-              <PasswordInput
-                label="Password *"
-                name="password"
-                value={registerForm.password}
-                onChange={handleRegisterChange}
-                showPassword={showPassword}
-                togglePassword={togglePassword}
-              />
-              {/* Strength Bar Code */}
+
+              {tab === "register" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="First Name" name="firstName" value={registerForm.firstName} onChange={handleRegisterChange} required />
+                  <Input label="Last Name" name="lastName" value={registerForm.lastName} onChange={handleRegisterChange} />
+                </div>
+              )}
+
               <div className="relative">
-                <motion.div className="w-full h-2 bg-gray-700/50 rounded-xl overflow-hidden" initial={false}>
-                  <motion.div
-                    className="h-full rounded-xl"
-                    animate={{
-                      width: ["0%", "25%", "50%", "75%", "100%"][passwordStrength] || "0%",
-                      backgroundColor: ["transparent", "#f56565", "#ecc94b", "#4299e1", "#48bb78"][passwordStrength]
-                    }}
-                  />
-                </motion.div>
-              </div>
-
-              <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
-              <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none">
-                <option value="">Select Gender</option>
-                <option value="Male" className="text-blue-500">Male</option> {/* القيمة بقت String Capitalized زي ما C# بتحب */}
-                <option value="Female" className="text-blue-500">Female</option>
-              </select>
-              <Input label="Phone" name="phone" value={registerForm.phone} onChange={handleRegisterChange} />
-              <Input label="Address" name="address" value={registerForm.address} onChange={handleRegisterChange} />
-
-              <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl text-white font-semibold text-lg shadow-xl">
-                {isSubmitting ? "Processing..." : "Register"}
-              </button>
-              <div className="text-center text-gray-400 text-sm mt-2">
-                Already have an account?{" "}
-                <button type="button" onClick={() => setTab("login")} className="text-purple-400 hover:text-purple-300">
-                  Login here
+                <Input
+                  label="Password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={tab === "login" ? loginForm.password : registerForm.password}
+                  onChange={tab === "login" ? handleLoginChange : handleRegisterChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-5 bottom-3 text-white/20 hover:text-white/50 text-[10px] tracking-widest"
+                >
+                  {showPassword ? "HIDE" : "SHOW"}
                 </button>
               </div>
+
+              {tab === "register" && (
+                 <div className="grid grid-cols-2 gap-3">
+                    <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
+                    <div className="flex flex-col gap-1">
+                      <label className="text-white/30 text-[10px] uppercase ml-4 tracking-widest">Gender</label>
+                      <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full bg-white/[0.03] border border-white/10 p-3 px-5 rounded-full text-white/80 outline-none text-sm focus:border-white/20 transition-all appearance-none cursor-pointer">
+                        <option value="" className="bg-[#0f0f15]">Select</option>
+                        <option value="Male" className="bg-[#0f0f15]">Male</option>
+                        <option value="Female" className="bg-[#0f0f15]">Female</option>
+                      </select>
+                    </div>
+                 </div>
+              )}
+
+              {/* الأزرار نصف دائرية (rounded-full) */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-4 mt-6 bg-white text-black font-bold rounded-full hover:bg-opacity-90 transition-all active:scale-[0.97] shadow-lg text-xs tracking-[0.2em]"
+              >
+                {isSubmitting ? "PROCESSING..." : tab === "login" ? "LOG IN" : "SIGN UP"}
+              </button>
             </motion.form>
-          )}
-        </AnimatePresence>
-        <div className="text-center mt-4">
-            <button onClick={() => navigate("/")} className="text-gray-400 hover:text-purple-400 text-sm underline">Back to Home</button>
+          </AnimatePresence>
+
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setTab(tab === "login" ? "register" : "login")}
+              className="text-white/30 hover:text-white/60 text-[10px] tracking-[0.15em] transition-colors"
+            >
+              {tab === "login" ? "CREATE AN ACCOUNT" : "I HAVE AN ACCOUNT"}
+            </button>
+          </div>
+          
+          <button onClick={() => navigate("/")} className="w-full mt-6 text-white/10 hover:text-white/30 text-[9px] tracking-[0.5em] transition-all">
+            EXIT
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
+// مكون المدخلات (نصف دائري rounded-full)
 function Input({ label, ...props }) {
   return (
-    <div>
-      <label className="text-gray-300 mb-1 block">{label}</label>
-      <input {...props} className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none placeholder-gray-400" />
-    </div>
-  );
-}
-
-function PasswordInput({ label, value, onChange, name, showPassword, togglePassword }) {
-  return (
-    <div className="relative">
-      <label className="text-gray-300 mb-1 block">{label}</label>
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-white/30 text-[10px] uppercase tracking-widest ml-4 font-light">{label}</label>
       <input
-        name={name}
-        type={showPassword ? "text" : "password"}
-        value={value}
-        onChange={onChange}
-        className="w-full p-3 bg-[#1e1e2e] border border-purple-700/50 rounded-xl text-gray-100 outline-none placeholder-gray-400"
+        {...props}
+        className="w-full bg-white/[0.03] border border-white/10 p-3 px-5 rounded-full text-white outline-none focus:bg-white/[0.06] focus:border-white/30 transition-all placeholder:text-white/5 text-sm font-light"
       />
-      <button type="button" onClick={togglePassword} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-        {showPassword ? "🙈" : "👁️"}
-      </button>
     </div>
   );
 }

@@ -29,13 +29,13 @@ const ChromaGrid = ({ items, className = '', radius = 300, damping = 0.45, fadeO
       url: 'https://www.linkedin.com/in/ibrahim-mahmoud-80b1a5358?utm_source=share_via&utm_content=profile&utm_medium=member_android'
     },
     {
-      image: '/assets/team_pics/Tomy.png',
+      image: '/assets/team_pics/Tom.jpeg',
       title: 'Hatem Waleed ',
       subtitle: 'Front-End Developer',
       handle: '@Tommy_225',
       borderColor: '#F59E0B',
       gradient: 'linear-gradient(145deg,#4F46E5,#000)',
-      url: 'https://dribbble.com/'
+      url: 'https://www.linkedin.com/in/hatem-waleed-a256a1320/'
     },
     {
       image: '/assets/team_pics/khaled.jpg',
