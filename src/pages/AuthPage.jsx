@@ -69,46 +69,50 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-6 relative overflow-hidden bg-black">
       
-      {/* 1. الصورة كخلفية مع زيادة الإضاءة */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000"
-        style={{ backgroundImage: `url('public/assets/AUTH_BG.png')` }} // تأكد أن الصورة في مجلد public
-      >
-        {/* طبقة لزيادة الإضاءة (Light Overlay) */}
-        <div className="absolute inset-0 bg-purple-500/10 backdrop-brightness-110"></div>
-      </div>
-
+      {/* استدعاء خط Syncopate */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap');
+        
         @keyframes rotate-beam { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .border-beam-calm::before {
           content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
           background: conic-gradient(transparent, transparent, transparent, rgba(168, 85, 247, 0.3), rgba(255, 255, 255, 0.1), transparent);
           animation: rotate-beam 8s linear infinite;
         }
+        .syncopate { font-family: 'Syncopate', sans-serif; }
       `}</style>
 
-      {/* 2. الكرت الزجاجي (Glass) */}
-      <div className="relative z-10 w-full max-w-[450px] rounded-[40px] overflow-hidden p-[1.5px] border-beam-calm shadow-2xl shadow-purple-900/20">
-        <div className="relative z-20 w-full bg-white/[0.05] backdrop-blur-[30px] rounded-[38.5px] p-8 md:p-10 border border-white/10">
+      {/* الصورة كخلفية */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('/assets/AUTH_BG.png')` }} 
+      >
+        <div className="absolute inset-0 bg-purple-500/10 backdrop-brightness-125"></div>
+      </div>
+
+      {/* الكرت الزجاجي */}
+      <div className="relative z-10 w-full max-w-[450px] rounded-[40px] overflow-hidden p-[1.5px] border-beam-calm shadow-2xl">
+        <div className="relative z-20 w-full bg-white/[0.06] backdrop-blur-[35px] rounded-[38.5px] p-8 md:p-10 border border-white/10">
           
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-semibold text-white tracking-tight mb-2">
-              {tab === "login" ? "Welcome" : "Get Started"}
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-white tracking-[0.3em] uppercase syncopate mb-3">
+              {tab === "login" ? "VULNSNEAK" : "REGISTER"}
             </h2>
-            <p className="text-white/40 text-[10px] uppercase tracking-[0.4em]">For designers</p>
+            {/* جعلنا كلمة For designers أوضح قليلاً */}
+            <p className="text-white/70 text-[9px] uppercase tracking-[0.5em] font-medium">For developers</p>
           </div>
 
           <AnimatePresence mode="wait">
             <motion.form
               key={tab}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               onSubmit={tab === "login" ? handleLoginSubmit : handleRegisterSubmit}
-              className="space-y-4"
+              className="space-y-5"
             >
               <Input
-                label="Email"
+                label="Email Address"
                 name="email"
                 type="email"
                 placeholder="email@example.com"
@@ -137,7 +141,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 bottom-3 text-white/20 hover:text-white/50 text-[10px] tracking-widest"
+                  className="absolute right-6 bottom-3.5 text-white/50 hover:text-white transition-all text-[10px] font-bold tracking-widest"
                 >
                   {showPassword ? "HIDE" : "SHOW"}
                 </button>
@@ -146,39 +150,39 @@ export default function AuthPage() {
               {tab === "register" && (
                  <div className="grid grid-cols-2 gap-3">
                     <Input label="Age" name="age" type="number" value={registerForm.age} onChange={handleRegisterChange} />
-                    <div className="flex flex-col gap-1">
-                      <label className="text-white/30 text-[10px] uppercase ml-4 tracking-widest">Gender</label>
-                      <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full bg-white/[0.03] border border-white/10 p-3 px-5 rounded-full text-white/80 outline-none text-sm focus:border-white/20 transition-all appearance-none cursor-pointer">
-                        <option value="" className="bg-[#0f0f15]">Select</option>
-                        <option value="Male" className="bg-[#0f0f15]">Male</option>
-                        <option value="Female" className="bg-[#0f0f15]">Female</option>
+                    <div className="flex flex-col gap-1.5">
+                      {/* الـ label هنا أيضاً أصبح أوضح */}
+                      <label className="text-white/80 text-[10px] uppercase ml-5 tracking-widest font-semibold">Gender</label>
+                      <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full bg-white/[0.05] border border-white/10 p-3 px-5 rounded-full text-white/90 outline-none text-sm focus:border-white/30 transition-all appearance-none cursor-pointer">
+                        <option value="" className="bg-[#111]">Select</option>
+                        <option value="Male" className="bg-[#111]">Male</option>
+                        <option value="Female" className="bg-[#111]">Female</option>
                       </select>
                     </div>
                  </div>
               )}
 
-              {/* الأزرار نصف دائرية (rounded-full) */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 mt-6 bg-white text-black font-bold rounded-full hover:bg-opacity-90 transition-all active:scale-[0.97] shadow-lg text-xs tracking-[0.2em]"
+                className="w-full py-4 mt-4 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-all active:scale-[0.97] shadow-xl text-xs tracking-[0.3em] syncopate"
               >
-                {isSubmitting ? "PROCESSING..." : tab === "login" ? "LOG IN" : "SIGN UP"}
+                {isSubmitting ? "..." : tab === "login" ? "LOG IN" : "SIGN UP"}
               </button>
             </motion.form>
           </AnimatePresence>
 
-          <div className="mt-8 text-center">
+          <div className="mt-10 text-center">
             <button
               onClick={() => setTab(tab === "login" ? "register" : "login")}
-              className="text-white/30 hover:text-white/60 text-[10px] tracking-[0.15em] transition-colors"
+              className="text-white/60 hover:text-white text-[9px] tracking-[0.2em] transition-colors font-bold"
             >
-              {tab === "login" ? "CREATE AN ACCOUNT" : "I HAVE AN ACCOUNT"}
+              {tab === "login" ? "CREATE AN ACCOUNT" : "ALREADY HAVE AN ACCOUNT"}
             </button>
           </div>
           
-          <button onClick={() => navigate("/")} className="w-full mt-6 text-white/10 hover:text-white/30 text-[9px] tracking-[0.5em] transition-all">
-            EXIT
+          <button onClick={() => navigate("/")} className="w-full mt-6 text-white/20 hover:text-white/40 text-[8px] tracking-[0.6em] transition-all">
+            EXIT SYSTEM
           </button>
         </div>
       </div>
@@ -186,14 +190,17 @@ export default function AuthPage() {
   );
 }
 
-// مكون المدخلات (نصف دائري rounded-full)
+// مكون المدخلات المحدث بـ Labels أكثر بياضاً
 function Input({ label, ...props }) {
   return (
-    <div className="flex flex-col gap-1 w-full">
-      <label className="text-white/30 text-[10px] uppercase tracking-widest ml-4 font-light">{label}</label>
+    <div className="flex flex-col gap-1.5 w-full">
+      {/* تغيير text-white/30 إلى text-white/80 و font-semibold لزيادة الوضوح */}
+      <label className="text-white/80 text-[10px] uppercase tracking-[0.15em] ml-5 font-semibold">
+        {label}
+      </label>
       <input
         {...props}
-        className="w-full bg-white/[0.03] border border-white/10 p-3 px-5 rounded-full text-white outline-none focus:bg-white/[0.06] focus:border-white/30 transition-all placeholder:text-white/5 text-sm font-light"
+        className="w-full bg-white/[0.04] border border-white/10 p-3.5 px-6 rounded-full text-white outline-none focus:bg-white/[0.08] focus:border-white/30 transition-all placeholder:text-white/20 text-sm font-light"
       />
     </div>
   );
