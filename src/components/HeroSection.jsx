@@ -75,8 +75,9 @@ function Hero() {
         </div> */}
 
         {/* Main Heading */}
-        <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-bold mb-1 block text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-500 leading-snug md:leading-normal">
-          Improve Your Security with AI
+        <style>@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');</style>
+        <h1 className="hero-title font-['Audiowide'] text-4xl md:text-5xl lg:text-6xl xl:text-6xl font-bold mb-1 block text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-purple-500 leading-snug md:leading-normal">
+           V U L N S N E A K
         </h1>
 
         {/* Description */}
