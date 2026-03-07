@@ -82,13 +82,22 @@ export default function AuthPage() {
         .syncopate { font-family: 'Syncopate', sans-serif; }
       `}</style>
 
-      {/* الصورة كخلفية */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('/assets/AUTH_BG.png')` }} 
+          {/* الفيديو كخلفية */}
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
       >
-        <div className="absolute inset-0 bg-purple-500/10 backdrop-brightness-125"></div>
-      </div>
+        <source src="/assets/AUTH_BG.mp4" type="video/mp4" />
+        {/* يمكنك إضافة روابط بديلة هنا لضمان التوافق */}
+      </video>
+
+      {/* طبقة الغطاء (Overlay) والتأثيرات */}
+      <div className="absolute inset-0 bg-purple-500/10 backdrop-brightness-125"></div>
+    </div>
 
       {/* الكرت الزجاجي */}
       <div className="relative z-10 w-full max-w-[450px] rounded-[40px] overflow-hidden p-[1.5px] border-beam-calm shadow-2xl">
