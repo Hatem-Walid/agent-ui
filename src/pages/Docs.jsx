@@ -348,7 +348,7 @@ export default function Docs() {
             </p>
           </div>
 
-          <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-12" />
+          <div className="h-px bg-linear-to-r from-transparent via-white/10 to-transparent mb-12" />
 
           {docs.map((doc) => (
             <section key={doc.id} id={doc.id} className="mb-24 scroll-mt-28">
@@ -364,7 +364,7 @@ export default function Docs() {
                     <h3 className="text-xl font-semibold text-purple-200 mb-4 flex items-center gap-2">
                        {topic.title}
                     </h3>
-                    <div className="text-gray-400 text-base leading-7 whitespace-pre-line bg-white/[0.02] border border-white/5 rounded-xl p-6 hover:bg-white/[0.04] transition-colors">
+                    <div className="text-gray-400 text-base leading-7 whitespace-pre-line bg-white/2 border border-white/5 rounded-xl p-6 hover:bg-white/4 transition-colors">
                       {topic.content}
                     </div>
                   </div>

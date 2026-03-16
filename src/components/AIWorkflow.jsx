@@ -102,7 +102,7 @@ const AIWorkflow = () => {
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"
+            className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-linear-to-r from-blue-400 via-purple-400 to-pink-400"
           >
             Full-Stack Security Pipeline
           </motion.h2>
@@ -125,7 +125,7 @@ const AIWorkflow = () => {
 
           {/* 2. الخط المتحرك المضيء (Gradient) */}
           <motion.div 
-            className="absolute left-8 md:left-[3.2rem] top-0 w-1 bg-gradient-to-b from-blue-500 via-purple-500 to-emerald-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.8)] z-10"
+            className="absolute left-8 md:left-[3.2rem] top-0 w-1 bg-linear-to-b from-blue-500 via-purple-500 to-emerald-500 rounded-full shadow-[0_0_20px_rgba(168,85,247,0.8)] z-10"
             initial={{ height: 0 }}
             whileInView={{ height: '100%' }}
             viewport={{ once: true }}
@@ -146,7 +146,7 @@ const AIWorkflow = () => {
                 
                 {/* الدائرة والأيقونة */}
                 <div className={`
-                  flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full 
+                  shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full 
                   bg-[#0A0A0A] border-2 ${step.border} 
                   flex items-center justify-center 
                   ${step.glow} shadow-xl z-20 
@@ -169,7 +169,7 @@ const AIWorkflow = () => {
                     {step.title}
                   </h3>
                   
-                  <div className="p-5 rounded-xl border border-white/5 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.07] transition-all duration-300">
+                  <div className="p-5 rounded-xl border border-white/5 bg-white/3 backdrop-blur-sm hover:bg-white/[0.07] transition-all duration-300">
                     <p className="text-gray-400 text-sm md:text-base leading-relaxed">
                       {step.description}
                     </p>

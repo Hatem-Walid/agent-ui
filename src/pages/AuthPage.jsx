@@ -101,7 +101,7 @@ export default function AuthPage() {
 
       {/* الكرت الزجاجي */}
       <div className="relative z-10 w-full max-w-[450px] rounded-[40px] overflow-hidden p-[1.5px] border-beam-calm shadow-2xl">
-        <div className="relative z-20 w-full bg-white/[0.06] backdrop-blur-[35px] rounded-[38.5px] p-8 md:p-10 border border-white/10">
+        <div className="relative z-20 w-full bg-white/6 backdrop-blur-[35px] rounded-[38.5px] p-8 md:p-10 border border-white/10">
           
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-white tracking-[0.3em] uppercase syncopate mb-3">
@@ -162,7 +162,7 @@ export default function AuthPage() {
                     <div className="flex flex-col gap-1.5">
                       {/* الـ label هنا أيضاً أصبح أوضح */}
                       <label className="text-white/80 text-[10px] uppercase ml-5 tracking-widest font-semibold">Gender</label>
-                      <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full bg-white/[0.05] border border-white/10 p-3 px-5 rounded-full text-white/90 outline-none text-sm focus:border-white/30 transition-all appearance-none cursor-pointer">
+                      <select name="gender" value={registerForm.gender} onChange={handleRegisterChange} className="w-full bg-white/5 border border-white/10 p-3 px-5 rounded-full text-white/90 outline-none text-sm focus:border-white/30 transition-all appearance-none cursor-pointer">
                         <option value="" className="bg-[#111]">Select</option>
                         <option value="Male" className="bg-[#111]">Male</option>
                         <option value="Female" className="bg-[#111]">Female</option>
@@ -209,7 +209,7 @@ function Input({ label, ...props }) {
       </label>
       <input
         {...props}
-        className="w-full bg-white/[0.04] border border-white/10 p-3.5 px-6 rounded-full text-white outline-none focus:bg-white/[0.08] focus:border-white/30 transition-all placeholder:text-white/20 text-sm font-light"
+        className="w-full bg-white/4 border border-white/10 p-3.5 px-6 rounded-full text-white outline-none focus:bg-white/8 focus:border-white/30 transition-all placeholder:text-white/20 text-sm font-light"
       />
     </div>
   );

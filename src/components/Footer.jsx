@@ -42,9 +42,9 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative overflow-hidden text-white bg-gradient-to-br from-[#0a031f] via-[#0b0830] to-[#0b1020]">
+    <footer className="relative overflow-hidden text-white bg-linear-to-br from-[#0a031f] via-[#0b0830] to-[#0b1020]">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0a031f] via-[#0b0830] to-[#0b1020]" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#0a031f] via-[#0b0830] to-[#0b1020]" />
 
       {/* Fixed grid overlay - بدون animation علشان تظهر على الموبايل */}
       <div 
@@ -73,7 +73,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className={`block py-1 transition-all duration-200 min-h-[36px] flex items-center ${
+                    className={`block py-1 transition-all duration-200 min-h-9 items-center ${
                       activeLink === `${title}-${linkIndex}` 
                         ? 'text-white translate-x-2 scale-105 font-medium bg-purple-500/20 rounded-lg px-2 -mx-2' 
                         : 'hover:text-white hover:translate-x-1'
@@ -111,7 +111,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.2, rotate: 5 }}
                 whileTap={{ scale: 0.9 }}
-                className={`p-2 rounded-full transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center ${
+                className={`p-2 rounded-full transition-all duration-200 min-w-11 min-h-11 flex items-center justify-center ${
                   activeSocial === i 
                     ? 'bg-purple-500 scale-110 shadow-lg shadow-purple-500/50' 
                     : 'bg-white/10 hover:bg-purple-500/20'

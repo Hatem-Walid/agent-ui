@@ -25,7 +25,7 @@ const FlowchartSection = () => {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-400 via-blue-500 to-purple-500 mb-4">
             System Architecture
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -42,7 +42,7 @@ const FlowchartSection = () => {
           onClick={() => setIsOpen(true)}
         >
           {/* 1. The Glowing Backlight Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl opacity-30 group-hover:opacity-60 blur-lg transition duration-500"></div>
+          <div className="absolute -inset-1 bg-linear-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl opacity-30 group-hover:opacity-60 blur-lg transition duration-500"></div>
 
           {/* 2. The Glass Frame */}
           <div className="relative rounded-2xl bg-[#0D0716]/80 backdrop-blur-xl border border-white/10 p-2 md:p-4 shadow-2xl">
@@ -70,7 +70,7 @@ const FlowchartSection = () => {
       {/* --- Lightbox / Modal for Full View --- */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-100 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setIsOpen(false)}
         >
           {/* Close Button */}

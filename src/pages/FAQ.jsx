@@ -118,7 +118,7 @@
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-blue-400">
                 Frequently Asked Questions
               </h1>
               <p className="text-gray-400 text-lg max-w-2xl">
@@ -154,7 +154,7 @@
                 className="flex gap-5 items-start group"
               >
                 {/* Icon Container */}
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/40 transition-all duration-300">
+                <div className="shrink-0 w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/40 transition-all duration-300">
                   <faq.icon className="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
 
@@ -178,7 +178,7 @@
             transition={{ delay: 0.5 }}
             className="mt-20 flex flex-col items-center gap-6"
           >
-            <div className="p-[1px] rounded-lg bg-gradient-to-r from-transparent via-purple-500/50 to-transparent w-full max-w-xs"></div>
+            <div className="p-px rounded-lg bg-linear-to-r from-transparent via-purple-500/50 to-transparent w-full max-w-xs"></div>
             
             <div className="text-center space-y-4">
               <p className="text-gray-400">Still have questions?</p>

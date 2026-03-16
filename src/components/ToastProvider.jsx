@@ -19,7 +19,7 @@ export default function ToastProvider({ children }) {
       {children}
 
       {/* Toasts Container */}
-      <div className="fixed top-5 right-5 space-y-3 z-[9999]">
+      <div className="fixed top-5 right-5 space-y-3 z-9999">
         {toasts.map((t) => (
           <div
             key={t.id}

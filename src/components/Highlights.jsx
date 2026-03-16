@@ -80,7 +80,7 @@ const services = [
   };
 
   return (
-    <section className="relative py-16 bg-gradient-to-br from-[#050029] via-[#050029] to-[#2a1460] overflow-hidden">
+    <section className="relative py-16 bg-linear-to-br from-[#050029] via-[#050029] to-[#2a1460] overflow-hidden">
       {/* تأثيرات خلفية */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(79,70,229,0.15),transparent_70%)]" /> 
       <div className="absolute inset-0 bg-grid-slate-800/20" />
@@ -96,7 +96,7 @@ const services = [
         >
           <h1 className="text-3xl lg:text-6xl font-bold text-white mb-4 leading-tight">
             The #1 Cloud-Native
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+            <span className="block text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-blue-400">
               Application Security Platform
             </span>
           </h1>
@@ -104,7 +104,7 @@ const services = [
 
         {/* الخط الفاصل */}
         <motion.div 
-          className="w-24 h-1 bg-gradient-to-r from-purple-400 to-blue-400 mx-auto mb-12 rounded-full"
+          className="w-24 h-1 bg-linear-to-r from-purple-400 to-blue-400 mx-auto mb-12 rounded-full"
           initial={{ width: 0 }}
           whileInView={{ width: 96 }}
           transition={{ duration: 1, delay: 0.5 }}
@@ -161,7 +161,7 @@ const services = [
               ))}
             </div>
 
-            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
+            <div className={`absolute inset-0 rounded-2xl bg-linear-to-br from-purple-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
               activeCard === 1 ? 'opacity-100' : 'opacity-0'
             }`} />
           </motion.div>
@@ -203,7 +203,7 @@ const services = [
               ))}
             </div>
 
-            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-auto transition-opacity duration-300 ${
+            <div className={`absolute inset-0 rounded-2xl bg-linear-to-br from-blue-500/10 to-transparent pointer-events-auto transition-opacity duration-300 ${
               activeCard === 2 ? 'opacity-100' : 'opacity-0'
             }`} />
           </motion.div>
@@ -243,7 +243,7 @@ const services = [
               ))}
             </div>
 
-            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
+            <div className={`absolute inset-0 rounded-2xl bg-linear-to-br from-indigo-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
               activeCard === 3 ? 'opacity-100' : 'opacity-0'
             }`} />
           </motion.div>
@@ -283,7 +283,7 @@ const services = [
               ))}
             </div>
 
-            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-fuchsia-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
+            <div className={`absolute inset-0 rounded-2xl bg-linear-to-br from-fuchsia-500/10 to-transparent pointer-events-none transition-opacity duration-300 ${
               activeCard === 4 ? 'opacity-100' : 'opacity-0'
             }`} />
           </motion.div>
@@ -325,7 +325,7 @@ const services = [
                 {/* 5. زر Start Free Trial المعدل */}
                 <button 
                   onClick={handleStartTrial}
-                  className="bg-white text-purple-700 px-6 py-3 rounded-xl hover:bg-purple-600 hover:text-purple-100 transition-all duration-300 font-semibold active:scale-95 min-h-[44px] shadow-lg shadow-purple-500/30"
+                  className="bg-white text-purple-700 px-6 py-3 rounded-xl hover:bg-purple-600 hover:text-purple-100 transition-all duration-300 font-semibold active:scale-95 min-h-11 shadow-lg shadow-purple-500/30"
                 >
                   Start Free Trial
                 </button>

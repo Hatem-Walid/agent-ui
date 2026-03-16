@@ -216,7 +216,7 @@ const BlogPage = () => {
               {/* Header */}
               <div className="text-center mb-16">
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-                  <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
+                  <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-blue-400">
                     Vulnerability Database
                   </h1>
                   <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -231,7 +231,7 @@ const BlogPage = () => {
                   onClick={() => handlePostClick(featuredPost)}
                   className="mb-16 relative group cursor-pointer rounded-3xl overflow-hidden border border-white/10"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#05020D] via-[#05020D]/60 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-linear-to-t from-[#05020D] via-[#05020D]/60 to-transparent z-10" />
                   <img 
                     src={featuredPost.image} 
                     alt="Featured" 
@@ -276,13 +276,13 @@ const BlogPage = () => {
                       </div>
                     </div>
                     
-                    <div className="p-6 flex flex-col flex-grow">
+                    <div className="p-6 flex flex-col grow">
                       <div className="flex items-center gap-2 text-xs text-purple-400 mb-3 font-medium">
                         <Calendar className="w-3 h-3" />
                         {post.date}
                       </div>
                       <h3 className="text-xl font-bold mb-3 group-hover:text-purple-300 transition-colors line-clamp-2">{post.title}</h3>
-                      <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">{post.excerpt}</p>
+                      <p className="text-gray-400 text-sm mb-4 line-clamp-3 grow">{post.excerpt}</p>
                       
                       <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
                         <div className="flex items-center gap-4 text-gray-500">
@@ -317,7 +317,7 @@ const BlogPage = () => {
 
               <div className="relative rounded-3xl overflow-hidden mb-8 shadow-2xl shadow-purple-900/20">
                 <img src={selectedPost.image} alt={selectedPost.title} className="w-full h-[400px] object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#05020D] to-transparent opacity-90" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#05020D] to-transparent opacity-90" />
                 <div className="absolute bottom-0 left-0 p-8 md:p-12">
                   <div className="flex flex-wrap gap-2 mb-4">
                     {selectedPost.tags.map(tag => (
