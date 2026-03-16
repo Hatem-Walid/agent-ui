@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom"; // أضفنا هذه
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import AuthPage from "./pages/AuthPage"; 
+import ProfileEdit from "./pages/profile_edit"; 
 import About from "./pages/About";
 import SplineChatPage from "./pages/SplineChatPage";
 import FAQ from "./pages/FAQ";
@@ -32,7 +33,7 @@ const MainLayout = ({ hideNavbarRoutes }) => {
 
 function App() {
   // المسارات التي لا تريد ظهور الـ Navbar فيها (لكن الـ RetellAgent سيظهر)
-  const hideNavbarRoutes = ["/auth", "/doc"];
+  const hideNavbarRoutes = ["/auth", "/doc", "/info"];
 
   return (
     <Routes>
@@ -40,6 +41,7 @@ function App() {
       <Route element={<MainLayout hideNavbarRoutes={hideNavbarRoutes} />}>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/info" element={<ProfileEdit />} />
         <Route path="/about" element={<About />} />
         <Route path="/ai" element={<SplineChatPage />} />
         <Route path="/faq" element={<FAQ />} />

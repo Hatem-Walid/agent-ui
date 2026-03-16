@@ -149,7 +149,7 @@ const Navbar = () => {
   const setCardRef = i => el => { if (el) cardsRef.current[i] = el; };
   
   return (
-    <div className="navbar-container absolute left-1/2 -translate-x-1/2 w-[90%] max-w-[900px] z-[99] top-[1.2em] md:top-[2em]">
+    <div className="navbar-container absolute left-1/2 -translate-x-1/2 w-[90%] max-w-[900px] z-99 top-[1.2em] md:top-[2em]">
       <nav
         ref={navRef}
         className="navbar block h-[60px] p-0 rounded-xl shadow-md relative overflow-hidden will-change-[height]"
@@ -159,17 +159,17 @@ const Navbar = () => {
           WebkitBackdropFilter: 'blur(12px)'
         }}
       >
-        <div className="navbar-top absolute inset-x-0 top-0 h-[60px] flex items-center justify-between p-2 pl-[1.1rem] z-[2]">
+        <div className="navbar-top absolute inset-x-0 top-0 h-[60px] flex items-center justify-between p-2 pl-[1.1rem] z-2">
           {/* Hamburger */}
           <div
-            className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''} group h-full flex flex-col items-center justify-center cursor-pointer gap-[6px]`}
+            className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''} group h-full flex flex-col items-center justify-center cursor-pointer gap-1.5`}
             onClick={toggleMenu} role="button" aria-label={isExpanded ? 'Close menu' : 'Open menu'} tabIndex={0}
             style={{ color: '#fff' }}
           >
-            <div className={`hamburger-line w-[30px] h-[2px] bg-current transition-transform duration-300 ease-in-out origin-center
-              ${isHamburgerOpen ? 'rotate-45 translate-y-[4px]' : ''}`} />
-            <div className={`hamburger-line w-[30px] h-[2px] bg-current transition-transform duration-300 ease-in-out origin-center
-              ${isHamburgerOpen ? '-rotate-45 -translate-y-[4px]' : ''}`} />
+            <div className={`hamburger-line w-[30px] h-0.5 bg-current transition-transform duration-300 ease-in-out origin-center
+              ${isHamburgerOpen ? 'rotate-45 translate-y-1' : ''}`} />
+            <div className={`hamburger-line w-[30px] h-0.5 bg-current transition-transform duration-300 ease-in-out origin-center
+              ${isHamburgerOpen ? '-rotate-45 -translate-y-1' : ''}`} />
           </div>
 
           {/* Logo */}
@@ -189,6 +189,15 @@ const Navbar = () => {
           <div className="hidden md:flex h-full items-center">
             {isAuthenticated ? (
               <div className="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-1.5 border border-white/10">
+                
+                {/* زر تعديل البروفايل المضاف حديثاً */}
+                <Link
+                  to="/info"
+                  className="text-[10px] bg-white/5 hover:bg-purple-500/20 text-purple-300 border border-white/10 px-2 py-1 rounded transition-all duration-300 flex items-center gap-1 uppercase font-bold tracking-tighter"
+                >
+                  ⚙️ Edit
+                </Link>
+
                 <span className="text-purple-200 text-sm font-semibold truncate max-w-[100px]">
                   Hi, {user?.name || "User"}
                 </span>
@@ -212,24 +221,24 @@ const Navbar = () => {
         </div>
 
         <div
-          className={`nav-content absolute left-0 right-0 top-[60px] bottom-0 p-2 flex flex-col items-stretch gap-2 justify-start z-[1] ${
+          className={`nav-content absolute left-0 right-0 top-[60px] bottom-0 p-2 flex flex-col items-stretch gap-2 justify-start z-1 ${
             isExpanded ? 'visible pointer-events-auto' : 'invisible pointer-events-none'
-          } md:flex-row md:items-end md:gap-[12px]`}
+          } md:flex-row md:items-end md:gap-3`}
           aria-hidden={!isExpanded}
         >
           {items.map((item, idx) => (
             <div
               key={`${item.label}-${idx}`}
-              className="nav-card select-none relative flex flex-col gap-[2px] p-[5px_12px] rounded-[10px] min-w-0 flex-[1_1_auto] h-auto min-h-[35px] md:h-[calc(100%-4px)] md:min-h-0 md:flex-[1_1_0%]"
+              className="nav-card select-none relative flex flex-col gap-0.5 p-[5px_12px] rounded-[10px] min-w-0 flex-[1_1_auto] h-auto min-h-[35px] md:h-[calc(100%-4px)] md:min-h-0 md:flex-[1_1_0%]"
               ref={setCardRef(idx)}
               style={{ backgroundColor: item.bgColor, color: item.textColor }}
             >
               <div className="nav-card-label font-normal tracking-[-0.5px] text-[18px] md:text-[22px]">{item.label}</div>
-              <div className="nav-card-links mt-auto flex flex-col gap-[2px]">
+              <div className="nav-card-links mt-auto flex flex-col gap-0.5">
                 {item.links.map((lnk, i) => (
                   <Link 
                     key={`${lnk.label}-${i}`}
-                    className="nav-card-link inline-flex items-center gap-[6px] no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
+                    className="nav-card-link inline-flex items-center gap-1.5 no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
                     to={lnk.href}
                     // هنا التغيير الأساسي: نمرر الحدث e والرابط للدالة الخاصة بنا
                     onClick={(e) => handleLinkClick(e, lnk.href)} 
