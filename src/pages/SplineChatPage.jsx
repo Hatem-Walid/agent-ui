@@ -10,7 +10,7 @@ import apiClient, {
   deleteChat, 
   renameChat 
 } from "../api/apiClient"; 
-import { uploadClient } from "../api/uploadClient";
+
 import { useAuth } from "../context/AuthContext"; 
 
 /**
