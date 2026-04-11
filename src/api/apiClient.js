@@ -7,7 +7,7 @@ import axios from "axios";
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
    headers: {
-     'Content-Type': 'application/json',
+    //  'Content-Type': 'application/json',
     // هذا السطر مهم جداً لتخطي صفحة تحذير ngrok التي تسبب الـ CORS error
     'ngrok-skip-browser-warning': 'any-value',
     "ngrok-skip-browser-warning": "69420", // 🔥 هذا السطر هو السحر اللي هيحل المشكلة
