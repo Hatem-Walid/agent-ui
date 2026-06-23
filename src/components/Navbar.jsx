@@ -1,110 +1,87 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, useEffect, memo } from 'react';
 import { gsap } from 'gsap';
-import { Link, useNavigate } from 'react-router-dom'; // 1. استدعاء useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Shield, Settings, LogOut, ChevronRight, Sun, Moon } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
-  const navigate = useNavigate(); // 2. تفعيل الهوك للتنقل اليدوي
-  
+  const navigate = useNavigate();
+
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      setIsLight(true);
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isLight) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'dark');
+      setIsLight(false);
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+      setIsLight(true);
+    }
+  };
+
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const navRef = useRef(null);
+  const navRef   = useRef(null);
   const cardsRef = useRef([]);
-  const tlRef = useRef(null);
+  const tlRef    = useRef(null);
 
   const items = [
     {
-      label: "Platform ",
-      bgColor: "#0D0716",
-      textColor: "#fff",
+      label: "PLATFORM",
       links: [
-        { label: "Home", href: "/" },
-        // { label: "Pricing Plans", href: "/plan" },
-        { label: "AI Chat / Assistant", href: "/ai" } // هذا الرابط الذي نريد حمايته
-      ]
+        { label: "Intelligence Home", href: "/" },
+        { label: "Neural Assistant",  href: "/ai" },
+      ],
     },
     {
-      label: "Features & Resources",
-      bgColor: "#170D27",
-      textColor: "#fff",
+      label: "RESOURCES",
       links: [
-        { label: "FAQ", href: "/faq" },
-        { label: "Blog", href: "/blog" },
-        { label: "Documentation", href: "/doc" } 
-      ]
+        { label: "Security Blog",  href: "/blog" },
+        { label: "Documentation",  href: "/doc"  },
+        { label: "System FAQ",     href: "/faq"  },
+      ],
     },
     {
-      label: "Company",
-      bgColor: "#271E37",
-      textColor: "#fff",
+      label: "COMPANY",
       links: [
-        { label: "About Us", href: "/About" },
-        { label: "Contact Us", href: "/contact" },
-      ]
-    }
+        { label: "Team Members",    href: "/About"   },
+        { label: "Contact Secure",  href: "/contact" },
+      ],
+    },
   ];
 
-  const ease = "power3.out";
+  const ease = "expo.out";
 
-  // دالة التعامل مع الضغط على الروابط
   const handleLinkClick = (e, href) => {
-    // أولاً: نقفل القائمة في كل الأحوال
     toggleMenu();
-
-    // ثانياً: لو الرابط هو صفحة الـ AI والمستخدم مش مسجل دخول
     if (href === '/ai' && !isAuthenticated) {
-      e.preventDefault(); // نمنع الذهاب لصفحة الـ AI
-      navigate('/auth');  // نوجهه لصفحة الدخول
+      e.preventDefault();
+      navigate('/auth');
     }
-    // لو مسجل دخول أو الرابط مش ai، الـ Link هيكمل شغله طبيعي
   };
 
-  const calculateHeight = () => {
-    const navEl = navRef.current;
-    if (!navEl) return 220; 
-    
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (isMobile) {
-      const contentEl = navEl.querySelector('.nav-content');
-      if (contentEl) {
-        const wasVisible = contentEl.style.visibility;
-        const wasPointerEvents = contentEl.style.pointerEvents;
-        const wasPosition = contentEl.style.position;
-        const wasHeight = contentEl.style.height;
-
-        contentEl.style.visibility = 'visible';
-        contentEl.style.pointerEvents = 'auto';
-        contentEl.style.position = 'static';
-        contentEl.style.height = 'auto';
-        contentEl.offsetHeight;
-
-        const topBar = 60;
-        const padding = 16;
-        const contentHeight = contentEl.scrollHeight;
-
-        contentEl.style.visibility = wasVisible;
-        contentEl.style.pointerEvents = wasPointerEvents;
-        contentEl.style.position = wasPosition;
-        contentEl.style.height = wasHeight;
-
-        return topBar + contentHeight + padding;
-      }
-    }
-    return 220; 
-  };
+  const calculateHeight = () =>
+    window.matchMedia('(max-width: 768px)').matches ? (window.innerHeight - 100) : 300;
 
   const createTimeline = () => {
     const navEl = navRef.current;
     if (!navEl) return null;
-
-    gsap.set(navEl, { height: 60, overflow: 'hidden' });
-    gsap.set(cardsRef.current, { y: 50, opacity: 0 });
-
+    gsap.set(navEl, { height: 64, overflow: 'hidden' });
+    gsap.set(cardsRef.current, { y: 30, opacity: 0 });
     const tl = gsap.timeline({ paused: true });
-    tl.to(navEl, { height: calculateHeight, duration: 0.4, ease });
-    tl.to(cardsRef.current, { y: 0, opacity: 1, duration: 0.4, ease, stagger: 0.08 }, '-=0.1');
-
+    tl.to(navEl, { height: calculateHeight(), duration: 0.6, ease });
+    tl.to(cardsRef.current, { y: 0, opacity: 1, duration: 0.5, ease, stagger: 0.1 }, '-=0.3');
     return tl;
   };
 
@@ -113,24 +90,6 @@ const Navbar = () => {
     tlRef.current = tl;
     return () => { tl?.kill(); tlRef.current = null; };
   }, []);
-
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      if (!tlRef.current) return;
-      if (isExpanded) {
-        gsap.set(navRef.current, { height: calculateHeight() });
-        tlRef.current.kill();
-        const newTl = createTimeline();
-        if (newTl) { newTl.progress(1); tlRef.current = newTl; }
-      } else {
-        tlRef.current.kill();
-        const newTl = createTimeline();
-        if (newTl) tlRef.current = newTl;
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isExpanded]);
 
   const toggleMenu = () => {
     const tl = tlRef.current;
@@ -146,73 +105,104 @@ const Navbar = () => {
     }
   };
 
-  const setCardRef = i => el => { if (el) cardsRef.current[i] = el; };
-  
+  const lineBase = [
+    'w-full h-[1.5px] transition-all duration-500',
+    isLight ? 'bg-zinc-800' : 'bg-white',
+  ].join(' ');
+
+  const iconBtn = isLight
+    ? 'border-black/[0.05] bg-black/[0.03] text-zinc-600 hover:text-zinc-900 hover:bg-black/[0.06]'
+    : 'border-white/[0.08] bg-white/[0.05] text-zinc-400 hover:text-white hover:bg-white/[0.10]';
+
   return (
-    <div className="navbar-container absolute left-1/2 -translate-x-1/2 w-[90%] max-w-[900px] z-99 top-[1.2em] md:top-[2em]">
+    <div className="navbar-container absolute left-1/2 -translate-x-1/2 w-[92%] max-w-[1000px] z-[999] top-4 sm:top-6 font-inter">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap');
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+      `}</style>
+
       <nav
         ref={navRef}
-        className="navbar block h-[60px] p-0 rounded-xl shadow-md relative overflow-hidden will-change-[height]"
+        className={`navbar block h-[64px] rounded-2xl shadow-xl relative overflow-hidden border ${
+          isLight ? 'border-black/[0.06]' : 'border-white/[0.08]'
+        }`}
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)'
+          backgroundColor: isLight ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)',
+          backdropFilter:       'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
         }}
       >
-        <div className="navbar-top absolute inset-x-0 top-0 h-[60px] flex items-center justify-between p-2 pl-[1.1rem] z-2">
+        {/* ── Top bar ── */}
+        <div className="navbar-top absolute inset-x-0 top-0 h-[64px] flex items-center justify-between px-4 z-[2]">
+
           {/* Hamburger */}
           <div
-            className={`hamburger-menu ${isHamburgerOpen ? 'open' : ''} group h-full flex flex-col items-center justify-center cursor-pointer gap-1.5`}
-            onClick={toggleMenu} role="button" aria-label={isExpanded ? 'Close menu' : 'Open menu'} tabIndex={0}
-            style={{ color: '#fff' }}
+            className="group flex items-center gap-3 cursor-pointer"
+            onClick={toggleMenu}
           >
-            <div className={`hamburger-line w-[30px] h-0.5 bg-current transition-transform duration-300 ease-in-out origin-center
-              ${isHamburgerOpen ? 'rotate-45 translate-y-1' : ''}`} />
-            <div className={`hamburger-line w-[30px] h-0.5 bg-current transition-transform duration-300 ease-in-out origin-center
-              ${isHamburgerOpen ? '-rotate-45 -translate-y-1' : ''}`} />
+            <div className="relative w-6 h-5 flex flex-col justify-between">
+              <span className={`${lineBase} ${isHamburgerOpen ? 'rotate-45 translate-y-[9px]' : ''}`} />
+              <span className={`${lineBase} ${isHamburgerOpen ? 'opacity-0' : ''}`} />
+              <span className={`${lineBase} ${isHamburgerOpen ? '-rotate-45 -translate-y-[9px]' : ''}`} />
+            </div>
+            <span className={`text-[10px] uppercase tracking-[0.3em] font-bold hidden sm:block ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              {isExpanded ? 'Close' : 'Menu'}
+            </span>
           </div>
 
-          {/* Logo */}
-         <Link
-          to="/"
-          >
-          <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
-            <img 
-              src="\assets\main.svg"
-              alt="Logo"
-              className="h-14 w-auto"
+          {/* Centered logo */}
+          <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group">
+            <img
+              src={isLight ? "/assets/Gemini.svg" : "/assets/icon1.svg"}
+              alt="VULNSNEAK Logo"
+              className="h-15 w-auto transition-opacity group-hover:opacity-80"
             />
-          </div>
           </Link>
 
-          {/* User / Login */}
-          <div className="hidden md:flex h-full items-center">
+          {/* Right section */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+              className={`p-2 rounded-full border transition-all ${iconBtn}`}
+            >
+              {isLight ? <Moon size={15} /> : <Sun size={15} />}
+            </button>
+
             {isAuthenticated ? (
-              <div className="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-1.5 border border-white/10">
-                
-                {/* زر تعديل البروفايل المضاف حديثاً */}
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Link
                   to="/info"
-                  className="text-[10px] bg-white/5 hover:bg-purple-500/20 text-purple-300 border border-white/10 px-2 py-1 rounded transition-all duration-300 flex items-center gap-1 uppercase font-bold tracking-tighter"
+                  className={`p-2 rounded-full border transition-all ${iconBtn}`}
                 >
-                  ⚙️ Edit
+                  <Settings size={16} />
                 </Link>
 
-                <span className="text-purple-200 text-sm font-semibold truncate max-w-[100px]">
-                  Hi, {user?.name || "User"}
-                </span>
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className={`text-[10px] uppercase tracking-widest font-bold ${isLight ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    Active Agent
+                  </span>
+                  <span className={`text-xs font-medium ${isLight ? 'text-zinc-900' : 'text-white'}`}>
+                    {user?.name || "User"}
+                  </span>
+                </div>
+
                 <button
                   onClick={logout}
-                  className="text-xs bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20 px-2 py-1 rounded transition-all duration-300"
+                  className="p-2 rounded-full border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500 hover:text-white transition-all"
                 >
-                  Logout
+                  <LogOut size={16} />
                 </button>
               </div>
             ) : (
               <Link
-                id="Get-Started"
                 to="/auth"
-                className="navbar-cta-button bg-black text-amber-100 border-0 rounded-[calc(0.75rem-0.2rem)] px-4 inline-flex items-center h-full font-medium cursor-pointer transition-colors duration-300 hover:bg-black/80"
+                className={`h-10 px-4 sm:px-6 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center whitespace-nowrap ${
+                  isLight
+                    ? 'bg-zinc-900 text-white hover:bg-zinc-700 shadow-[0_4px_20px_rgba(0,0,0,0.06)]'
+                    : 'bg-white text-black hover:bg-zinc-200 shadow-[0_4px_20px_rgba(255,255,255,0.10)]'
+                }`}
               >
                 Login
               </Link>
@@ -220,33 +210,52 @@ const Navbar = () => {
           </div>
         </div>
 
+        {/* ── Expanded bento cards ── */}
         <div
-          className={`nav-content absolute left-0 right-0 top-[60px] bottom-0 p-2 flex flex-col items-stretch gap-2 justify-start z-1 ${
-            isExpanded ? 'visible pointer-events-auto' : 'invisible pointer-events-none'
-          } md:flex-row md:items-end md:gap-3`}
-          aria-hidden={!isExpanded}
+          className={`nav-content absolute inset-x-0 top-[64px] bottom-0 p-2 md:p-3 flex flex-col md:flex-row gap-2 md:gap-3 overflow-y-auto md:overflow-hidden items-stretch ${
+            isExpanded ? 'visible' : 'invisible'
+          }`}
         >
           {items.map((item, idx) => (
             <div
-              key={`${item.label}-${idx}`}
-              className="nav-card select-none relative flex flex-col gap-0.5 p-[5px_12px] rounded-[10px] min-w-0 flex-[1_1_auto] h-auto min-h-[35px] md:h-[calc(100%-4px)] md:min-h-0 md:flex-[1_1_0%]"
-              ref={setCardRef(idx)}
-              style={{ backgroundColor: item.bgColor, color: item.textColor }}
+              key={idx}
+              ref={el => { if (el) cardsRef.current[idx] = el; }}
+              className={`flex-1 self-stretch rounded-xl p-4 md:p-6 flex flex-col transition-all backdrop-blur-md group/card ${
+                isLight
+                  ? 'bg-white/40 border border-black/[0.04] hover:border-black/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.01)]'
+                  : 'bg-zinc-950/80 border border-white/[0.03] hover:border-white/10'
+              }`}
             >
-              <div className="nav-card-label font-normal tracking-[-0.5px] text-[18px] md:text-[22px]">{item.label}</div>
-              <div className="nav-card-links mt-auto flex flex-col gap-0.5">
+              <h3 className={`text-[10px] uppercase tracking-[0.4em] font-bold mb-4 group-hover/card:text-purple-500 transition-colors ${
+                isLight ? 'text-zinc-400' : 'text-zinc-600'
+              }`}>
+                {item.label}
+              </h3>
+
+              <div className="flex flex-col gap-3 md:gap-4">
                 {item.links.map((lnk, i) => (
-                  <Link 
-                    key={`${lnk.label}-${i}`}
-                    className="nav-card-link inline-flex items-center gap-1.5 no-underline cursor-pointer transition-opacity duration-300 hover:opacity-75 text-[15px] md:text-[16px]"
+                  <Link
+                    key={i}
                     to={lnk.href}
-                    // هنا التغيير الأساسي: نمرر الحدث e والرابط للدالة الخاصة بنا
-                    onClick={(e) => handleLinkClick(e, lnk.href)} 
-                    style={{color: "inherit"}}
+                    onClick={(e) => handleLinkClick(e, lnk.href)}
+                    className={`flex items-center justify-between transition-all group/link ${
+                      isLight ? 'text-zinc-600 hover:text-zinc-900' : 'text-zinc-400 hover:text-white'
+                    }`}
                   >
-                    ➤ {lnk.label}
+                    <span className="text-sm md:text-base font-light font-inter">{lnk.label}</span>
+                    <ChevronRight
+                      size={14}
+                      className="opacity-0 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all"
+                    />
                   </Link>
                 ))}
+              </div>
+
+              <div className={`mt-auto pt-3 border-t flex justify-between items-center ${
+                isLight ? 'border-black/[0.04]' : 'border-white/[0.02]'
+              }`}>
+                <span className="text-[8px] font-mono tracking-widest">LAYER_0{idx + 1}</span>
+                <div className="w-1 h-1 rounded-full bg-green-400" />
               </div>
             </div>
           ))}
@@ -256,4 +265,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

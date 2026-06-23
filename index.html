@@ -2,77 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Favicon -->
+    <!-- SEO Optimization -->
+    <title>VulnSneak-AI | AI-Powered Cybersecurity & Vulnerability Scanning</title>
+    <meta name="description" content="VulnSneak-AI is an AI-powered cybersecurity platform for intelligent vulnerability detection, real-time security scanning, and performance monitoring." />
+    <meta name="keywords" content="VulnSneak-AI, AI cybersecurity, vulnerability scanning, web security, threat detection" />
+    <meta name="author" content="Hatem Waleed" />
+    
+    <!-- Open Graph (WhatsApp / Facebook) -->
+    <meta property="og:title" content="VulnSneak-AI | Secure your site" />
+    <meta property="og:description" content="AI-Agent platform for vulnerability detection and security scanning." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://vulnsneak-ai.vercel.app/" />
+    <meta property="og:image" content="https://vulnsneak-ai.vercel.app/logos/og-image.png" />
+
+    <!-- Favicon & Icons -->
     <link rel="icon" type="image/svg+xml" href="/assets/icon-7.svg" />
-   <link rel="icon" type="image/png" href="/logos/favicon.png" />
+    <link rel="icon" type="image/png" href="/logos/favicon.png" />
 
     <!-- Manifest for PWA -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0d1117" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- SEO Optimization -->
-    <title>VulnSneak-AI | AI-Powered Cybersecurity & Vulnerability Scanning</title>
-
-    <meta
-      name="description"
-      content="VulnSneak-AI is an AI-powered cybersecurity platform for intelligent vulnerability detection, real-time security scanning, and performance monitoring. Identify threats early and secure your systems before attacks happen."
-    />
-
-    <meta
-      name="keywords"
-      content="VulnSneak-AI, AI cybersecurity, vulnerability scanning, web security, penetration testing, threat detection, security monitoring, offensive security"
-    />
-
-    <meta name="author" content="Hatem Waleed" />
-    
-    <!-- Open Graph (WhatsApp / Facebook) -->
-    <meta property="og:title" content="VulnSneak-AI | Secure your site" />
-    <meta
-      property="og:description"
-      content="AI-Agent platform for vulnerability detection, security scanning, and intelligent threat analysis.
-      Sneak to vulnerability into your site , Secure site -> life without problems."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://vulnsneak-ai.vercel.app/" />
-    <meta property="og:image" content="https://vulnsneak-ai.vercel.app/logos/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="VulnSneak-AI" />
-    <meta
-      name="twitter:description"
-      content="AI-powered cybersecurity and vulnerability scanning platform."
-    />
-    <meta name="twitter:image" content="https://vulnsneak-ai.vercel.app/logos/og-image.png" />
-
-    <!-- ⚡ Skeleton UI -->
+    <!-- ⚡ Base Styles (إضافة لون الخلفية فقط لمنع الومضة البيضاء) -->
     <style>
-      #initial-loader {
-        width: 100%;
-        height: 100vh;
-        background: #0d1117;
-        color: #ffffff;
-        font-size: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: system-ui, sans-serif;
+      body {
+        margin: 0;
+        background: #0d1117; /* نفس لون ثيم الموقع */
       }
     </style>
   </head>
 
   <body>
-    <!-- Skeleton مكان React -->
-      
-    <div id="root">
-      <div id="initial-loader">Loading...</div>
-    </div>
-
+    <!-- React Root Mount Node -->
+    <div id="root"></div>
 
     <!-- React / Vite Entry -->
     <script type="module" src="/src/main.jsx"></script>

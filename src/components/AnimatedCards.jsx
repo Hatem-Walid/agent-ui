@@ -1,329 +1,300 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect, useLayoutEffect, useRef, useState, memo,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { gsap }          from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  ChevronLeft, ChevronRight,
+  Fingerprint, Cpu, ShieldCheck, Activity,
+} from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const AUTOPLAY_MS = 6000;
 
-const testimonials = [
+const features = [
   {
-    id: 1,
-    name: "AI-Based Vulnerability Detection",
-    role: "Detection Engine",
-    company: "Frontend & Backend Code",
-    quote:
-      "Uses fine-tuned Transformer-based models to perform static code analysis and accurately detect security vulnerabilities, including XSS, SQL Injection, CSRF, and broken access control.",
+    id:      1,
+    name:    "Neural Detection Engine",
+    role:    "Static Analysis",
+    company: "XSS, SQLi, CSRF",
+    quote:   "Uses fine-tuned Transformer-based models to perform deep semantic analysis, detecting security vulnerabilities with higher precision than rule-based systems.",
+    icon:    <Fingerprint size={18} />,
   },
   {
-    id: 2,
-    name: "Context-Aware Automated Repair",
-    role: "Repair Engine",
-    company: "Source Code Level",
-    quote:
-      "Generates secure, context-aware code patches using sequence-to-sequence learning, ensuring syntactic correctness while preserving original application behavior.",
+    id:      2,
+    name:    "Context-Aware Repair",
+    role:    "Remediation",
+    company: "Seq2Seq Learning",
+    quote:   "Generates secure code patches using context-aware sequence learning, ensuring syntactic correctness while preserving original application logic.",
+    icon:    <ShieldCheck size={18} />,
   },
   {
-    id: 3,
-    name: "Semantic Code Understanding",
-    role: "Analysis Layer",
-    company: "Code Semantics",
-    quote:
-      "Goes beyond rule-based pattern matching by understanding the semantic and structural representation of source code using pretrained language models.",
+    id:      3,
+    name:    "Semantic Understanding",
+    role:    "Core Logic",
+    company: "Language Models",
+    quote:   "Goes beyond pattern matching by understanding the structural representation of source code using industry-leading pretrained language models.",
+    icon:    <Activity size={18} />,
   },
   {
-    id: 4,
-    name: "Curated & Labeled Training Dataset",
-    role: "Training Foundation",
-    company: "OWASP & CWE Standards",
-    quote:
-      "Trained on a high-quality dataset of vulnerable and fixed code samples enriched using OWASP Top 10 and CWE vulnerability classifications.",
-  },
-  {
-    id: 5,
-    name: "Dual-Model Architecture",
-    role: "System Design",
-    company: "Detection & Repair Pipeline",
-    quote:
-      "Separates vulnerability detection and automated repair into two independent AI models, enabling better optimization, evaluation, and future extensibility.",
-  },
-  {
-    id: 6,
-    name: "Secure Deployment via Isolation Layer",
-    role: "Security Architecture",
-    company: "Raspberry Pi Proxy",
-    quote:
-      "Implements a Raspberry Pi–based proxy to enforce privilege isolation, protect sensitive API keys, and secure communication between AI services and the backend.",
-  },
-  {
-    id: 7,
-    name: "Validation & Human-in-the-Loop Control",
-    role: "Safety Mechanism",
-    company: "Validation & Testing Phase",
-    quote:
-      "Includes a validation phase where generated fixes are reviewed or tested to ensure functional correctness and prevent unsafe or regressive changes.",
-  },
-  {
-    id: 8,
-    name: "Scalable Research-Oriented Design",
-    role: "System Scalability",
-    company: "Extensible Architecture",
-    quote:
-      "Designed as a research-ready platform that supports experimentation with new models, vulnerability categories, and advanced repair validation techniques.",
+    id:      4,
+    name:    "Raspberry Pi Isolation",
+    role:    "Hardware Layer",
+    company: "Secure Proxy",
+    quote:   "Implements a dedicated hardware isolation layer to enforce privilege separation and secure communication between the UI and AI services.",
+    icon:    <Cpu size={18} />,
   },
 ];
 
-export default function TestimonialsSection() {
-  const [index, setIndex] = useState(0);
-  const autoplayRef = useRef(null);
-  const containerRef = useRef(null);
+function FeaturesSection() {
+  const [index,     setIndex]     = useState(0);
+  const autoplayRef  = useRef(null);
+  const sectionRef   = useRef(null);
+  const leftRef      = useRef(null);
+  const rightRef     = useRef(null);
+  const badgeRef     = useRef(null);
   const [isInView, setIsInView] = useState(true);
-  const [isTouching, setIsTouching] = useState(false);
-  const [lastScrollTime, setLastScrollTime] = useState(0);
 
+  const handleNext = () => setIndex((p) => (p + 1) % features.length);
+  const handlePrev = () => setIndex((p) => (p - 1 + features.length) % features.length);
+
+  /* ── Autoplay ───────────────────────────────────────────────── */
   useEffect(() => {
-    startAutoplay();
-    return stopAutoplay;
-  }, [index]);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((ent) => setIsInView(ent.isIntersecting));
-      },
-      { threshold: 0.25 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (isInView && !isTouching) startAutoplay();
-    else stopAutoplay();
-  }, [isInView, isTouching]);
-
-  // Scroll event for desktop only - FIXED VERSION
-  useEffect(() => {
-    const handleWheel = (e) => {
-      // Check if it's desktop (window width > 768px) and section is in view
-      if (window.innerWidth > 768 && isInView) {
-        const now = Date.now();
-        
-        // Prevent too rapid scrolling (debounce)
-        if (now - lastScrollTime < 800) return;
-        
-        setLastScrollTime(now);
-        
-        if (e.deltaY > 20) {
-          // Scroll down - next testimonial
-          handleNext();
-        } else if (e.deltaY < -20) {
-          // Scroll up - previous testimonial
-          handlePrev();
-        }
-        // Don't prevent default to allow normal scrolling on page
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [isInView, lastScrollTime]);
-
-  // Alternative: استخدام Keyboard arrows للتنقل
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (window.innerWidth > 768 && isInView) {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-          e.preventDefault();
-          handleNext();
-        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-          e.preventDefault();
-          handlePrev();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isInView]);
-
-  function startAutoplay() {
-    stopAutoplay();
-    autoplayRef.current = setInterval(() => {
-      setIndex((p) => (p + 1) % testimonials.length);
-    }, AUTOPLAY_MS);
-  }
-
-  function stopAutoplay() {
-    if (autoplayRef.current) {
+    if (isInView) {
+      autoplayRef.current = setInterval(handleNext, AUTOPLAY_MS);
+    } else {
       clearInterval(autoplayRef.current);
-      autoplayRef.current = null;
     }
-  }
+    return () => clearInterval(autoplayRef.current);
+  }, [isInView, index]);
 
-  function handlePrev() {
-    setIndex((p) => (p - 1 + testimonials.length) % testimonials.length);
-    startAutoplay();
-  }
+  /* ── GSAP section entrance ───────────────────────────────────── */
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
 
-  function handleNext() {
-    setIndex((p) => (p + 1) % testimonials.length);
-    startAutoplay();
-  }
+      /* Badge */
+      gsap.from(badgeRef.current, {
+        opacity:  0,
+        y:        20,
+        duration: 1.2,
+        ease:     "expo.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start:   "top 82%",
+        },
+      });
 
-  // Swipe functions for mobile
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+      /* Left panel slides from left */
+      gsap.from(leftRef.current, {
+        opacity:   0,
+        x:        -80,
+        duration:  1.4,
+        ease:      "expo.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start:   "top 78%",
+        },
+      });
 
-  const minSwipeDistance = 50;
+      /* Right card scales + fades from right */
+      gsap.from(rightRef.current, {
+        opacity:   0,
+        x:         80,
+        scale:     0.94,
+        duration:  1.5,
+        ease:      "expo.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start:   "top 78%",
+        },
+      });
 
-  const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-    setIsTouching(true);
-    stopAutoplay();
-  };
+      /* In-view detection for autoplay */
+      ScrollTrigger.create({
+        trigger:  sectionRef.current,
+        start:    "top bottom",
+        end:      "bottom top",
+        onToggle: (self) => setIsInView(self.isActive),
+      });
 
-  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+    }, sectionRef);
 
-  const onTouchEnd = () => {
-    setIsTouching(false);
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe) {
-      handleNext();
-    } else if (isRightSwipe) {
-      handlePrev();
-    }
-    
-    setTimeout(() => startAutoplay(), 2000);
-  };
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section
-      ref={containerRef}
-      className="relative w-full overflow-hidden min-h-[90vh] flex items-center"
-      aria-label="Testimonials"
+      ref={sectionRef}
+      className="relative w-full min-h-screen flex items-center bg-[#000] [[data-theme=light]_&]:bg-[#ffffff] py-24 overflow-hidden border-t border-white/[0.03] [[data-theme=light]_&]:border-black/[0.05] transition-colors duration-500"
     >
-      {/* Gradient Background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(190deg, #1b0033 0%, #060025 100%)",
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-purple-900/10 [[data-theme=light]_&]:bg-purple-500/5 blur-[150px] rounded-full pointer-events-none transition-colors" />
 
-          zIndex: 0,
-        }}
-      />
+      {/* ── السهم الكروكل الملفوف المضيء والتفاعلي في منتصف الشاشة (يظهر فقط في الوضع الفاتح) ── */}
+      <div className="absolute left-[44%] top-[45%] z-20 hidden lg:block pointer-events-none opacity-0 [[data-theme=light]_&]:opacity-100 transition-opacity duration-500">
+        <motion.div
+          animate={{ y: [0, -6, 0], rotate: [0, 1, 0] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          className="relative flex flex-col items-center text-black"
+        >
+          <svg viewBox="0 0 160 80" className="w-46 h-28">
+            <path 
+              d="M10,80 Q40,15 75,45 T145,25" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeDasharray="6 4" 
+            />
+            <path 
+              d="M142,15 L158,22 L148,38" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+            />
+          </svg>
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-purple-500 mt-2 font-bold bg-purple-50/80 px-2 py-0.5 rounded-full border border-purple-200/50 backdrop-blur-md">
+            system features
+          </span>
+        </motion.div>
+      </div>
+      {/* ────────────────────────────────────────────────────────────────────────── */}
 
-      <div className="relative z-10 max-w-8xl mx-auto px-6 py-20 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* LEFT */}
-          <div>
-            
-            <h2 className="text-4xl font-extrabold text-gray-300 leading-tight mb-4">
-             AI-powered vulnerability detection and automated code repair.
-            </h2>
-            <p className=" text-purple-300 mb-6">
-              built to support secure development workflows
-            </p>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
 
-            {/* Controls + Progress */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handlePrev}
-                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-11 min-w-11 flex items-center justify-center"
-              >
-                <ChevronLeft size={18} color="white" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="p-3 rounded-lg bg-white/10 hover:bg-white/20 transition active:scale-95 active:bg-white/30 min-h-11 min-w-11 flex items-center justify-center"
-              >
-                <ChevronRight size={18} color="white" />
-              </button>
-
-              <div className="flex-1 ml-2">
-                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                  <motion.div
-                    key={index}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${((index + 1) / testimonials.length) * 100}%` }}
-                    transition={{ duration: 0.6, ease: "easeIn" }}
-                    className="h-2 bg-linear-to-r to-purple-500 from-blue-900"
-                  />
-                </div>
-              </div>
+          {/* ── LEFT ────────────────────────────────────────── */}
+          <div ref={leftRef} className="max-w-xl">
+            <div ref={badgeRef} className="mb-6 flex items-center gap-3">
+              <div className="w-8 h-px bg-purple-500" />
+              <span className="text-[10px] uppercase tracking-[0.4em] text-purple-500 font-bold">Capabilities</span>
             </div>
 
-            {/* Scroll & Keyboard Indicators for Desktop */}
-            <div className="hidden md:block mt-6 space-y-2">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-                Scroll to navigate
+            <h2 className="text-4xl md:text-6xl font-bold font-space tracking-tight text-white [[data-theme=light]_&]:text-black mb-8 leading-[1.1] transition-colors">
+              INTELLIGENT <br />
+              <span className="text-zinc-600 [[data-theme=light]_&]:text-transparent [[data-theme=light]_&]:bg-clip-text [[data-theme=light]_&]:bg-gradient-to-r [[data-theme=light]_&]:from-purple-600 [[data-theme=light]_&]:to-indigo-600 transition-all duration-500">
+                DEFENSE SYSTEM.
+              </span>
+            </h2>
+
+            <p className="text-zinc-500 [[data-theme=light]_&]:text-zinc-700 text-lg font-inter font-light leading-relaxed mb-12 transition-colors">
+              Our dual-model architecture separates detection and repair to provide
+              a high-fidelity security pipeline tailored for modern developers.
+            </p>
+
+            {/* Controls */}
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handlePrev}
+                  className="p-4 rounded-full border border-white/5 [[data-theme=light]_&]:border-black/[0.2] bg-white/5 [[data-theme=light]_&]:bg-black/[0.2] hover:bg-white/10 [[data-theme=light]_&]:hover:bg-black/[0.06] hover:border-white/20 [[data-theme=light]_&]:hover:border-black/20 transition-all active:scale-95 text-white [[data-theme=light]_&]:text-zinc-800"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="p-4 rounded-full border border-white/5 [[data-theme=light]_&]:border-black/[0.2] bg-white/5 [[data-theme=light]_&]:bg-black/[0.2] hover:bg-white/10 [[data-theme=light]_&]:hover:bg-black/[0.06] hover:border-white/20 [[data-theme=light]_&]:hover:border-black/20 transition-all active:scale-95 text-white [[data-theme=light]_&]:text-zinc-800"
+                >
+                  <ChevronRight size={20} />
+                </button>
+
+                <div className="flex-1 h-[2px] bg-white/10 [[data-theme=light]_&]:bg-black/[0.08] relative overflow-hidden transition-colors">
+                  <motion.div
+                    key={index}
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "0%" }}
+                    transition={{ duration: AUTOPLAY_MS / 1000, ease: "linear" }}
+                    className="absolute inset-0 bg-purple-500"
+                  />
+                </div>
+                <span className="font-mono text-[10px] text-zinc-600 [[data-theme=light]_&]:text-zinc-500 transition-colors">
+                  0{index + 1} / 0{features.length}
+                </span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                Use arrow keys ← → ↑ ↓
+
+              {/* Stats - كبسولات بيضاء ناصعة متباينة جداً بحدود رمادية ناعمة في الفاتح */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl border border-white/[0.03] [[data-theme=light]_&]:border-black/[0.06] bg-zinc-950/50 [[data-theme=light]_&]:bg-[#fcfdfe] shadow-sm [[data-theme=light]_&]:shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300">
+                  <span className="text-[9px] uppercase tracking-widest text-zinc-600 [[data-theme=light]_&]:text-zinc-500 block mb-1 transition-colors">Status</span>
+                  <span className="text-xs text-zinc-300 [[data-theme=light]_&]:text-zinc-900 font-mono font-bold transition-colors">Neural Net Active</span>
+                </div>
+                <div className="p-4 rounded-2xl border border-white/[0.03] [[data-theme=light]_&]:border-black/[0.06] bg-zinc-950/50 [[data-theme=light]_&]:bg-[#fcfdfe] shadow-sm [[data-theme=light]_&]:shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all duration-300">
+                  <span className="text-[9px] uppercase tracking-widest text-zinc-600 [[data-theme=light]_&]:text-zinc-500 block mb-1 transition-colors">Inference</span>
+                  <span className="text-xs text-zinc-300 [[data-theme=light]_&]:text-zinc-900 font-mono font-bold transition-colors">240ms Avg Latency</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT - Mobile Touch Area */}
-          <div 
-            className="flex justify-center md:justify-end relative"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
+          {/* ── RIGHT (carousel card with Hover Parallax Glow) ── */}
+          <div
+            ref={rightRef}
+            className="relative flex justify-center lg:justify-end h-[450px] items-center"
           >
             <AnimatePresence mode="wait">
               <motion.div
-                key={testimonials[index].id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="w-full max-w-xl relative"
+                key={features[index].id}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1,    y: 0  }}
+                exit={{    opacity: 0, scale: 1.05, y: -20 }}
+                whileHover={{ 
+                  y: -8, 
+                  scale: 1.01,
+                  boxShadow: "0 30px 60px rgba(139, 92, 246, 0.12)"
+                }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full max-w-lg cursor-pointer"
               >
-                <div className={`backdrop-blur-sm bg-linear-to-r from-white/5 to-white/2 border border-white/1 rounded-4xl p-10 shadow-2xl transition-all duration-300
-                  ${isTouching ? 'scale-95 bg-white/5' : ''}
-                `}>
-                  <blockquote className="text-lg text-white/50 leading-relaxed mb-6">
-                    “{testimonials[index].quote}”
+                {/* البطاقة الزجاجية المعتمة فائقة النقاوة والجمال في الوضع الفاتح (Real Glassmorphism) */}
+                <div className="relative group overflow-hidden rounded-3xl border border-white/[0.08] [[data-theme=light]_&]:border-black/20 bg-zinc-900/20 [[data-theme=light]_&]:bg-white/10 backdrop-blur-3xl p-10 md:p-12 shadow-2xl transition-all duration-500">
+                  
+                  {/* طبقة الانعكاس الضوئي الزجاجي الفخمة في الوضع الفاتح (Glass Reflection Layer) */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 [[data-theme=light]_&]:opacity-100 transition-opacity pointer-events-none" />
+                  
+                  <div className="absolute top-0 left-1/4 right-1/4 h-px bg-linear-to-r from-transparent via-purple-500/50 to-transparent" />
+
+                  {/* صندوق الأيقونة البنفسجي */}
+                  <div className="mb-8 w-12 h-12 rounded-2xl bg-purple-500/10 in-data-[theme=light]:bg-purple-500/10 border border-purple-500/20 [[data-theme=light]_&]:border-purple-500/20 flex items-center justify-center text-purple-400 [[data-theme=light]_&]:text-purple-600 transition-colors duration-500">
+                    {features[index].icon}
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold font-space text-white [[data-theme=light]_&]:text-black mb-4 tracking-tight transition-colors duration-500">
+                    {features[index].name}
+                  </h3>
+
+                  {/* تباين الخط المقتبس أصبح حاداً ومريحاً جداً للعين وقابل للقراءة بلمحة واحدة */}
+                  <blockquote className="text-zinc-400 [[data-theme=light]_&]:text-zinc-800 text-base md:text-lg font-inter font-stretch-75% leading-relaxed mb-8 transition-colors duration-500">
+                    "{features[index].quote}"
                   </blockquote>
-                  <div className="flex justify-between items-center">
+
+                  <div className="pt-8 border-t border-white/[0.05] [[data-theme=light]_&]:border-black/[0.4] flex items-center justify-between transition-colors duration-500">
                     <div>
-                      <div className="text-white font-semibold">
-                        {testimonials[index].name}
-                      </div>
-                      <div className="text-gray-400 text-sm">
-                        {testimonials[index].role} — {testimonials[index].company}
+                      <div className="text-[12px] uppercase tracking-[0.2em] text-zinc-600 [[data-theme=light]_&]:text-purple-500 mb-1 transition-colors">Architecture Layer</div>
+                      <div className="text-xs font-semibold text-zinc-300 [[data-theme=light]_&]:text-zinc-800 tracking-wide transition-colors">
+                        {features[index].role} — {features[index].company}
                       </div>
                     </div>
-                    <div className="px-3 py-1 rounded-full bg-white/10 text-xs text-white font-medium">
-                      {testimonials[index].company}
+                    <div className="h-8 w-8 rounded-full border border-white/10 [[data-theme=light]_&]:border-black/10 flex items-center justify-center text-zinc-600 [[data-theme=light]_&]:text-zinc-500 text-[10px] font-mono transition-colors">
+                      ID
                     </div>
                   </div>
-                </div>
-
-                {/* Swipe Indicator for Mobile */}
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 md:hidden transition-opacity">
-                  Swipe to navigate
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
       </div>
+
+      <style>{`
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+      `}</style>
     </section>
   );
 }
+
+export default memo(FeaturesSection);

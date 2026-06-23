@@ -22,19 +22,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // دالة اللوجن المعدلة لاستقبال الرد من الـ .NET
-  const login = (newToken, userName ) => {
-  sessionStorage.setItem("token", newToken);
+  const login = (newToken, userName) => {
+    sessionStorage.setItem("token", newToken);
 
-  // لو userName string، نخزنه ك object
-  const userData = typeof userName === "string" ? { name: userName } : userName;
+    // لو userName string، نخزنه ك object
+    const userData = typeof userName === "string" ? { name: userName } : userName;
 
-  sessionStorage.setItem("user", JSON.stringify(userData));
-  setToken(newToken);
-  setUser(userData);
+    sessionStorage.setItem("user", JSON.stringify(userData));
+    setToken(newToken);
+    setUser(userData);
 
-  console.log("✅ User stored:", userData); // <<< debug
-};
-
+    console.log("✅ User stored:", userData); // <<< debug
+  };
 
   const logout = () => {
     sessionStorage.removeItem("token");

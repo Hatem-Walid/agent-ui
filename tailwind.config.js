@@ -4,6 +4,9 @@ module.exports = {
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  /* Enables the `dark:` utility prefix when the `.dark` class
+     is present on <html>. ThemeContext manages this class.     */
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -11,7 +14,7 @@ module.exports = {
       },
       keyframes: {
         shine: {
-          "0%": { backgroundPositionX: "200%" },
+          "0%":   { backgroundPositionX: "200%" },
           "100%": { backgroundPositionX: "-200%" },
         },
       },

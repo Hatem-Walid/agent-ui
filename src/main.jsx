@@ -4,7 +4,7 @@ import App from "./App";
 import "./index.css";
 import ToastProvider from "./components/ToastProvider";
 import { BrowserRouter as Router } from "react-router-dom";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 // 👇 1. استيراد البروفايدر اللي عملناه
 import { AuthProvider } from "./context/AuthContext"; 

@@ -1,63 +1,104 @@
-import { Routes, Route, useLocation } from "react-router-dom";
-import { Outlet } from "react-router-dom"; // أضفنا هذه
+import { useState, useEffect } from "react";
+import { Routes, Route, useLocation, Outlet } from "react-router-dom";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Components
 import Navbar from "./components/Navbar";
+import RetellAgent from "./components/RetellAgent";
+import Preloader from "./components/Preloader";
+import CustomCursor from "./components/CustomCursor";
+import PageTransition from "./components/PageTransition";
+
+// Pages
 import Home from "./pages/Home";
-import AuthPage from "./pages/AuthPage"; 
-import ProfileEdit from "./pages/profile_edit"; 
+import AuthPage from "./pages/AuthPage";
+import ProfileEdit from "./pages/profile_edit";
 import About from "./pages/About";
 import SplineChatPage from "./pages/SplineChatPage";
 import FAQ from "./pages/FAQ";
 import Docs from "./pages/Docs";
 import Blog from "./pages/Blog";
 import ContactUs from "./pages/ContactUs";
-// import PlanPage from "./pages/PlanPage";
-// import Page404joke from "./pages/Page404joke";
 import Page404 from "./pages/Page404";
-import './App.css';
-import RetellAgent from './components/RetellAgent';
 
-// مكون الـ Layout الذي يحتوي على العناصر المشتركة
+// Styles
+import "./App.css";
+
+// Register GSAP plugins once globally
+gsap.registerPlugin(ScrollTrigger);
+
+/* ==========================================================================
+   MainLayout – Shared shell (Navbar + RetellAgent + Outlet)
+   GSAP ScrollTrigger handles reveals per-component.
+   ========================================================================== */
 const MainLayout = ({ hideNavbarRoutes }) => {
   const location = useLocation();
-  // التحقق من إخفاء الـ Navbar في مسارات معينة (مثل /auth) داخل الصفحات الرئيسية
+
+  // Refresh ScrollTrigger when the route changes to register new triggers correctly.
+  useEffect(() => {
+    const id = setTimeout(() => ScrollTrigger.refresh(), 120);
+    return () => clearTimeout(id);
+  }, [location.pathname]);
+
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
     <>
       {!shouldHideNavbar && <Navbar />}
       <RetellAgent />
-      <Outlet /> {/* هنا سيتم عرض محتوى الصفحة (Home, About, etc.) */}
+      <PageTransition>
+        <Outlet />
+      </PageTransition>
     </>
   );
 };
 
+/* ==========================================================================
+   App Component
+   ========================================================================== */
 function App() {
-  // المسارات التي لا تريد ظهور الـ Navbar فيها (لكن الـ RetellAgent سيظهر)
-  const hideNavbarRoutes = ["/auth", "/doc", "/info"];
+  const [loading, setLoading] = useState(true);
+
+  // ربط لوجيك الزر بالـ App بأكمله لمنع الوميض (Flickering)
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }, []);
+
+  const hideNavbarRoutes = ["/auth", "/doc", "/info", "/ai"];
 
   return (
-    <Routes>
-      {/* 1. المسارات التي يظهر فيها الـ RetellAgent والـ Navbar */}
-      <Route element={<MainLayout hideNavbarRoutes={hideNavbarRoutes} />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/info" element={<ProfileEdit />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/ai" element={<SplineChatPage />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/doc" element={<Docs />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/contact" element={<ContactUs />} />
+    <>
+      {/* Global magnetic cursor (desktop only – hides on touch) */}
+      <CustomCursor />
 
-        {/* <Route path="/plan" element={<PlanPage />} />  */}
-        {/* <Route path="*" element={<Page404joke />} />  */}
-      </Route>
+      {/* Preloader – animations fire after finishLoading() */}
+      {loading && <Preloader finishLoading={() => setLoading(false)} />}
 
-      {/* 2. صفحة الـ 404 (خارج الـ Layout لضمان عدم ظهور أي شيء معها) */}
-      <Route path="*" element={<Page404 />} />
-    </Routes>
+      <Routes>
+        {/* Routes with shared Navbar / RetellAgent shell */}
+        <Route element={<MainLayout hideNavbarRoutes={hideNavbarRoutes} />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/info" element={<ProfileEdit />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/ai" element={<SplineChatPage />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/doc" element={<Docs />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/contact" element={<ContactUs />} />
+        </Route>
+
+        {/* 404 */}
+        <Route path="*" element={<Page404 />} />
+      </Routes>
+    </>
   );
 }
 
 export default App;
-

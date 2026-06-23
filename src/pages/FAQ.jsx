@@ -1,197 +1,139 @@
-  import { Link } from "react-router-dom";
-  import { motion } from "framer-motion";
-  import { 
-    Target, 
-    BrainCircuit, 
-    Layers, 
-    Sparkles, 
-    Database, 
-    Wrench, 
-    CheckCircle2, 
-    GitFork, 
-    Cpu, 
-    RefreshCw, 
-    FileText, 
-    UserCheck, 
-    AlertTriangle, 
-    Rocket,
-    ExternalLink 
-  } from "lucide-react";
+import { Link } from "react-router-dom";
+import { motion, memo } from "framer-motion";
+import { 
+  Target, BrainCircuit, Layers, Sparkles, Database, 
+  Wrench, CheckCircle2, GitFork, Cpu, RefreshCw, 
+  FileText, UserCheck, AlertTriangle, Rocket, ExternalLink, Terminal
+} from "lucide-react";
 
-  // تم تحديث البيانات والأيقونات لتناسب المحتوى الجديد
-  const faqs = [
-    {
-      icon: Target,
-      question: "What problem does VulnSneak aim to solve?",
-      answer:
-        "VulnSneak addresses the lack of intelligent, automated solutions that can both detect and repair security vulnerabilities in web application source code. Traditional tools often suffer from high false positives, limited contextual understanding, and lack of automated remediation, especially for small teams and academic environments.",
-    },
-    {
-      icon: BrainCircuit,
-      question: "How is VulnSneak different from traditional SAST tools?",
-      answer:
-        "Unlike rule-based static analysis tools, VulnSneak uses Transformer-based AI models to analyze the semantic and structural meaning of source code. This allows the system to detect vulnerabilities based on insecure behavior patterns rather than fixed rules, improving adaptability and reducing noise.",
-    },
-    {
-      icon: Layers,
-      question: "Does VulnSneak analyze both frontend and backend code?",
-      answer:
-        "Yes. VulnSneak is designed to analyze both frontend and backend source code, reflecting real-world web application architectures where vulnerabilities may exist across multiple layers.",
-    },
-    {
-      icon: Sparkles,
-      question: "What role does machine learning play in VulnSneak?",
-      answer:
-        "Machine learning is central to VulnSneak. The system uses fine-tuned Transformer models trained on labeled datasets of vulnerable and fixed code samples to classify vulnerabilities and generate secure repair suggestions.",
-    },
-    {
-      icon: Database,
-      question: "How is the training dataset constructed?",
-      answer:
-        "The dataset is curated from public sources such as Hugging Face and Kaggle, enriched with manually reviewed examples, and aligned with OWASP Top 10 and CWE vulnerability standards. Each vulnerable code sample is linked to a corresponding secure fix to support both detection and repair tasks.",
-    },
-    {
-      icon: Wrench,
-      question: "How does VulnSneak generate secure code fixes?",
-      answer:
-        "After a vulnerability is detected, a secondary AI model generates context-aware repair suggestions using sequence-to-sequence learning. The goal is to produce syntactically valid fixes that preserve the original functionality while improving security.",
-    },
-    {
-      icon: CheckCircle2,
-      question: "How does the system ensure that fixes do not break functionality?",
-      answer:
-        "VulnSneak includes a validation stage where generated fixes can be reviewed, tested, or approved by the developer. This human-in-the-loop approach ensures that automated repairs do not introduce regressions or unintended behavior.",
-    },
-    {
-      icon: GitFork,
-      question: "Why does VulnSneak use a dual-model architecture?",
-      answer:
-        "The system separates vulnerability detection and repair into two specialized models. This design improves modularity, allows independent optimization of each task, and supports future experimentation with alternative detection or repair strategies.",
-    },
-    {
-      icon: Cpu,
-      question: "What is the purpose of the Raspberry Pi in the system architecture?",
-      answer:
-        "The Raspberry Pi acts as a secure proxy that isolates AI services from the main backend. It protects sensitive API keys, enforces privilege separation, and adds an extra security layer for handling external AI communications.",
-    },
-    {
-      icon: RefreshCw,
-      question: "Is VulnSneak suitable for CI/CD integration?",
-      answer:
-        "Yes. VulnSneak is designed to integrate into local development workflows and CI/CD pipelines, enabling continuous vulnerability detection and repair during the software development lifecycle.",
-    },
-    {
-      icon: FileText,
-      question: "How are vulnerabilities reported to the user?",
-      answer:
-        "The system generates a detailed report that includes the vulnerability type, affected code section, and suggested secure fix. This report is designed to be understandable even for users with limited security expertise.",
-    },
-    {
-      icon: UserCheck,
-      question: "Is VulnSneak intended to replace security experts?",
-      answer:
-        "No. VulnSneak is designed to assist developers, not replace human expertise. It provides intelligent recommendations while keeping developers in control of final decisions.",
-    },
-    {
-      icon: AlertTriangle,
-      question: "What are the limitations of VulnSneak?",
-      answer:
-        "As an academic research project, VulnSneak currently focuses on a subset of common web vulnerabilities. Some complex, context-dependent security issues may require further validation or manual review.",
-    },
-    {
-      icon: Rocket,
-      question: "What future improvements are planned for VulnSneak?",
-      answer:
-        "Future work includes expanding supported vulnerability types, improving automated fix validation, supporting additional programming languages, and enhancing integration with real-world development pipelines.",
-    },
-  ];
+const faqs = [
+  { icon: Target, question: "What problem does VulnSneak aim to solve?", answer: "VulnSneak addresses the lack of intelligent, automated solutions that can both detect and repair security vulnerabilities in web application source code. It bridges the gap for small teams and academic environments." },
+  { icon: BrainCircuit, question: "How is it different from traditional SAST?", answer: "Unlike rule-based tools, VulnSneak uses Transformer-based AI models to analyze semantic meaning, detecting behavior patterns rather than fixed signatures." },
+  { icon: Layers, question: "Does it analyze both frontend and backend?", answer: "Yes. VulnSneak provides full-stack coverage, reflecting real-world architectures where vulnerabilities exist across multiple layers." },
+  { icon: Sparkles, question: "What role does machine learning play?", answer: "Machine learning is the core engine. We use fine-tuned Transformer models trained on labeled security datasets for classification and repair." },
+  { icon: Database, question: "How is the training dataset constructed?", answer: "Curated from public sources like Hugging Face, enriched with manual reviews, and aligned with OWASP Top 10 and CWE standards." },
+  { icon: Wrench, question: "How does it generate secure code fixes?", answer: "A secondary AI model uses sequence-to-sequence learning to produce syntactically valid patches that preserve original functionality." },
+  { icon: CheckCircle2, question: "How is functionality preserved?", answer: "A human-in-the-loop validation stage allows developers to review and test fixes before they are applied to the codebase." },
+  { icon: GitFork, question: "Why a dual-model architecture?", answer: "Separating detection and repair improves modularity and allows independent optimization for each specialized task." },
+  { icon: Cpu, question: "What is the purpose of the Raspberry Pi?", answer: "The Pi acts as a secure hardware proxy, isolating AI services and protecting sensitive API keys from the main backend." },
+  { icon: RefreshCw, question: "Is it suitable for CI/CD integration?", answer: "Yes. Designed to integrate into local workflows and pipelines for continuous security feedback during development." },
+  { icon: FileText, question: "How are vulnerabilities reported?", answer: "Via detailed technical reports including risk type, code location, and neural repair suggestions." },
+  { icon: UserCheck, question: "Is it intended to replace security experts?", answer: "No. It is an assistant designed to empower developers with intelligent recommendations while keeping them in control." },
+  { icon: AlertTriangle, question: "What are the current limitations?", answer: "As research-oriented, it focuses on common web vulnerabilities. Complex logic flaws may still require manual expert review." },
+  { icon: Rocket, question: "What future improvements are planned?", answer: "Expanding vulnerability categories, supporting more languages, and enhancing automated fix validation layers." },
+];
 
-  export default function FAQ() {
-    return (
-      <div className="min-h-screen bg-[#05020D] text-white py-20 px-6 font-sans selection:bg-purple-500/30">
-        <div className="max-w-7xl mx-auto">
-          
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 mt-10 gap-6">
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-blue-400">
-                Frequently Asked Questions
-              </h1>
-              <p className="text-gray-400 text-lg max-w-2xl">
-                Quick answers to questions you may have. Can’t find what you’re looking for? 
-                Check out our full <Link to="/doc" className="text-purple-400 underline decoration-purple-400/50 hover:decoration-purple-400 transition-all">documentation</Link>.
-              </p>
-            </motion.div>
+const FAQ = () => {
+  return (
+    <div className="min-h-screen bg-black text-white pt-44 pb-32 px-6 font-inter selection:bg-purple-500/30 [[data-theme=light]_&]:bg-[#f4f4f7] [[data-theme=light]_&]:text-zinc-900 [[data-theme=light]_&]:selection:bg-purple-500/10">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@700&family=Space+Mono&display=swap');
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
 
+        /* تباين جزيئات الخلفية التفاعلية */
+        :root { 
+          --grid-line-color: rgba(255, 255, 255, 0.15); 
+          --grid-size: 40px 40px;
+        }
+        [data-theme=light] { 
+          --grid-line-color: rgba(0, 0, 0, 0.15); 
+        }
+      `}</style>
+
+      {/* Grid Pattern Mask */}
+      <div className="fixed inset-0 pointer-events-none opacity-100 z-0" 
+           style={{ backgroundImage: `radial-gradient(circle at 2px 2px, var(--grid-line-color) 1.5px, transparent 0)`, backgroundSize: 'var(--grid-size)' }} />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        
+        {/* Cinematic Header */}
+        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="max-w-2xl"
+          >
+            <div className="flex items-center gap-3 mb-6">
+               <div className="w-8 h-px bg-purple-500 [[data-theme=light]_&]:bg-purple-600"></div>
+               <span className="text-[10px] uppercase tracking-[0.5em] text-purple-500 font-bold [[data-theme=light]_&]:text-purple-600">Knowledge Base</span>
+            </div>
+            <h1 className="text-5xl md:text-8xl font-bold font-space tracking-tighter mb-6 leading-none text-white [[data-theme=light]_&]:text-zinc-950">
+              VULNSNEAK <span className="text-zinc-700 [[data-theme=light]_&]:text-zinc-500">Q&A.</span>
+            </h1>
+            <p className="text-zinc-500 text-lg font-light leading-relaxed [[data-theme=light]_&]:text-zinc-700 [[data-theme=light]_&]:font-normal">
+              Technical insights into the autonomous security platform. For in-depth research, consult our <Link to="/doc" className="text-white border-b border-white/20 hover:border-white transition-all [[data-theme=light]_&]:text-zinc-950 [[data-theme=light]_&]:border-zinc-400 [[data-theme=light]_&]:hover:border-zinc-950">full documentation</Link>.
+            </p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+            <Link to="/doc" className="flex items-center gap-3 px-6 py-3 rounded-xl bg-zinc-900 border border-white/5 hover:bg-zinc-800 transition-all group [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:border-zinc-300 [[data-theme=light]_&]:hover:bg-zinc-50 [[data-theme=light]_&]:shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <span className="text-xs font-mono uppercase tracking-widest text-white [[data-theme=light]_&]:text-zinc-800">Open Docs</span>
+              <ExternalLink size={14} className="text-zinc-500 group-hover:text-white transition-colors [[data-theme=light]_&]:text-zinc-500 [[data-theme=light]_&]:group-hover:text-zinc-900" />
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Technical Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {faqs.map((faq, index) => (
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.05 }}
+              className="group relative bg-zinc-950/40 border border-white/[0.05] rounded-2xl p-8 hover:bg-zinc-900/50 hover:border-white/10 transition-all duration-500 border-l-transparent [[data-theme=light]_&]:border-zinc-200 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:shadow-[0_12px_35px_rgba(0,0,0,0.06)] [[data-theme=light]_&]:hover:shadow-[0_20px_45px_rgba(0,0,0,0.12)] [[data-theme=light]_&]:hover:bg-white [[data-theme=light]_&]:border-l-4 [[data-theme=light]_&]:border-l-zinc-300 [[data-theme=light]_&]:hover:border-l-purple-600"
             >
-              <Link 
-                to="/doc"
-                className="group flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-300 font-medium text-sm md:text-base"
-              >
-                Documentation
-                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* Grid Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-12">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="flex gap-5 items-start group"
-              >
-                {/* Icon Container */}
-                <div className="shrink-0 w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border-purple-500/40 transition-all duration-300">
-                  <faq.icon className="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform duration-300" />
+              <div className="flex gap-6 items-start">
+                {/* Tech Node Icon */}
+                <div className="shrink-0 w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-zinc-500 group-hover:text-purple-400 group-hover:border-purple-500/20 transition-all duration-500 [[data-theme=light]_&]:bg-zinc-100 [[data-theme=light]_&]:border-zinc-250 [[data-theme=light]_&]:text-zinc-600 [[data-theme=light]_&]:group-hover:text-purple-600 [[data-theme=light]_&]:group-hover:bg-purple-50/50 [[data-theme=light]_&]:group-hover:border-purple-300">
+                  <faq.icon size={20} />
                 </div>
 
-                {/* Text Content */}
-                <div className="space-y-2">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-100 group-hover:text-purple-200 transition-colors">
-                    {faq.question}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Terminal size={12} className="text-zinc-800 [[data-theme=light]_&]:text-zinc-400" />
+                    <h3 className="text-lg font-bold font-space text-zinc-200 group-hover:text-white transition-colors [[data-theme=light]_&]:text-zinc-900 [[data-theme=light]_&]:group-hover:text-zinc-950">
+                      {faq.question}
+                    </h3>
+                  </div>
+                  <p className="text-zinc-500 font-inter font-light leading-relaxed text-sm md:text-base [[data-theme=light]_&]:text-zinc-700 [[data-theme=light]_&]:font-normal">
                     {faq.answer}
                   </p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              </div>
 
-          {/* Footer / Load More */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-20 flex flex-col items-center gap-6"
-          >
-            <div className="p-px rounded-lg bg-linear-to-r from-transparent via-purple-500/50 to-transparent w-full max-w-xs"></div>
-            
-            <div className="text-center space-y-4">
-              <p className="text-gray-400">Still have questions?</p>
-              <Link
-                  to="/contact"
-                  className="inline-block px-8 py-3 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-lg shadow-purple-900/30 hover:shadow-purple-900/50 transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  Contact our Team
-                </Link>
-            </div>
-          </motion.div>
-
+              {/* Decorative Corner Label */}
+              <div className="absolute top-4 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <span className="text-[8px] font-mono text-zinc-700 tracking-widest uppercase [[data-theme=light]_&]:text-zinc-400">ID_REF: 0{index + 1}</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
+
+        {/* Bottom CTA Terminal */}
+
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          className="mt-32 flex flex-col items-center p-16 rounded-[40px] border border-white/[0.03] bg-zinc-950/20 text-center [[data-theme=light]_&]:bg-[#09090b] [[data-theme=light]_&]:border-zinc-800/80 [[data-theme=light]_&]:shadow-[0_30px_70px_rgba(0,0,0,0.25)]"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 mb-8">
+             <Rocket size={24} />
+          </div>
+          <h2 className="text-3xl md:text-5xl font-bold font-space tracking-tighter mb-6 text-white">STILL HAVE QUESTIONS?</h2>
+          <p className="text-zinc-500 max-w-lg mb-10 font-light text-lg">Our intelligence team is standing by to provide deep-technical clarifications.</p>
+          <Link
+            to="/contact"
+            className="px-12 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.2)]"
+          >
+            Launch Transmission
+          </Link>
+        </motion.div>
       </div>
-    );
-  }
+    </div>
+  );
+};
+
+export default memo(FAQ);

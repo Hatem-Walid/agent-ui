@@ -3,7 +3,7 @@
 // Vite + Background Sync + Push
 // ===============================
 
-const CACHE_NAME = "agentx-v3";
+const CACHE_NAME = "agentx-v4"; // ✅ Bumped version to bust old stale caches
 const API_CACHE = "agentx-api-cache";
 
 // Basic shell
@@ -47,6 +47,22 @@ const isHTML = (req) =>
   req.headers.get("accept")?.includes("text/html");
 
 // ===============================
+// ✅ Fix: Detect Vite JS/CSS bundles
+// These must NEVER be served from cache first —
+// stale bundles were causing the white page on normal refresh.
+// ===============================
+const isViteAsset = (url) => {
+  const u = new URL(url);
+  return (
+    u.pathname.startsWith("/assets/") ||
+    u.pathname.endsWith(".js") ||
+    u.pathname.endsWith(".jsx") ||
+    u.pathname.endsWith(".css") ||
+    u.searchParams.has("v") // Vite cache-busting query param
+  );
+};
+
+// ===============================
 // 🚫 Ignore Spline / 3D Files
 // ===============================
 const isHeavy3D = (url) =>
@@ -64,7 +80,6 @@ async function handleAPIRequest(req) {
 
   const networkFetch = fetch(req)
     .then((res) => {
-      // Clone immediately for caching
       const resClone = res.clone();
       cache.put(req, resClone).catch(() => {});
       return res;
@@ -111,7 +126,6 @@ self.addEventListener("fetch", (event) => {
         try {
           return await fetch(req);
         } catch {
-          // Clone request safely before reading body
           const cloned = req.clone();
           let bodyText = null;
           try {
@@ -127,7 +141,6 @@ self.addEventListener("fetch", (event) => {
             },
           });
 
-          // schedule background sync
           self.registration.sync.register("retry-api-queue");
 
           return new Response(
@@ -146,7 +159,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // HTML → Network first
+  // HTML → Network first, fall back to cache
   if (isHTML(req)) {
     event.respondWith(
       fetch(req)
@@ -156,14 +169,31 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static → Cache first
+  // ✅ Fix: Vite JS/CSS bundles → Network first, THEN cache
+  // Previously these were cache-first, which served stale bundles
+  // and caused the white page on normal refresh.
+  if (isViteAsset(req.url)) {
+    event.respondWith(
+      fetch(req)
+        .then((networkRes) => {
+          const resClone = networkRes.clone();
+          caches.open(CACHE_NAME).then((cache) =>
+            cache.put(req, resClone).catch(() => {})
+          );
+          return networkRes;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Other static assets → Cache first
   event.respondWith(
     caches.match(req).then((cacheRes) => {
       if (cacheRes) return cacheRes;
 
       return fetch(req).then((networkRes) => {
         if (req.url.startsWith(self.location.origin)) {
-          // Clone for cache safely
           const resClone = networkRes.clone();
           caches.open(CACHE_NAME).then((cache) =>
             cache.put(req, resClone).catch(() => {})
@@ -207,6 +237,6 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow("https://www.vulunsneak-ai.site/ai") // غيّر اللينك حسب المشروع
+    clients.openWindow("https://vulnsneak-ai.vercel.app/ai")
   );
 });

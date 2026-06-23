@@ -1,218 +1,308 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Send, Loader2, Github, Twitter, Linkedin } from "lucide-react";
+import { Mail, Send, Loader2, Github, Twitter, Linkedin, ShieldCheck, Terminal } from "lucide-react";
 
 const ContactUs = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
+  // --- التحكم في الظهور والمزامنة ---
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    let timeout;
+    const triggerPageStart = () => {
+      timeout = setTimeout(() => {
+        setIsReady(true);
+      }, 1500);
+    };
+
+    if (window.__vsTransitionDone) {
+      triggerPageStart();
+    } else {
+      window.addEventListener("pageTransitionComplete", triggerPageStart, { once: true });
+    }
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      window.removeEventListener("pageTransitionComplete", triggerPageStart);
+    };
+  }, []);
+
+  // --- منطق الفورم وإرسال البريد الإلكتروني ---
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // محاكاة إرسال البيانات
-    setTimeout(() => {
+
+    // ضع هنا الـ Access Key الذي وصلك مجاناً على إيميلك من موقع Web3Forms
+    const ACCESS_KEY = "978bed24-32aa-46fc-801d-658b625e0487"; 
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          access_key: ACCESS_KEY,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: "New Vulnerability Dossier - VulnSneak Portal"
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        alert("Transmission Successful. Our agents will contact you shortly.");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        throw new Error(result.message || "Failed to process transmission.");
+      }
+    } catch (error) {
+      alert("Transmission Failed. Please ensure your ACCESS_KEY is configured correctly.");
+      console.error("Transmission Error:", error);
+    } finally {
       setIsSubmitting(false);
-      alert("Message sent successfully! We'll get back to you soon.");
-      setFormData({ name: "", email: "", message: "" });
-    }, 2000);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#05020D] text-white py-20 px-4 relative overflow-hidden font-sans selection:bg-purple-500/30">
-      
-      {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-900/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[120px]" />
-      </div>
-
-      <div className="max-w-6xl mx-auto relative z-10 mt-10">
+    <div className="main-theme-wrapper min-h-screen transition-colors duration-500 bg-[var(--bg)] text-[var(--text-main)] pt-32 pb-20 px-6 relative overflow-hidden font-inter selection:bg-purple-500/30">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@700&family=Space+Mono&display=swap');
         
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-blue-400">
-            Get in Touch
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            Have questions about VulunSneak? Need a custom enterprise plan? 
-            Our team is ready to help you secure your applications.
-          </p>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        :root {
+          --bg: #000000;
+          --text-main: #ffffff;
+          --text-muted: #71717a;
+          --grid-color: rgba(255, 255, 255, 0.03);
+          --accent: #a855f7;
           
-          {/* Left Side: Contact Info */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-8"
-          >
-            {/* Info Card */}
-            <div className="bg-[#120B2E]/50 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute inset-0 bg-linear-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <h2 className="text-2xl font-bold text-white mb-6">Contact Information</h2>
-              
-              <div className="space-y-6 relative z-10">
-                <div className="flex items-start gap-4 group/item">
-                  <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover/item:bg-purple-500/20 transition-colors">
-                    <MapPin className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Our Location</h3>
-                    <p className="text-gray-400">127 Qaomia Street, ZAG City, Egypt</p>
-                  </div>
-                </div>
+          /* الكارت أبيض في الـ Dark Mode */
+          --card-bg: #ffffff; 
+          --card-border: rgba(0, 0, 0, 0.1);
+          --card-text-main: #09090b;
+          --card-text-muted: #52525b;
+          --card-input-border: rgba(0, 0, 0, 0.15);
+          --card-placeholder: #a1a1aa;
+          --card-btn-bg: #09090b;
+          --card-btn-text: #ffffff;
 
-                <div className="flex items-start gap-4 group/item">
-                  <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover/item:bg-blue-500/20 transition-colors">
-                    <Phone className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Phone Number</h3>
-                    <p className="text-gray-400">+20 127 929 3585</p>
-                  </div>
-                </div>
+          /* أزرار السوشيال ميديا في الـ Dark Mode */
+          --btn-social-bg: rgba(255, 255, 255, 0.03);
+          --btn-social-border: rgba(255, 255, 255, 0.08);
+          --btn-social-text: #a1a1aa;
+          --btn-social-hover-bg: #a855f7;
+          --btn-social-hover-text: #ffffff;
+          --btn-social-hover-border: #a855f7;
+        }
 
-                <div className="flex items-start gap-4 group/item">
-                  <div className="p-3 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 group-hover/item:bg-pink-500/20 transition-colors">
-                    <Mail className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium mb-1">Email Address</h3>
-                    <p className="text-gray-400">noter1500@gmail.com</p>
-                  </div>
+        [data-theme='light'] {
+          --bg: #f9fafb;
+          --text-main: #09090b;
+          --text-muted: #52525b;
+          --grid-color: rgba(0, 0, 0, 0.04);
+          --accent: #7e22ce;
+          
+          /* الكارت أسود في الـ Light Mode */
+          --card-bg: #09090b; 
+          --card-border: rgba(255, 255, 255, 0.1);
+          --card-text-main: #ffffff;
+          --card-text-muted: #a1a1aa;
+          --card-input-border: rgba(255, 255, 255, 0.2);
+          --card-placeholder: #52525b;
+          --card-btn-bg: #ffffff;
+          --card-btn-text: #09090b;
+
+          /* أزرار السوشيال ميديا في الـ Light Mode */
+          --btn-social-bg: rgba(0, 0, 0, 0.03);
+          --btn-social-border: rgba(0, 0, 0, 0.08);
+          --btn-social-text: #52525b;
+          --btn-social-hover-bg: #7e22ce;
+          --btn-social-hover-text: #ffffff;
+          --btn-social-hover-border: #7e22ce;
+        }
+
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+        
+        input::placeholder, textarea::placeholder { 
+          color: var(--card-placeholder) !important; 
+          font-size: 12px; 
+          text-transform: uppercase; 
+          letter-spacing: 1px; 
+        }
+
+        .input-glow:focus {
+          border-bottom-color: var(--accent);
+          box-shadow: 0 4px 12px -4px rgba(168, 85, 247, 0.2);
+        }
+      `}</style>
+      
+      {/* Background Elements */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0" 
+        style={{ 
+          backgroundImage: `radial-gradient(circle at 2px 2px, var(--grid-color) 1.5px, transparent 0)`, 
+          backgroundSize: '40px 40px' 
+        }} 
+      />
+      
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none" />
+
+      <motion.div 
+        className="max-w-7xl mx-auto relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Cinematic Header */}
+        <div className="flex flex-col items-center text-center mb-24">
+          <div className="px-4 py-1.5 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--card-text-main)] mb-6 backdrop-blur-md shadow-sm transition-all">
+            <span className="text-[10px] uppercase tracking-[0.5em] text-[var(--accent)] font-bold font-mono">Secure Communication</span>
+          </div>
+          <h1 className="text-5xl md:text-8xl font-bold font-space tracking-tighter mb-6 leading-none text-[var(--text-main)]">
+            GET IN <span className="text-[var(--text-muted)]">TOUCH.</span>
+          </h1>
+          <p className="text-[var(--text-muted)] text-lg max-w-xl font-light">
+            Direct access to the VulnSneak Intelligence team. Secure your infrastructure today.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-[1fr_1.5fr] gap-20 items-start">
+          
+          {/* LEFT SIDE: Technical Info Nodes */}
+          <div className="space-y-12">
+            <div className="space-y-8">
+              <div className="group cursor-default">
+                <div className="flex items-center gap-4 mb-4">
+                  <Terminal size={18} className="text-[var(--accent)]" />
+                  <h3 className="text-[10px] font-bold tracking-[0.3em] text-[var(--text-muted)] uppercase">Headquarters</h3>
                 </div>
+                <p className="text-xl font-space text-[var(--text-main)]">127 Qaomia St, ZAG City, Egypt</p>
+              </div>
+
+              <div className="group cursor-default">
+                <div className="flex items-center gap-4 mb-4">
+                  <ShieldCheck size={18} className="text-[var(--accent)]" />
+                  <h3 className="text-[10px] font-bold tracking-[0.3em] text-[var(--text-muted)] uppercase">Direct Link</h3>
+                </div>
+                <p className="text-xl font-space text-[var(--text-main)]">+20 127 929 3585</p>
+              </div>
+
+              <div className="group cursor-default">
+                <div className="flex items-center gap-4 mb-4">
+                  <Mail size={18} className="text-[var(--accent)]" />
+                  <h3 className="text-[10px] font-bold tracking-[0.3em] text-[var(--text-muted)] uppercase">Encrypted Email</h3>
+                </div>
+                <p className="text-xl font-space text-[var(--text-main)]">intel@vulnsneak.ai</p>
               </div>
             </div>
 
-            {/* Social Links */}
-            <div className="flex justify-center gap-6">
+            {/* Social Matrix */}
+            <div className="pt-12 border-t border-[var(--card-border)] flex gap-4">
               {[Github, Twitter, Linkedin].map((Icon, i) => (
                 <a 
                   key={i} 
                   href="#" 
-                  className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-purple-600 hover:border-purple-500 hover:scale-110 transition-all duration-300 text-gray-400 hover:text-white"
+                  className="w-12 h-12 rounded-full border border-[var(--btn-social-border)] bg-[var(--btn-social-bg)] flex items-center justify-center text-[var(--btn-social-text)] hover:bg-[var(--btn-social-hover-bg)] hover:text-[var(--btn-social-hover-text)] hover:border-[var(--btn-social-hover-border)] shadow-sm hover:shadow-[0_10px_25px_-5px_rgba(168,85,247,0.3)] [[data-theme=light]_&]:hover:shadow-[0_10px_25px_-5px_rgba(126,34,206,0.2)] transition-all duration-300"
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon size={18} />
                 </a>
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Right Side: Form */}
-          <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+          {/* RIGHT SIDE: Neural Submission Form */}
+          <form 
+            onSubmit={handleSubmit} 
+            className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-[32px] p-10 md:p-16 relative overflow-hidden shadow-[0_45px_100px_rgba(0,0,0,0.6)] [[data-theme=light]_&]:shadow-[0_45px_100px_rgba(0,0,0,0.35)] transition-all duration-500"
           >
-            <form
-              onSubmit={handleSubmit}
-              className="bg-[#120B2E]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl relative"
-            >
-              <div className="absolute top-0 right-0 p-4 opacity-20 pointer-events-none">
-                <Send className="w-24 h-24 text-purple-500 transform rotate-12" />
-              </div>
+            <div className="absolute top-8 right-8 flex items-center gap-2 opacity-90">
+               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+               <span className="text-[8px] font-mono tracking-widest uppercase text-purple-500 font-bold">Encryption: GCM-256</span>
+            </div>
 
-              <h2 className="text-2xl font-bold text-white mb-2">Send a Message</h2>
-              <p className="text-gray-400 mb-8 text-sm">We usually respond within 24 hours.</p>
-              
-              <div className="space-y-5">
-                {/* Name Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 ml-1">Full Name</label>
+            <div className="space-y-10">
+              <div className="grid md:grid-cols-2 gap-10">
+                <div className="group relative">
+                  <label className="text-[10px] uppercase tracking-widest text-[var(--card-text-muted)] mb-4 block group-focus-within:text-[var(--accent)] transition-colors font-bold">
+                    Identification
+                  </label>
                   <input
                     type="text"
                     name="name"
-                    placeholder="enter your name ..."
+                    placeholder="FULL NAME"
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full bg-[#05020D]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                    className="w-full bg-transparent border-b border-[var(--card-input-border)] py-3 text-[var(--card-text-main)] focus:outline-none transition-all font-light input-glow"
                   />
                 </div>
-
-                {/* Email Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 ml-1">Email Address</label>
+                
+                <div className="group relative">
+                  <label className="text-[10px] uppercase tracking-widest text-[var(--card-text-muted)] mb-4 block group-focus-within:text-[var(--accent)] transition-colors font-bold">
+                    Communication Link
+                  </label>
                   <input
                     type="email"
                     name="email"
-                    placeholder="email@gmail.com"
+                    placeholder="EMAIL ADDRESS"
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full bg-[#05020D]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                    className="w-full bg-transparent border-b border-[var(--card-input-border)] py-3 text-[var(--card-text-main)] focus:outline-none transition-all font-light input-glow"
                   />
                 </div>
-
-                {/* Message Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300 ml-1">Your Message</label>
-                  <textarea
-                    name="message"
-                    placeholder="How can we help you?"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows="5"
-                    className="w-full bg-[#05020D]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all resize-none"
-                  ></textarea>
-                </div>
-
-                {/* Submit Button (add an targted email) */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full mt-4 bg-linear-to-r from-purple-600 to-blue-600 text-white py-3.5 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      Send Message
-                      <Send className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
               </div>
-            </form>
-          </motion.div>
-        </div>
 
-        {/* Footer */}
-        <motion.footer 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-20 pt-8 border-t border-white/5 text-center text-gray-500 text-sm"
-        >
-          <p className="mb-2">© {new Date().getFullYear()} VulunSneak. All Rights Reserved.</p>
-          <p className="flex items-center justify-center gap-1">
-            Designed with <span className="text-purple-500">💜</span> by VulnSneak Team
-          </p>
-        </motion.footer>
+              <div className="group relative">
+                <label className="text-[10px] uppercase tracking-widest text-[var(--card-text-muted)] mb-4 block group-focus-within:text-[var(--accent)] transition-colors font-bold">
+                  Message Parameters
+                </label>
+                <textarea
+                  name="message"
+                  placeholder="DESCRIBE YOUR INQUIRY..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows="4"
+                  className="w-full bg-transparent border-b border-[var(--card-input-border)] py-3 text-[var(--card-text-main)] focus:outline-none transition-all resize-none font-light input-glow"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-14 bg-[var(--card-btn-bg)] text-[var(--card-btn-text)] font-bold uppercase tracking-widest text-xs rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98] shadow-lg"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    Launch Transmission
+                    <Send size={14} />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </motion.div>
+
+      {/* Footer Bottom */}
+      <div className="mt-32 flex justify-center opacity-10">
+         <div className="w-1/3 h-px bg-gradient-to-r from-transparent via-[var(--text-main)] to-transparent"></div>
       </div>
     </div>
   );
 };
 
-export default ContactUs;
+export default memo(ContactUs);
