@@ -99,7 +99,7 @@ const Footer = () => {
             <div className="flex items-center gap-3 mb-6 group cursor-default">
               <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-colors group-hover:border-purple-500/50">
                 <img 
-                    src="public/assets/icon1.svg" 
+                    src="/assets/icon1.svg" 
                     alt="icon" 
                     className="w-12 h-12 object-contain" 
                   />
