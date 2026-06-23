@@ -265,7 +265,7 @@ const CheckmarkOneSection = () => {
           <div className="relative bg-[#000] rounded-[23px] px-8 py-16 text-center flex flex-col items-center">
             <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-2xl">
               <img 
-              src="public/assets/icon-7.svg" 
+              src="/assets/icon-7.svg" 
               alt="icon" 
               className="w-12 h-12 object-contain" 
             />

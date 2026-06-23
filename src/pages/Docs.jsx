@@ -292,7 +292,7 @@ const Docs = () => {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2 group">
           <img 
-              src="public/assets/icon-7.svg" 
+              src="/assets/icon-7.svg" 
               alt="icon" 
               className="w-9 h-9 object-contain" 
             />
