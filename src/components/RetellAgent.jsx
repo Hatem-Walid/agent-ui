@@ -86,7 +86,7 @@ const RetellAgent = () => {
             <Activity className="pulse-icon" />
           ) : (
             <img 
-              src="public\assets\icon-7.svg" 
+              src="public/assets/icon-7.svg" 
               alt="icon" 
               className="w-12 h-12 object-contain" 
             />

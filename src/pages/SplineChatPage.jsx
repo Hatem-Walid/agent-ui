@@ -1976,7 +1976,7 @@ const generateChatPDF = async () => {
                                 className="w-10 h-10 rounded-2xl bg-purple-600 flex items-center justify-center text-white"
                               >
                                 <img
-                                  src="public\assets\icon1.svg"
+                                  src="public/assets/icon1.svg"
                                   className="w-[32px] h-[3a2px]"
                                   alt="shield"
                                 />
