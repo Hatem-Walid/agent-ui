@@ -390,61 +390,51 @@ const NeuralCodeIntelligence = ({ vuln, language }) => {
           isExpanded ? "max-h-none flex-1" : "max-h-[400px]"
         }`}>
           <table className="w-full border-collapse">
-            <tbody>
-              {lines.map((line, idx) => {
-                const absLine = chunkStart + idx;
-                const isHit   = isLineHit(absLine, vulnRanges);
+  <tbody>
+    {lines.map((line, idx) => {
+      const absLine = chunkStart + idx;
+      const isHit = isLineHit(absLine, vulnRanges);
+      // Only apply the highlight visual styling if it's a hit AND marked as vulnerable
+      const showHighlight = isHit && isVulnerable;
 
-                return (
-                  <tr
-                    key={idx}
-                    style={isHit ? {
-                      background: isVulnerable
-                        ? "linear-gradient(90deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.06) 60%, transparent 100%)"
-                        : "linear-gradient(90deg, rgba(16,185,129,0.18) 0%, rgba(16,185,129,0.06) 60%, transparent 100%)",
-                      boxShadow: isVulnerable
-                        ? "inset 0 0 20px rgba(239,68,68,0.08)"
-                        : "inset 0 0 20px rgba(16,185,129,0.08)",
-                    } : undefined}
-                    className={!isHit ? "hover:bg-white/[0.01] [[data-theme=light]_&]:hover:bg-black/[0.02]" : ""}
-                  >
-                    <td className={`w-10 text-right pr-4 select-none border-r tabular-nums py-[3px] ${
-                      isHit
-                        ? isVulnerable
-                          ? "text-red-400 border-red-500/30 bg-red-500/10"
-                          : "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
-                        : "text-zinc-600 [[data-theme=light]_&]:text-zinc-500 border-white/5 [[data-theme=light]_&]:border-black/[0.08] opacity-50 [[data-theme=light]_&]:opacity-80"
-                    }`}>
-                      {absLine}
-                    </td>
+      return (
+        <tr
+          key={idx}
+          style={showHighlight ? {
+            background: "linear-gradient(90deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.06) 60%, transparent 100%)",
+            boxShadow: "inset 0 0 20px rgba(239,68,68,0.08)",
+          } : undefined}
+          className={!showHighlight ? "hover:bg-white/[0.01] [[data-theme=light]_&]:hover:bg-black/[0.02]" : ""}
+        >
+          <td className={`w-10 text-right pr-4 select-none border-r tabular-nums py-[3px] ${
+            showHighlight
+              ? "text-red-400 border-red-500/30 bg-red-500/10"
+              : "text-zinc-600 [[data-theme=light]_&]:text-zinc-500 border-white/5 [[data-theme=light]_&]:border-black/[0.08] opacity-50 [[data-theme=light]_&]:opacity-80"
+          }`}>
+            {absLine}
+          </td>
 
-                    <td className="pl-4 whitespace-pre text-zinc-300 [[data-theme=light]_&]:text-zinc-900 relative py-[3px]">
-                      {isHit && (
-                        <div
-                          className={`absolute left-0 top-0 bottom-0 w-[3px] z-10 ${
-                            isVulnerable ? "bg-red-500" : "bg-emerald-500"
-                          }`}
-                          style={{
-                            boxShadow: isVulnerable
-                              ? "0 0 8px #ef4444, 0 0 20px #ef4444, 0 0 40px rgba(239,68,68,0.4)"
-                              : "0 0 8px #10b981, 0 0 20px #10b981, 0 0 40px rgba(16,185,129,0.4)",
-                          }}
-                        />
-                      )}
-                      <span style={isHit ? {
-                        textShadow: isVulnerable
-                          ? "0 0 12px rgba(239,68,68,0.6)"
-                          : "0 0 12px rgba(16,185,129,0.6)",
-                        fontWeight: 500,
-                      } : undefined}>
-                        {renderHighlightedLine(line, language) ?? " "}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <td className="pl-4 whitespace-pre text-zinc-300 [[data-theme=light]_&]:text-zinc-900 relative py-[3px]">
+            {showHighlight && (
+              <div
+                className="absolute left-0 top-0 bottom-0 w-[3px] z-10 bg-red-500"
+                style={{
+                  boxShadow: "0 0 8px #ef4444, 0 0 20px #ef4444, 0 0 40px rgba(239,68,68,0.4)",
+                }}
+              />
+            )}
+            <span style={showHighlight ? {
+              textShadow: "0 0 12px rgba(239,68,68,0.6)",
+              fontWeight: 500,
+            } : undefined}>
+              {renderHighlightedLine(line, language) ?? " "}
+            </span>
+          </td>
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
         </div>
       </div>
     );
@@ -1429,7 +1419,7 @@ const generateChatPDF = async () => {
           formattedMessages.push({
             sender          : "bot",
             text            : session.status === "Safe"
-              ? "Neural Engine: No critical anomalies detected."
+              ? `Analysis of  "${session.fileName}" Synchronized. All protocols safe.`
               : `Scan Result: ${session.status}`,
             label           : session.status || "Safe",
             vulnDtos        : session.vulnDtos || [],
