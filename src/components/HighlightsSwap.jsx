@@ -39,21 +39,21 @@ const HighlightsSwap = () => {
       title: "VulnSneak AI",
       subtitle: "Effortless scanning with a modern interface.",
       desc: "VulnSneak is an AI-powered platform for system security and architecture. It helps you brainstorm, visualize, and fix software vulnerabilities using natural language.",
-      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000",
+      image: "/assets/slide2.png",
       icon: <MessageSquare className="h-8 w-8 text-white" />
     },
     {
       title: "Neural Pipeline",
       subtitle: "Flexible templates for every security workflow.",
       desc: "Load pre-built security patterns and customize them either by dragging directly into the dashboard or by answering follow-up questions for guided editing.",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=1000",
+      image: "/assets/slide1.png",
       icon: <LayoutDashboard className="h-8 w-8 text-white" />
     },
     {
       title: "Secure Remediation",
       subtitle: "Real-time patching keep your code safe.",
       desc: "Use the engine to design secure software architecture just by dragging components and also you can use the code editor to sync fixes with your repository.",
-      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1000",
+      image: "/assets/slide3.png",
       icon: <Cpu className="h-8 w-8 text-white" />
     }
   ];
