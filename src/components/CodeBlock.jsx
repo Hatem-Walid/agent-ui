@@ -31,6 +31,20 @@ const LANG_KEYWORDS = {
   default: ['function','return','if','else','for','while','class','const','let','var','import','export','new','null','true','false'],
 };
 
+// ─── ENTITY DECODER ───────────────────────────────────────────────────────────
+function decodeHTMLEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&amp;/g,  '&')
+    .replace(/&lt;/g,   '<')
+    .replace(/&gt;/g,   '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g,  "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
 // ─── UTILITIES ────────────────────────────────────────────────────────────────
 function getLangMeta(filename) {
   const ext = (filename || '').split('.').pop().toLowerCase();
@@ -54,7 +68,8 @@ function detectLanguage(code) {
 
 function normalizeCode(code) {
   if (!code) return '';
-  const lines = code.split('\n');
+  const decoded = decodeHTMLEntities(code);
+  const lines = decoded.split('\n');
   const indents = lines.filter(l => l.trim().length > 0).map(l => l.match(/^(\s*)/)[1].length);
   const minIndent = indents.length ? Math.min(...indents) : 0;
   return lines.map(l => l.length >= minIndent ? l.slice(minIndent) : l).join('\n').replace(/\t/g, '  ').trimEnd();
@@ -62,14 +77,25 @@ function normalizeCode(code) {
 
 function highlightLine(line, lang) {
   const kws = LANG_KEYWORDS[lang] || LANG_KEYWORDS.default;
-  let out = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // ★ كشف ما إذا كان السطر يحتوي على وسوم تلوين وتنسيق HTML جاهزة من الشات بوت
+  const hasHTMLHighlights = /<span|<div|<\/span|<\/div>/i.test(line);
+
+  if (hasHTMLHighlights) {
+    // نقوم فقط بفك رموز الـ Entities لتمكين المتصفح من رندرتها كأكواد تلوين حقيقية
+    return decodeHTMLEntities(line);
+  }
+
+  // Decode any residual entities before re-encoding for safe HTML output
+  const decoded = decodeHTMLEntities(line);
+  let out = decoded.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   // Comments first (before other processing)
   const commentMatch = out.match(/^(.*?)(\/\/[^\n]*)$/) || out.match(/^(.*?)(#(?!include)[^\n]*)$/);
   let commentSuffix = '';
   if (commentMatch) { out = commentMatch[1]; commentSuffix = `<span style="color:#4b6070;font-style:italic">${commentMatch[2]}</span>`; }
 
-  // Strings
+  // Strings (تم إصلاح خطأ الـ RegExp هنا)
   out = out.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g,
     '<span style="color:#a8cc8c">$1</span>');
   // Numbers
@@ -94,11 +120,16 @@ const CODEBLOCK_STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
   .vs-cb {
-    --cb-bg: #07090f;
-    --cb-surface: rgba(255,255,255,0.02);
-    --cb-border: rgba(255,255,255,0.06);
+    --cb-bg: #09090e; /* ★ تم تحديث لون الخلفية الأساسي ليكون داكناً وأنيقاً */
+    --cb-surface: rgba(255,255,255,0.015);
+    --cb-border: rgba(255,255,255,0.05);
     --cb-line-hover: rgba(255,255,255,0.025);
     font-family: 'JetBrains Mono', monospace;
+    color: #e4e4e7 !important; /* ★ لون ثابت وفائق الوضوح ومريح للقراءة للنصوص العادية */
+  }
+
+  .vs-cb code {
+    color: #e4e4e7 !important; /* تلوين ثابت لوسوم الأكواد لمنع تداخل ألوان الموقع */
   }
 
   .vs-cb::-webkit-scrollbar { width: 3px; height: 3px; }

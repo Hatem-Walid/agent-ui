@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo, Suspense, useCallback } from "react";
+import { useState, useRef, useEffect, memo, Suspense, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Terminal, Shield, Zap, Plus, Trash2,
@@ -18,7 +18,24 @@ import MarkdownMessage from "../components/MarkdownMessage";
 import CodeBlock from "../components/CodeBlock";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 1. SYNTAX HIGHLIGHTER
+// 1. ENTITY DECODER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function decodeHTMLEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&amp;/g,  '&')
+    .replace(/&lt;/g,   '<')
+    .replace(/&gt;/g,   '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g,  "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 2. SYNTAX HIGHLIGHTER
 // ─────────────────────────────────────────────────────────────────────────────
 
 const KW = {
@@ -137,7 +154,9 @@ function tokenizeLine(line, language) {
 
 function renderHighlightedLine(line, language) {
   if (!line) return null;
-  const tokens = tokenizeLine(line, language);
+  // Decode HTML entities before tokenizing to fix double-encoding (e.g. &lt; → <)
+  const decoded = decodeHTMLEntities(line);
+  const tokens = tokenizeLine(decoded, language);
   return tokens.map((tok, idx) => (
     <span
       key={idx}
@@ -153,7 +172,7 @@ function renderHighlightedLine(line, language) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 2. vulnLines HELPER
+// 3. vulnLines HELPER
 // ─────────────────────────────────────────────────────────────────────────────
 
 function buildVulnRanges(vuln) {
@@ -218,7 +237,8 @@ const EnhancedCodeBlock = ({ code, language, highlightLine = null, isVulnerabili
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isExpanded,  setIsExpanded]  = useState(false);
 
-  const cleanCode = code?.trim() || "";
+  // Decode entities once at the top so all rendering is clean
+  const cleanCode = decodeHTMLEntities(code?.trim() || "");
   const lines     = cleanCode.split("\n");
 
   const handleCopy = () => {
@@ -326,14 +346,28 @@ const NeuralCodeIntelligence = ({ vuln, language }) => {
   const [copied,     setCopied]     = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Detect language from the code snippet itself if parent didn't pass a useful one
+  const detectedLocalLang = useMemo(() => {
+    const code = vuln.CodeSnippet || vuln.codeSnippet || "";
+    if (!language || language === "source_link") {
+      if (/^\s*<(!DOCTYPE|html|div|span|script|style)/i.test(code)) return "html";
+      if (/^\s*(import|from|def|class|if __name__)\s+/m.test(code))  return "py";
+      if (/^\s*(#include|int\s+main|using\s+namespace)/m.test(code)) return "cpp";
+      if (/interface\s+\w+|:\s*(string|number|boolean|void)\b/.test(code)) return "ts";
+      if (/^\s*(const|let|var|function|import|export|=>)/m.test(code)) return "js";
+      return "js";
+    }
+    return language;
+  }, [vuln, language]);
+
   const vulnRanges = buildVulnRanges(vuln);
 
   const startLine  = vuln.StartLine || vuln.startLine || 1;
   const endLine    = vuln.EndLine   || vuln.endLine   || startLine;
   const confidence = vuln.Confidence ?? vuln.confidence ?? 0;
   const vulnName   = vuln.VulnName  || vuln.vulnerability_name || "Unknown";
-  const codeSnippet   = vuln.CodeSnippet   || vuln.codeSnippet   || "";
-  const repairedCode  = vuln.Repair?.RepairedCode || vuln.repairedCode || "";
+  const codeSnippet   = decodeHTMLEntities(vuln.CodeSnippet   || vuln.codeSnippet   || "");
+  const repairedCode  = decodeHTMLEntities(vuln.Repair?.RepairedCode || vuln.repairedCode || "");
   const explanation   = vuln.Repair?.Explanation  || vuln.explanation  || "";
   const elapsedSecs   = vuln.Repair?.ElapsedSecs  || vuln.elapsedSecs  || 0;
   const modelUsed     = vuln.Repair?.ModelUsed     || vuln.modelUsed    || "None";
@@ -394,7 +428,6 @@ const NeuralCodeIntelligence = ({ vuln, language }) => {
     {lines.map((line, idx) => {
       const absLine = chunkStart + idx;
       const isHit = isLineHit(absLine, vulnRanges);
-      // Only apply the highlight visual styling if it's a hit AND marked as vulnerable
       const showHighlight = isHit && isVulnerable;
 
       return (
@@ -427,7 +460,7 @@ const NeuralCodeIntelligence = ({ vuln, language }) => {
               textShadow: "0 0 12px rgba(239,68,68,0.6)",
               fontWeight: 500,
             } : undefined}>
-              {renderHighlightedLine(line, language) ?? " "}
+              {renderHighlightedLine(line, detectedLocalLang) ?? " "}
             </span>
           </td>
         </tr>
@@ -658,7 +691,7 @@ export default function SplineAgentPage() {
   const [editingChatId, setEditingChatId] = useState(null);
   const [renameValue,   setRenameValue]   = useState("");
   const [isScanning,    setIsScanning]    = useState(false);
-  const [isExportingPDF, setIsExportingPDF] = useState(false);   // ← NEW
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const [stagedCode,   setStagedCode]   = useState(null);
   const [detectedLang, setDetectedLang] = useState("");
@@ -729,7 +762,6 @@ export default function SplineAgentPage() {
     if (/^\s*(import|from|def|class|if __name__)\s+/m.test(code))        return "py";
     if (/^\s*(#include|int\s+main|using\s+namespace|std::)/m.test(code)) return "cpp";
     if (/^\s*(<\?php|namespace|public\s+function)/i.test(code))          return "php";
-    // if (/[{}]/.test(code) && /[:;]/.test(code) && !code.includes("function")) return "css";
     if (/^\s*(const|let|var|function|import|export|interface|type)\s+/m.test(code) || code.includes("=>")) return "js";
     return "code";
   };
@@ -760,603 +792,547 @@ export default function SplineAgentPage() {
     } catch (error) { console.error("Download error", error); }
   };
 
-  // ─────────────────────────────────────────────────────────────────────────────
-// استبدل الـ generateChatPDF الحالية بالكاملة بالكود ده
-// ─────────────────────────────────────────────────────────────────────────────
-const generateChatPDF = async () => {
-  if (isExportingPDF || messages.length === 0) return;
-  setIsExportingPDF(true);
+  const generateChatPDF = async () => {
+    if (isExportingPDF || messages.length === 0) return;
+    setIsExportingPDF(true);
 
-  try {
-    const { jsPDF } = await import("jspdf");
-    
-    // ── 1. محاولة تحميل مكتبة الـ Reshaper الاحترافية ديناميكياً من CDN ──
-    let externalReshaper = null;
     try {
-      const reshaperModule = await import(
-        /* @vite-ignore */ "https://esm.sh/arabic-persian-reshaper"
-      );
-      externalReshaper = reshaperModule.default || reshaperModule;
-    } catch (e) {
-      console.warn("External Arabic reshaper load failed. Using high-fidelity local fallback instead.", e);
-    }
+      const { jsPDF } = await import("jspdf");
 
-    // ── 2. المعالج المحلي المدمج (تراجع آمن في حال عدم وجود إنترنت) ──
-    const reshapeArabicLocal = (text) => {
-      if (!text) return "";
-      
-      const arabicCharsMap = {
-        '\u0621': ['\uFE80', '\uFE80', '\uFE80', '\uFE80'], // ء
-        '\u0622': ['\uFE81', '\uFE82', '\uFE82', '\uFE81'], // آ
-        '\u0623': ['\uFE83', '\uFE84', '\uFE84', '\uFE83'], // أ
-        '\u0624': ['\uFE85', '\uFE86', '\uFE86', '\uFE85'], // ؤ
-        '\u0625': ['\uFE87', '\uFE88', '\uFE84', '\uFE87'], // إ
-        '\u0626': ['\uFE89', '\uFE8A', '\uFE8C', '\uFE8B'], // ئ
-        '\u0627': ['\uFE8D', '\uFE8E', '\uFE8E', '\uFE8D'], // ا
-        '\u0628': ['\uFE8F', '\uFE90', '\uFE92', '\uFE91'], // ب
-        '\u0629': ['\uFE93', '\uFE94', '\uFE94', '\uFE93'], // ة
-        '\u062A': ['\uFE95', '\uFE96', '\uFE98', '\uFE97'], // ت
-        '\u062B': ['\uFE99', '\uFE9A', '\uFE9C', '\uFE9B'], // ث
-        '\u062C': ['\uFE9D', '\uFE9E', '\uFEA0', '\uFE9F'], // ج
-        '\u062D': ['\uFEA1', '\uFEA2', '\uFEA4', '\uFEA3'], // ح
-        '\u062E': ['\uFEA5', '\uFEA6', '\uFEA8', '\uFEA7'], // خ
-        '\u062F': ['\uFEA9', '\uFEAA', '\uFEAA', '\uFEA9'], // د
-        '\u0630': ['\uFEAB', '\uFEAC', '\uFEAC', '\uFEAB'], // ذ
-        '\u0631': ['\uFEAD', '\uFEAE', '\uFEAE', '\uFEAD'], // ر
-        '\u0632': ['\uFEAF', '\uFEB0', '\uFEB0', '\uFEAF'], // ز
-        '\u0633': ['\uFEB1', '\uFEB2', '\uFEB4', '\uFEB3'], // س
-        '\u0634': ['\uFEB5', '\uFEB6', '\uFEB8', '\uFEB7'], // ش
-        '\u0635': ['\uFEB9', '\uFEBA', '\uFEBC', '\uFEBB'], // ص
-        '\u0636': ['\uFEBD', '\uFEBE', '\uFEC0', '\uFEBF'], // ض
-        '\u0637': ['\uFEC1', '\uFEC2', '\uFEC4', '\uFEC3'], // ط
-        '\u0638': ['\uFEC5', '\uFEC6', '\uFEC8', '\uFEC7'], // ظ
-        '\u0639': ['\uFEC9', '\uFECA', '\uFECC', '\uFECB'], // ع
-        '\u063A': ['\uFECD', '\uFECE', '\uFED0', '\uFECF'], // غ
-        '\u0641': ['\uFED1', '\uFED2', '\uFED4', '\uFED3'], // ف
-        '\u0642': ['\uFED5', '\uFED6', '\uFED8', '\uFED7'], // ق
-        '\u0643': ['\uFED9', '\uFEDA', '\uFEDC', '\uFEDB'], // ك
-        '\u0644': ['\uFEDD', '\uFEDE', '\uFEE0', '\uFEDF'], // ل
-        '\u0645': ['\uFEE1', '\uFEE2', '\uFEE4', '\uFEE3'], // م
-        '\u0646': ['\uFEE5', '\uFEE6', '\uFEE8', '\uFEE7'], // ن
-        '\u0647': ['\uFEE9', '\uFEEA', '\uFEEC', '\uFEEB'], // ه
-        '\u0648': ['\uFEED', '\uFEEE', '\uFEEE', '\uFEED'], // و
-        '\u0649': ['\uFEEF', '\uFEF0', '\uFEF0', '\uFEEF'], // ى
-        '\u064A': ['\uFEF1', '\uFEF2', '\uFEF4', '\uFEF3'], // ي
+      let externalReshaper = null;
+      try {
+        const reshaperModule = await import(
+          /* @vite-ignore */ "https://esm.sh/arabic-persian-reshaper"
+        );
+        externalReshaper = reshaperModule.default || reshaperModule;
+      } catch (e) {
+        console.warn("External Arabic reshaper load failed. Using high-fidelity local fallback instead.", e);
+      }
+
+      const reshapeArabicLocal = (text) => {
+        if (!text) return "";
+
+        const arabicCharsMap = {
+          '\u0621': ['\uFE80', '\uFE80', '\uFE80', '\uFE80'],
+          '\u0622': ['\uFE81', '\uFE82', '\uFE82', '\uFE81'],
+          '\u0623': ['\uFE83', '\uFE84', '\uFE84', '\uFE83'],
+          '\u0624': ['\uFE85', '\uFE86', '\uFE86', '\uFE85'],
+          '\u0625': ['\uFE87', '\uFE88', '\uFE84', '\uFE87'],
+          '\u0626': ['\uFE89', '\uFE8A', '\uFE8C', '\uFE8B'],
+          '\u0627': ['\uFE8D', '\uFE8E', '\uFE8E', '\uFE8D'],
+          '\u0628': ['\uFE8F', '\uFE90', '\uFE92', '\uFE91'],
+          '\u0629': ['\uFE93', '\uFE94', '\uFE94', '\uFE93'],
+          '\u062A': ['\uFE95', '\uFE96', '\uFE98', '\uFE97'],
+          '\u062B': ['\uFE99', '\uFE9A', '\uFE9C', '\uFE9B'],
+          '\u062C': ['\uFE9D', '\uFE9E', '\uFEA0', '\uFE9F'],
+          '\u062D': ['\uFEA1', '\uFEA2', '\uFEA4', '\uFEA3'],
+          '\u062E': ['\uFEA5', '\uFEA6', '\uFEA8', '\uFEA7'],
+          '\u062F': ['\uFEA9', '\uFEAA', '\uFEAA', '\uFEA9'],
+          '\u0630': ['\uFEAB', '\uFEAC', '\uFEAC', '\uFEAB'],
+          '\u0631': ['\uFEAD', '\uFEAE', '\uFEAE', '\uFEAD'],
+          '\u0632': ['\uFEAF', '\uFEB0', '\uFEB0', '\uFEAF'],
+          '\u0633': ['\uFEB1', '\uFEB2', '\uFEB4', '\uFEB3'],
+          '\u0634': ['\uFEB5', '\uFEB6', '\uFEB8', '\uFEB7'],
+          '\u0635': ['\uFEB9', '\uFEBA', '\uFEBC', '\uFEBB'],
+          '\u0636': ['\uFEBD', '\uFEBE', '\uFEC0', '\uFEBF'],
+          '\u0637': ['\uFEC1', '\uFEC2', '\uFEC4', '\uFEC3'],
+          '\u0638': ['\uFEC5', '\uFEC6', '\uFEC8', '\uFEC7'],
+          '\u0639': ['\uFEC9', '\uFECA', '\uFECC', '\uFECB'],
+          '\u063A': ['\uFECD', '\uFECE', '\uFED0', '\uFECF'],
+          '\u0641': ['\uFED1', '\uFED2', '\uFED4', '\uFED3'],
+          '\u0642': ['\uFED5', '\uFED6', '\uFED8', '\uFED7'],
+          '\u0643': ['\uFED9', '\uFEDA', '\uFEDC', '\uFEDB'],
+          '\u0644': ['\uFEDD', '\uFEDE', '\uFEE0', '\uFEDF'],
+          '\u0645': ['\uFEE1', '\uFEE2', '\uFEE4', '\uFEE3'],
+          '\u0646': ['\uFEE5', '\uFEE6', '\uFEE8', '\uFEE7'],
+          '\u0647': ['\uFEE9', '\uFEEA', '\uFEEC', '\uFEEB'],
+          '\u0648': ['\uFEED', '\uFEEE', '\uFEEE', '\uFEED'],
+          '\u0649': ['\uFEEF', '\uFEF0', '\uFEF0', '\uFEEF'],
+          '\u064A': ['\uFEF1', '\uFEF2', '\uFEF4', '\uFEF3'],
+        };
+
+        const rightLink = ['\u0622', '\u0623', '\u0624', '\u0625', '\u0627', '\u062F', '\u0630', '\u0631', '\u0632', '\u0648', '\u0649'];
+        const dualLink = ['\u0628', '\u062A', '\u062B', '\u062C', '\u062D', '\u062E', '\u0633', '\u0634', '\u0635', '\u0636', '\u0637', '\u0638', '\u0639', '\u063A', '\u0641', '\u0642', '\u0643', '\u0644', '\u0645', '\u0646', '\u0647', '\u064A', '\u0626'];
+
+        let words = text.split(" ");
+        let result = [];
+
+        for (let w = 0; w < words.length; w++) {
+          let word = words[w];
+          let shapedWord = "";
+          for (let i = 0; i < word.length; i++) {
+            let char = word[i];
+            if (!arabicCharsMap[char]) {
+              shapedWord += char;
+              continue;
+            }
+            let prev = word[i - 1];
+            let next = word[i + 1];
+
+            let linkPrev = prev && (dualLink.includes(prev) || rightLink.includes(prev));
+            let linkNext = next && (dualLink.includes(next));
+
+            if (linkPrev && linkNext) {
+              shapedWord += arabicCharsMap[char][2];
+            } else if (linkPrev) {
+              shapedWord += arabicCharsMap[char][1];
+            } else if (linkNext) {
+              shapedWord += arabicCharsMap[char][3];
+            } else {
+              shapedWord += arabicCharsMap[char][0];
+            }
+          }
+          result.push(shapedWord);
+        }
+        return result.join(" ");
       };
 
-      const rightLink = ['\u0622', '\u0623', '\u0624', '\u0625', '\u0627', '\u062F', '\u0630', '\u0631', '\u0632', '\u0648', '\u0649'];
-      const dualLink = ['\u0628', '\u062A', '\u062B', '\u062C', '\u062D', '\u062E', '\u0633', '\u0634', '\u0635', '\u0636', '\u0637', '\u0638', '\u0639', '\u063A', '\u0641', '\u0642', '\u0643', '\u0644', '\u0645', '\u0646', '\u0647', '\u064A', '\u0626'];
-
-      let words = text.split(" ");
-      let result = [];
-
-      for (let w = 0; w < words.length; w++) {
-        let word = words[w];
-        let shapedWord = "";
-        for (let i = 0; i < word.length; i++) {
-          let char = word[i];
-          if (!arabicCharsMap[char]) {
-            shapedWord += char;
-            continue;
-          }
-          let prev = word[i - 1];
-          let next = word[i + 1];
-
-          let linkPrev = prev && (dualLink.includes(prev) || rightLink.includes(prev));
-          let linkNext = next && (dualLink.includes(next));
-
-          if (linkPrev && linkNext) {
-            shapedWord += arabicCharsMap[char][2]; // الوسطية
-          } else if (linkPrev) {
-            shapedWord += arabicCharsMap[char][1]; // النهائية
-          } else if (linkNext) {
-            shapedWord += arabicCharsMap[char][3]; // الأولية
-          } else {
-            shapedWord += arabicCharsMap[char][0]; // المنفصلة
-          }
+      const shapeText = (txt) => {
+        if (!txt) return "";
+        if (externalReshaper && typeof externalReshaper.reshape === "function") {
+          return externalReshaper.reshape(txt);
         }
-        result.push(shapedWord);
+        return reshapeArabicLocal(txt);
+      };
+
+      const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+      const PW  = 210;
+      const PH  = 297;
+      const ML  = 15;
+      const MR  = 15;
+      const CW  = PW - ML - MR;
+      let   y   = ML;
+
+      try {
+        const fontUrl = "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/amiri/Amiri-Regular.ttf";
+        const response = await fetch(fontUrl);
+        if (!response.ok) throw new Error("Font fetch failed");
+        const arrayBuffer = await response.arrayBuffer();
+        const base64 = btoa(
+          new Uint8Array(arrayBuffer).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            ""
+          )
+        );
+        doc.addFileToVFS("Amiri-Regular.ttf", base64);
+        doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+      } catch (fontErr) {
+        console.error("Failed to load Amiri font dynamically:", fontErr);
       }
-      return result.join(" ");
-    };
 
-    // الدالة الموحدة لمعالجة وتشكيل النصوص العربية
-    const shapeText = (txt) => {
-      if (!txt) return "";
-      if (externalReshaper && typeof externalReshaper.reshape === "function") {
-        return externalReshaper.reshape(txt);
-      }
-      return reshapeArabicLocal(txt);
-    };
+      const C = {
+        pageBg    : [8,   8,  10],
+        cardDark  : [20,  20, 24],
+        cardBorder: [45,  45, 50],
+        gutter    : [14,  14, 18],
+        purple    : [139, 92, 246],
+        purpleLo  : [76,  29,149],
+        white     : [255,255,255],
+        z200      : [228,228,231],
+        z300      : [212,212,216],
+        z400      : [161,161,170],
+        z500      : [113,113,122],
+        z600      : [82, 82, 91 ],
+        z700      : [63, 63, 70 ],
+        z800      : [39, 39, 42 ],
+        z850      : [28, 28, 32 ],
+        z900      : [18, 18, 22 ],
+        red       : [239, 68, 68],
+        redBg     : [40,  8,  8 ],
+        redStripe : [80, 16, 16 ],
+        emerald   : [52, 211,153],
+        emeraldBg : [4,  28, 18 ],
+        yellow    : [251,191, 36],
+        blue      : [96, 165,250],
+      };
 
-    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-    const PW  = 210;
-    const PH  = 297;
-    const ML  = 15;          // margin left
-    const MR  = 15;          // margin right
-    const CW  = PW - ML - MR; // content width = 180
-    let   y   = ML;
+      const fc  = (rgb) => doc.setFillColor(...rgb);
+      const sc  = (rgb) => doc.setDrawColor(...rgb);
+      const tc  = (rgb) => doc.setTextColor(...rgb);
+      const lw  = (w)   => doc.setLineWidth(w);
+      const H   = (sz)  => { doc.setFont("helvetica","bold");   doc.setFontSize(sz); };
+      const N   = (sz)  => { doc.setFont("helvetica","normal"); doc.setFontSize(sz); };
+      const I   = (sz)  => { doc.setFont("helvetica","italic"); doc.setFontSize(sz); };
+      const M   = (sz)  => { doc.setFont("courier",  "normal"); doc.setFontSize(sz); };
+      const MB  = (sz)  => { doc.setFont("courier",  "bold");   doc.setFontSize(sz); };
 
-    // تحميل خط Amiri العربي ديناميكياً عبر خادم jsDelivr لتجنب حظر الـ CORS
-    try {
-      const fontUrl = "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/amiri/Amiri-Regular.ttf";
-      const response = await fetch(fontUrl);
-      if (!response.ok) throw new Error("Font fetch failed");
-      const arrayBuffer = await response.arrayBuffer();
-      const base64 = btoa(
-        new Uint8Array(arrayBuffer).reduce(
-          (data, byte) => data + String.fromCharCode(byte),
-          ""
-        )
-      );
-      doc.addFileToVFS("Amiri-Regular.ttf", base64);
-      doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-    } catch (fontErr) {
-      console.error("Failed to load Amiri font dynamically:", fontErr);
-    }
+      const isArabic = (text) => /[\u0600-\u06FF]/.test(String(text || ""));
 
-    /* ── palette ──────────────────────────────────────────────────────── */
-    const C = {
-      pageBg    : [8,   8,  10],
-      cardDark  : [20,  20, 24],
-      cardBorder: [45,  45, 50],
-      gutter    : [14,  14, 18],
-      purple    : [139, 92, 246],
-      purpleLo  : [76,  29,149],
-      white     : [255,255,255],
-      z200      : [228,228,231],
-      z300      : [212,212,216],
-      z400      : [161,161,170],
-      z500      : [113,113,122],
-      z600      : [82, 82, 91 ],
-      z700      : [63, 63, 70 ],
-      z800      : [39, 39, 42 ],
-      z850      : [28, 28, 32 ],
-      z900      : [18, 18, 22 ],
-      red       : [239, 68, 68],
-      redBg     : [40,  8,  8 ],
-      redStripe : [80, 16, 16 ],
-      emerald   : [52, 211,153],
-      emeraldBg : [4,  28, 18 ],
-      yellow    : [251,191, 36],
-      blue      : [96, 165,250],
-    };
+      const writeText = (txt, x, y, options = {}) => {
+        if (!txt) return;
+        const isAr = isArabic(txt);
 
-    /* ── pdf helpers ──────────────────────────────────────────────────── */
-    const fc  = (rgb) => doc.setFillColor(...rgb);
-    const sc  = (rgb) => doc.setDrawColor(...rgb);
-    const tc  = (rgb) => doc.setTextColor(...rgb);
-    const lw  = (w)   => doc.setLineWidth(w);
-    const H   = (sz)  => { doc.setFont("helvetica","bold");   doc.setFontSize(sz); };
-    const N   = (sz)  => { doc.setFont("helvetica","normal"); doc.setFontSize(sz); };
-    const I   = (sz)  => { doc.setFont("helvetica","italic"); doc.setFontSize(sz); };
-    const M   = (sz)  => { doc.setFont("courier",  "normal"); doc.setFontSize(sz); };
-    const MB  = (sz)  => { doc.setFont("courier",  "bold");   doc.setFontSize(sz); };
+        const fonts = doc.getFontList();
+        const hasAmiri = fonts && fonts["Amiri"];
 
-    /* فحص وجود نصوص عربية */
-    const isArabic = (text) => /[\u0600-\u06FF]/.test(String(text || ""));
-
-    /* دالة ذكية لكتابة النصوص وتحديد المحاذاة والخط بناءً على اللغة */
-    const writeText = (txt, x, y, options = {}) => {
-      if (!txt) return;
-      const isAr = isArabic(txt);
-      
-      const fonts = doc.getFontList();
-      const hasAmiri = fonts && fonts["Amiri"];
-
-      if (isAr && hasAmiri) {
-        doc.setFont("Amiri", "normal");
-        const shaped = shapeText(txt);
-        const targetX = (x === ML) ? (PW - MR) : x;
-        doc.text(shaped, targetX, y, { ...options, isRTL: true, align: "right" });
-      } else {
-        doc.setFont("helvetica", options.fontStyle || "normal");
-        doc.text(txt, x, y, options);
-      }
-    };
-
-    /* دالة كتابة الأسطر المتعددة ودعم اللغتين */
-    const writeLines = (lines, x, y, lh, options = {}) => {
-      if (!lines || lines.length === 0) return;
-      lines.forEach((line, i) => {
-        writeText(line, x, y + (i * lh), options);
-      });
-    };
-
-    /* wrap text — always reset font after */
-    const wrap = (txt, maxW, sz, bold = false) => {
-      const isAr = isArabic(txt);
-      const fonts = doc.getFontList();
-      const hasAmiri = fonts && fonts["Amiri"];
-
-      if (isAr && hasAmiri) {
-        doc.setFont("Amiri", "normal");
-      } else {
-        doc.setFont("helvetica", bold ? "bold" : "normal");
-      }
-      doc.setFontSize(sz);
-      
-      const lines = doc.splitTextToSize(String(txt ?? ""), maxW);
-      if (isAr) {
-        return lines.map(line => shapeText(line));
-      }
-      return lines;
-    };
-
-    const wrapMono = (txt, maxW, sz) => {
-      doc.setFont("courier","normal"); doc.setFontSize(sz);
-      return doc.splitTextToSize(String(txt ?? ""), maxW);
-    };
-
-    /* page background */
-    const bg = () => { fc(C.pageBg); doc.rect(0,0,PW,PH,"F"); };
-
-    /* footer */
-    const footer = (p, total) => {
-      fc(C.z850); doc.rect(0, PH-9, PW, 9, "F");
-      N(6); tc(C.z600);
-      doc.text("VulnSneak-AI \xB7 Confidential Security Report", ML, PH-3);
-      doc.text(`${p} / ${total}`, PW-MR, PH-3, { align:"right" });
-    };
-
-    /* page break if needed */
-    const br = (need = 20) => {
-      if (y + need > PH - 12) { doc.addPage(); bg(); y = ML; return true; }
-      return false;
-    };
-
-    /* thin divider line */
-    const divider = (opacity = 0.3) => {
-      sc(C.z700); lw(0.12);
-      doc.line(ML, y, PW-MR, y);
-      y += 5;
-    };
-
-    /* ── drawCodeBlock (تعمل بذكاء فائق لعرض أسطر تعليقات الكود باللغة العربية) ── */
-    const drawCodeBlock = (codeText, blockType, vulnRanges, startLine, label) => {
-      if (!codeText?.trim()) return;
-
-      const isVuln  = blockType === "vulnerable";
-      const rawLines = codeText.trim().split("\n");
-
-      /* layout */
-      const FS      = 7.2;   // font size pt
-      const LH      = 4.8;   // line height mm
-      const GW      = 11;    // gutter width (line numbers)
-      const PAD_L   = 3;     // left pad inside code area
-      const PAD_V   = 3;     // top/bottom padding inside body
-      const HDR_H   = 8;     // header height
-      const STRIPE  = 2;     // accent stripe width on hit lines
-      const INDENT  = 2;     // space between gutter separator and code text
-
-      const bodyH   = rawLines.length * LH + PAD_V * 2;
-      const totalH  = HDR_H + bodyH;
-
-      br(totalH + 8);
-
-      const accent  = isVuln ? C.red     : C.emerald;
-      const bodyBg  = isVuln ? C.redBg   : C.emeraldBg;
-      const hitBg   = isVuln ? C.redStripe : [8,50,30];
-
-      /* ── outer card ── */
-      fc(bodyBg);
-      sc(accent.map(v => Math.round(v * 0.38)));
-      lw(0.3);
-      doc.roundedRect(ML, y, CW, totalH, 1.5, 1.5, "FD");
-
-      /* ── header band ── */
-      fc(accent.map(v => Math.round(v * 0.22)));
-      doc.rect(ML, y, CW, HDR_H, "F");
-      /* flatten bottom of header */
-      fc(bodyBg); doc.rect(ML, y + HDR_H - 1, CW, 1, "F");
-
-      /* header left accent bar */
-      fc(accent); doc.rect(ML, y, 2.5, HDR_H, "F");
-
-      /* header text */
-      MB(6.8); tc(accent);
-      doc.text(
-        `  ${label}`,
-        ML + 5, y + HDR_H - 2.2
-      );
-
-      /* line count badge */
-      N(6); tc(accent.map(v => Math.round(v * 0.75)));
-      const countTxt = `${rawLines.length} lines`;
-      doc.text(countTxt, ML + CW - MR*0.4, y + HDR_H - 2.2, { align:"right" });
-
-      y += HDR_H;
-
-      /* ── separator line below header ── */
-      sc(accent.map(v => Math.round(v * 0.3))); lw(0.15);
-      doc.line(ML, y, ML + CW, y);
-      y += PAD_V;
-
-      /* ── render each line ── */
-      rawLines.forEach((rawLine, idx) => {
-        const absLine = startLine + idx;
-        const isHit   = isVuln
-          ? (vulnRanges || []).some(r => absLine >= r.start && absLine <= r.end)
-          : false;
-
-        const rowY = y + idx * LH;
-        const txtY = rowY + LH - 1.3;  /* text baseline */
-
-        /* hit line: full-width background */
-        if (isHit) {
-          fc(hitBg);
-          doc.rect(ML, rowY, CW, LH, "F");
-          /* left accent stripe */
-          fc(accent);
-          doc.rect(ML, rowY, STRIPE, LH, "F");
+        if (isAr && hasAmiri) {
+          doc.setFont("Amiri", "normal");
+          const shaped = shapeText(txt);
+          const targetX = (x === ML) ? (PW - MR) : x;
+          doc.text(shaped, targetX, y, { ...options, isRTL: true, align: "right" });
+        } else {
+          doc.setFont("helvetica", options.fontStyle || "normal");
+          doc.text(txt, x, y, options);
         }
+      };
 
-        /* gutter background */
-        fc(isHit ? accent.map(v => Math.round(v * 0.28)) : C.z900);
-        doc.rect(ML, rowY, GW, LH, "F");
+      const writeLines = (lines, x, y, lh, options = {}) => {
+        if (!lines || lines.length === 0) return;
+        lines.forEach((line, i) => {
+          writeText(line, x, y + (i * lh), options);
+        });
+      };
 
-        /* line number */
-        M(FS - 0.8);
-        tc(isHit ? accent : C.z600);
+      const wrap = (txt, maxW, sz, bold = false) => {
+        const isAr = isArabic(txt);
+        const fonts = doc.getFontList();
+        const hasAmiri = fonts && fonts["Amiri"];
+
+        if (isAr && hasAmiri) {
+          doc.setFont("Amiri", "normal");
+        } else {
+          doc.setFont("helvetica", bold ? "bold" : "normal");
+        }
+        doc.setFontSize(sz);
+
+        const lines = doc.splitTextToSize(String(txt ?? ""), maxW);
+        if (isAr) {
+          return lines.map(line => shapeText(line));
+        }
+        return lines;
+      };
+
+      const wrapMono = (txt, maxW, sz) => {
+        doc.setFont("courier","normal"); doc.setFontSize(sz);
+        return doc.splitTextToSize(String(txt ?? ""), maxW);
+      };
+
+      const bg = () => { fc(C.pageBg); doc.rect(0,0,PW,PH,"F"); };
+
+      const footer = (p, total) => {
+        fc(C.z850); doc.rect(0, PH-9, PW, 9, "F");
+        N(6); tc(C.z600);
+        doc.text("VulnSneak-AI \xB7 Confidential Security Report", ML, PH-3);
+        doc.text(`${p} / ${total}`, PW-MR, PH-3, { align:"right" });
+      };
+
+      const br = (need = 20) => {
+        if (y + need > PH - 12) { doc.addPage(); bg(); y = ML; return true; }
+        return false;
+      };
+
+      const divider = (opacity = 0.3) => {
+        sc(C.z700); lw(0.12);
+        doc.line(ML, y, PW-MR, y);
+        y += 5;
+      };
+
+      const drawCodeBlock = (codeText, blockType, vulnRanges, startLine, label) => {
+        if (!codeText?.trim()) return;
+
+        // Decode entities so code renders correctly in PDF too
+        const decodedCode = decodeHTMLEntities(codeText);
+
+        const isVuln  = blockType === "vulnerable";
+        const rawLines = decodedCode.trim().split("\n");
+
+        const FS      = 7.2;
+        const LH      = 4.8;
+        const GW      = 11;
+        const PAD_L   = 3;
+        const PAD_V   = 3;
+        const HDR_H   = 8;
+        const STRIPE  = 2;
+        const INDENT  = 2;
+
+        const bodyH   = rawLines.length * LH + PAD_V * 2;
+        const totalH  = HDR_H + bodyH;
+
+        br(totalH + 8);
+
+        const accent  = isVuln ? C.red     : C.emerald;
+        const bodyBg  = isVuln ? C.redBg   : C.emeraldBg;
+        const hitBg   = isVuln ? C.redStripe : [8,50,30];
+
+        fc(bodyBg);
+        sc(accent.map(v => Math.round(v * 0.38)));
+        lw(0.3);
+        doc.roundedRect(ML, y, CW, totalH, 1.5, 1.5, "FD");
+
+        fc(accent.map(v => Math.round(v * 0.22)));
+        doc.rect(ML, y, CW, HDR_H, "F");
+        fc(bodyBg); doc.rect(ML, y + HDR_H - 1, CW, 1, "F");
+
+        fc(accent); doc.rect(ML, y, 2.5, HDR_H, "F");
+
+        MB(6.8); tc(accent);
         doc.text(
-          String(absLine).padStart(3),
-          ML + GW - 1.5, txtY, { align:"right" }
+          `  ${label}`,
+          ML + 5, y + HDR_H - 2.2
         );
 
-        /* gutter | separator */
-        sc(isHit ? accent.map(v => Math.round(v * 0.4)) : C.z800);
-        lw(0.12);
-        doc.line(ML + GW, rowY, ML + GW, rowY + LH);
+        N(6); tc(accent.map(v => Math.round(v * 0.75)));
+        const countTxt = `${rawLines.length} lines`;
+        doc.text(countTxt, ML + CW - MR*0.4, y + HDR_H - 2.2, { align:"right" });
 
-        /* code text */
-        tc(isHit ? (isVuln ? [255,200,200] : [180,255,220]) : C.z300);
+        y += HDR_H;
 
-        const lineIsAr = isArabic(rawLine);
-        const maxCodeW = CW - GW - PAD_L - INDENT - 2;
-        let displayLine = rawLine;
+        sc(accent.map(v => Math.round(v * 0.3))); lw(0.15);
+        doc.line(ML, y, ML + CW, y);
+        y += PAD_V;
 
-        /* measure and trim */
-        while (displayLine.length > 0 && doc.getTextWidth(displayLine) > maxCodeW) {
-          displayLine = displayLine.slice(0, -4) + "...";
-        }
+        rawLines.forEach((rawLine, idx) => {
+          const absLine = startLine + idx;
+          const isHit   = isVuln
+            ? (vulnRanges || []).some(r => absLine >= r.start && absLine <= r.end)
+            : false;
 
-        if (lineIsAr) {
-          // استبدال خط الـ Courier بخط Amiri عند اكتشاف تعليق عربي داخل أسطر البرمجة
-          doc.setFont("Amiri", "normal");
-          doc.setFontSize(FS + 1);
-          const shaped = shapeText(displayLine);
-          doc.text(shaped, ML + GW + PAD_L + INDENT, txtY, { isRTL: true, align: "left" });
-        } else {
-          doc.setFont("courier", "normal");
-          doc.setFontSize(FS);
-          doc.text(displayLine || " ", ML + GW + PAD_L + INDENT, txtY);
-        }
-      });
+          const rowY = y + idx * LH;
+          const txtY = rowY + LH - 1.3;
 
-      y += rawLines.length * LH + PAD_V + 2;
-    };
+          if (isHit) {
+            fc(hitBg);
+            doc.rect(ML, rowY, CW, LH, "F");
+            fc(accent);
+            doc.rect(ML, rowY, STRIPE, LH, "F");
+          }
 
-    /* ══════════════════════════════════════════════════════════════════
-       COVER PAGE
-    ══════════════════════════════════════════════════════════════════ */
-    bg();
-    /* top purple bar */
-    fc(C.purple); doc.rect(0, 0, PW, 3, "F");
+          fc(isHit ? accent.map(v => Math.round(v * 0.28)) : C.z900);
+          doc.rect(ML, rowY, GW, LH, "F");
 
-    /* wordmark */
-    y = 40;
-    doc.setFontSize(36); doc.setFont("helvetica","bold");
-    tc(C.z700); doc.text("VULN", ML, y);
-    const _w1 = doc.getTextWidth("VULN");
-    tc(C.white); doc.text("SNEAK", ML + _w1, y);
-    const _w2 = doc.getTextWidth("SNEAK");
-    tc(C.purple); doc.text(".", ML + _w1 + _w2, y);
+          M(FS - 0.8);
+          tc(isHit ? accent : C.z600);
+          doc.text(
+            String(absLine).padStart(3),
+            ML + GW - 1.5, txtY, { align:"right" }
+          );
 
-    y += 5; N(7); tc(C.z600);
-    doc.text("AUTONOMOUS SECURITY INTELLIGENCE REPORT", ML, y);
+          sc(isHit ? accent.map(v => Math.round(v * 0.4)) : C.z800);
+          lw(0.12);
+          doc.line(ML + GW, rowY, ML + GW, rowY + LH);
 
-    y += 10; sc(C.purpleLo); lw(0.3);
-    doc.line(ML, y, PW-MR, y);
+          tc(isHit ? (isVuln ? [255,200,200] : [180,255,220]) : C.z300);
 
-    y += 9;
-    const chatName = chatsHistory.find(c=>(c.chatId||c.id)===currentChatId)?.chatName || "Untitled_Chat";
-    const titleLns = wrap(chatName, CW, 16, true);
-    H(16); tc(C.white);
-    writeLines(titleLns, ML, y, 7);
-    y += titleLns.length * 7 + 5;
+          const lineIsAr = isArabic(rawLine);
+          const maxCodeW = CW - GW - PAD_L - INDENT - 2;
+          let displayLine = rawLine;
 
-    N(8); tc(C.z400);
-    doc.text(`Generated : ${new Date().toUTCString()}`, ML, y); y += 5;
-    doc.text(`Messages  : ${messages.length}`, ML, y); y += 5;
+          while (displayLine.length > 0 && doc.getTextWidth(displayLine) > maxCodeW) {
+            displayLine = displayLine.slice(0, -4) + "...";
+          }
 
-    const totalVulns = messages.reduce((a,m)=>a+(m.vulnDtos?.length||0),0);
-    doc.text(`Vulnerabilities detected : ${totalVulns}`, ML, y); y += 5;
-
-    /* severity summary badges */
-    if (totalVulns > 0) {
-      y += 5;
-      const allV  = messages.flatMap(m => m.vulnDtos || []);
-      const high   = allV.filter(v=>(v.Confidence??v.confidence??0)>=0.85).length;
-      const medium = allV.filter(v=>{const c=v.Confidence??v.confidence??0;return c>=0.70&&c<0.85;}).length;
-      const low    = allV.length - high - medium;
-      let bx = ML;
-      [{l:"HIGH",n:high,col:C.red},{l:"MEDIUM",n:medium,col:C.yellow},{l:"LOW",n:low,col:C.blue}]
-        .forEach(({l,n,col}) => {
-          let badgeText = `${l}: ${n}`;
-          fc(col);
-          doc.rect(bx, y, 32, 6, "F");
-          N(7); tc(C.white);
-          doc.text(badgeText, bx + 16, y + 4.2, {align:"center"});
-          bx += 35;
+          if (lineIsAr) {
+            doc.setFont("Amiri", "normal");
+            doc.setFontSize(FS + 1);
+            const shaped = shapeText(displayLine);
+            doc.text(shaped, ML + GW + PAD_L + INDENT, txtY, { isRTL: true, align: "left" });
+          } else {
+            doc.setFont("courier", "normal");
+            doc.setFontSize(FS);
+            doc.text(displayLine || " ", ML + GW + PAD_L + INDENT, txtY);
+          }
         });
-      y += 8;
-    }
 
-    /* ══════════════════════════════════════════════════════════════════
-       MESSAGES
-    ══════════════════════════════════════════════════════════════════ */
-    doc.addPage(); bg(); y = ML;
+        y += rawLines.length * LH + PAD_V + 2;
+      };
 
-    messages.forEach((msg) => {
-      br(30);
+      // ── COVER PAGE ──────────────────────────────────────────────────────────
+      bg();
+      fc(C.purple); doc.rect(0, 0, PW, 3, "F");
 
-      /* ── USER MESSAGE ── */
-      if (msg.sender === "user") {
-        const lns = wrap(msg.text, CW - 20, 9);
-        const bh  = lns.length * 5.2 + 10;
-        br(bh + 12);
+      y = 40;
+      doc.setFontSize(36); doc.setFont("helvetica","bold");
+      tc(C.z700); doc.text("VULN", ML, y);
+      const _w1 = doc.getTextWidth("VULN");
+      tc(C.white); doc.text("SNEAK", ML + _w1, y);
+      const _w2 = doc.getTextWidth("SNEAK");
+      tc(C.purple); doc.text(".", ML + _w1 + _w2, y);
 
-        fc(C.white);
-        doc.roundedRect(ML + 20, y, CW - 20, bh, 2, 2, "F");
-        H(9); tc([5,5,5]);
-        writeLines(lns, ML + 26, y + 7, 5.2);
-        y += bh + 3;
+      y += 5; N(7); tc(C.z600);
+      doc.text("AUTONOMOUS SECURITY INTELLIGENCE REPORT", ML, y);
 
-        N(6.5); tc(C.z600);
-        doc.text(msg.isText ? "TEXT QUERY" : "FILE UPLOAD", PW-MR, y, {align:"right"});
-        y += 9;
+      y += 10; sc(C.purpleLo); lw(0.3);
+      doc.line(ML, y, PW-MR, y);
 
-      /* ── BOT MESSAGE ── */
-      } else {
-        /* engine badge */
-        fc(C.purple);
-        doc.roundedRect(ML, y, 32, 6, 2, 2, "F");
-        H(6.2); tc(C.white);
-        doc.text("VULNSNEAK-ENGINE", ML + 16, y + 4.2, {align:"center"});
-        y += 9;
+      y += 9;
+      const chatName = chatsHistory.find(c=>(c.chatId||c.id)===currentChatId)?.chatName || "Untitled_Chat";
+      const titleLns = wrap(chatName, CW, 16, true);
+      H(16); tc(C.white);
+      writeLines(titleLns, ML, y, 7);
+      y += titleLns.length * 7 + 5;
 
-        /* response text */
-        const lns = wrap(msg.text, CW, 9);
-        br(lns.length * 5.2 + 6);
-        N(9); tc(C.z400);
-        writeLines(lns, ML, y, 5.2);
-        y += lns.length * 5.2 + 6;
+      N(8); tc(C.z400);
+      doc.text(`Generated : ${new Date().toUTCString()}`, ML, y); y += 5;
+      doc.text(`Messages  : ${messages.length}`, ML, y); y += 5;
 
-        /* ── VULNERABILITY CARDS ── */
-        (msg.vulnDtos || []).forEach((vuln, vi) => {
-          br(50);
+      const totalVulns = messages.reduce((a,m)=>a+(m.vulnDtos?.length||0),0);
+      doc.text(`Vulnerabilities detected : ${totalVulns}`, ML, y); y += 5;
 
-          const conf   = vuln.Confidence ?? vuln.confidence ?? 0;
-          const sev    = conf>=0.85 ? "HIGH" : conf>=0.70 ? "MEDIUM" : "LOW";
-          const sevCol = sev==="HIGH" ? C.red : sev==="MEDIUM" ? C.yellow : C.blue;
-          const name   = vuln.VulnName || vuln.vulnerability_name || "Unknown Vulnerability";
-          const sLine  = vuln.StartLine || vuln.startLine || 1;
-          const eLine  = vuln.EndLine   || vuln.endLine   || sLine;
-          const comment= vuln.Repair?.Comment     || vuln.comment     || "";
-          const explain= vuln.Repair?.Explanation || vuln.explanation || "";
-          const codeSnip = vuln.CodeSnippet || vuln.codeSnippet || "";
-          const repaired = vuln.Repair?.RepairedCode || vuln.repairedCode || "";
-          const ranges   = buildVulnRanges(vuln);
-
-          /* ─ meta card ─ */
-          const nameLns = wrap(name,    CW - 18, 11, true);
-          const commLns = comment ? wrap(comment, CW - 18, 8) : [];
-          const explLns = explain ? wrap(explain, CW - 18, 8) : [];
-          const mH = nameLns.length*7 + commLns.length*4.8 + explLns.length*4.8 + 42;
-          br(mH + 8);
-
-          /* card */
-          fc(C.z850);
-          sc(sevCol.map(v=>Math.round(v*0.35))); lw(0.2);
-          doc.roundedRect(ML, y, CW, mH, 2, 2, "FD");
-          /* left stripe */
-          fc(sevCol); doc.rect(ML, y, 3.5, mH, "F");
-
-          let cx = ML + 9, cy = y + 9;
-
-          /* name */
-          H(11); tc(C.white);
-          writeLines(nameLns, cx, cy, 7);
-          cy += nameLns.length * 7 + 5;
-
-          /* badges */
-          let bx = cx;
-          [
-            { t:`SEVERITY: ${sev}`,                      col: sevCol    },
-            { t:`LINES: ${sLine}\u2013${eLine}`,          col: C.emerald },
-            { t:`CONFIDENCE: ${(conf*100).toFixed(0)}%`, col: C.yellow  },
-          ].forEach(({t,col}) => {
-            H(6.5); const bw = doc.getTextWidth(t) + 9;
-            fc(col.map(c=>Math.round(c*0.16)));
-            doc.roundedRect(bx, cy, bw, 6, 1.5, 1.5, "F");
-            tc(col); doc.text(t, bx + bw/2, cy + 4.2, {align:"center"});
-            bx += bw + 5;
+      if (totalVulns > 0) {
+        y += 5;
+        const allV  = messages.flatMap(m => m.vulnDtos || []);
+        const high   = allV.filter(v=>(v.Confidence??v.confidence??0)>=0.85).length;
+        const medium = allV.filter(v=>{const c=v.Confidence??v.confidence??0;return c>=0.70&&c<0.85;}).length;
+        const low    = allV.length - high - medium;
+        let bx = ML;
+        [{l:"HIGH",n:high,col:C.red},{l:"MEDIUM",n:medium,col:C.yellow},{l:"LOW",n:low,col:C.blue}]
+          .forEach(({l,n,col}) => {
+            let badgeText = `${l}: ${n}`;
+            fc(col);
+            doc.rect(bx, y, 32, 6, "F");
+            N(7); tc(C.white);
+            doc.text(badgeText, bx + 16, y + 4.2, {align:"center"});
+            bx += 35;
           });
-          cy += 10;
-
-          /* divider inside card */
-          sc(sevCol.map(v=>Math.round(v*0.2))); lw(0.12);
-          doc.line(cx, cy, ML+CW-4, cy); cy += 5;
-
-          if (commLns.length > 0) {
-            H(7); tc(C.z500); writeText("STRATEGY", cx, cy); cy += 5;
-            I(8); tc(C.z400); writeLines(commLns, cx, cy, 4.8);
-            cy += commLns.length * 4.8 + 3;
-          }
-          if (explLns.length > 0) {
-            H(7); tc(C.z500); writeText("HOW TO FIX", cx, cy); cy += 5;
-            N(8); tc(C.z300); writeLines(explLns, cx, cy, 4.8);
-          }
-
-          y += mH + 8;
-
-          /* ─ vulnerable code block ─ */
-          if (codeSnip.trim()) {
-            drawCodeBlock(
-              codeSnip, "vulnerable", ranges, sLine,
-              `VULNERABLE SOURCE  \xB7  Lines ${sLine}\u2013${eLine}`
-            );
-            y += 4;
-          }
-
-          /* ─ repaired code block ─ */
-          if (repaired.trim()) {
-            drawCodeBlock(
-              repaired, "repaired", [], sLine,
-              "REPAIRED CODE  \xB7  Neural Remedy Applied"
-            );
-            y += 4;
-          }
-
-          /* vuln separator */
-          sc(C.z800); lw(0.15);
-          doc.line(ML+8, y, PW-MR-8, y);
-          y += 7;
-        });
-
-        /* server PDF note */
-        if (msg.fileReport) {
-          br(10);
-          fc([18,6,36]);
-          doc.roundedRect(ML, y, CW, 7.5, 1.5, 1.5, "F");
-          N(7); tc(C.purple);
-          doc.text("\u2193  Neural_Intel_Export PDF available for this scan", ML+5, y+5.2);
-          y += 12;
-        }
+        y += 8;
       }
 
-      divider();
-    });
+      // ── MESSAGES ────────────────────────────────────────────────────────────
+      doc.addPage(); bg(); y = ML;
 
-    /* footers */
-    const tp = doc.getNumberOfPages();
-    for (let p=1; p<=tp; p++) {
-      doc.setPage(p);
-      footer(p, tp);
+      messages.forEach((msg) => {
+        br(30);
+
+        if (msg.sender === "user") {
+          const lns = wrap(msg.text, CW - 20, 9);
+          const bh  = lns.length * 5.2 + 10;
+          br(bh + 12);
+
+          fc(C.white);
+          doc.roundedRect(ML + 20, y, CW - 20, bh, 2, 2, "F");
+          H(9); tc([5,5,5]);
+          writeLines(lns, ML + 26, y + 7, 5.2);
+          y += bh + 3;
+
+          N(6.5); tc(C.z600);
+          doc.text(msg.isText ? "TEXT QUERY" : "FILE UPLOAD", PW-MR, y, {align:"right"});
+          y += 9;
+
+        } else {
+          fc(C.purple);
+          doc.roundedRect(ML, y, 32, 6, 2, 2, "F");
+          H(6.2); tc(C.white);
+          doc.text("VULNSNEAK-ENGINE", ML + 16, y + 4.2, {align:"center"});
+          y += 9;
+
+          const lns = wrap(msg.text, CW, 9);
+          br(lns.length * 5.2 + 6);
+          N(9); tc(C.z400);
+          writeLines(lns, ML, y, 5.2);
+          y += lns.length * 5.2 + 6;
+
+          (msg.vulnDtos || []).forEach((vuln, vi) => {
+            br(50);
+
+            const conf   = vuln.Confidence ?? vuln.confidence ?? 0;
+            const sev    = conf>=0.85 ? "HIGH" : conf>=0.70 ? "MEDIUM" : "LOW";
+            const sevCol = sev==="HIGH" ? C.red : sev==="MEDIUM" ? C.yellow : C.blue;
+            const name   = vuln.VulnName || vuln.vulnerability_name || "Unknown Vulnerability";
+            const sLine  = vuln.StartLine || vuln.startLine || 1;
+            const eLine  = vuln.EndLine   || vuln.endLine   || sLine;
+            const comment= vuln.Repair?.Comment     || vuln.comment     || "";
+            const explain= vuln.Repair?.Explanation || vuln.explanation || "";
+            const codeSnip = decodeHTMLEntities(vuln.CodeSnippet || vuln.codeSnippet || "");
+            const repaired = decodeHTMLEntities(vuln.Repair?.RepairedCode || vuln.repairedCode || "");
+            const ranges   = buildVulnRanges(vuln);
+
+            const nameLns = wrap(name,    CW - 18, 11, true);
+            const commLns = comment ? wrap(comment, CW - 18, 8) : [];
+            const explLns = explain ? wrap(explain, CW - 18, 8) : [];
+            const mH = nameLns.length*7 + commLns.length*4.8 + explLns.length*4.8 + 42;
+            br(mH + 8);
+
+            fc(C.z850);
+            sc(sevCol.map(v=>Math.round(v*0.35))); lw(0.2);
+            doc.roundedRect(ML, y, CW, mH, 2, 2, "FD");
+            fc(sevCol); doc.rect(ML, y, 3.5, mH, "F");
+
+            let cx = ML + 9, cy = y + 9;
+
+            H(11); tc(C.white);
+            writeLines(nameLns, cx, cy, 7);
+            cy += nameLns.length * 7 + 5;
+
+            let bx = cx;
+            [
+              { t:`SEVERITY: ${sev}`,                      col: sevCol    },
+              { t:`LINES: ${sLine}\u2013${eLine}`,          col: C.emerald },
+              { t:`CONFIDENCE: ${(conf*100).toFixed(0)}%`, col: C.yellow  },
+            ].forEach(({t,col}) => {
+              H(6.5); const bw = doc.getTextWidth(t) + 9;
+              fc(col.map(c=>Math.round(c*0.16)));
+              doc.roundedRect(bx, cy, bw, 6, 1.5, 1.5, "F");
+              tc(col); doc.text(t, bx + bw/2, cy + 4.2, {align:"center"});
+              bx += bw + 5;
+            });
+            cy += 10;
+
+            sc(sevCol.map(v=>Math.round(v*0.2))); lw(0.12);
+            doc.line(cx, cy, ML+CW-4, cy); cy += 5;
+
+            if (commLns.length > 0) {
+              H(7); tc(C.z500); writeText("STRATEGY", cx, cy); cy += 5;
+              I(8); tc(C.z400); writeLines(commLns, cx, cy, 4.8);
+              cy += commLns.length * 4.8 + 3;
+            }
+            if (explLns.length > 0) {
+              H(7); tc(C.z500); writeText("HOW TO FIX", cx, cy); cy += 5;
+              N(8); tc(C.z300); writeLines(explLns, cx, cy, 4.8);
+            }
+
+            y += mH + 8;
+
+            if (codeSnip.trim()) {
+              drawCodeBlock(
+                codeSnip, "vulnerable", ranges, sLine,
+                `VULNERABLE SOURCE  \xB7  Lines ${sLine}\u2013${eLine}`
+              );
+              y += 4;
+            }
+
+            if (repaired.trim()) {
+              drawCodeBlock(
+                repaired, "repaired", [], sLine,
+                "REPAIRED CODE  \xB7  Neural Remedy Applied"
+              );
+              y += 4;
+            }
+
+            sc(C.z800); lw(0.15);
+            doc.line(ML+8, y, PW-MR-8, y);
+            y += 7;
+          });
+
+          if (msg.fileReport) {
+            br(10);
+            fc([18,6,36]);
+            doc.roundedRect(ML, y, CW, 7.5, 1.5, 1.5, "F");
+            N(7); tc(C.purple);
+            doc.text("\u2193  Neural_Intel_Export PDF available for this scan", ML+5, y+5.2);
+            y += 12;
+          }
+        }
+
+        divider();
+      });
+
+      const tp = doc.getNumberOfPages();
+      for (let p=1; p<=tp; p++) {
+        doc.setPage(p);
+        footer(p, tp);
+      }
+
+      const slug = chatName.replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,36);
+      doc.save(`VulnSneak_${slug}_${Date.now()}.pdf`);
+
+    } catch(err) {
+      console.error("PDF export failed:", err);
+      alert("PDF export failed.");
+    } finally {
+      setIsExportingPDF(false);
     }
+  };
 
-    const slug = chatName.replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,36);
-    doc.save(`VulnSneak_${slug}_${Date.now()}.pdf`);
-
-  } catch(err) {
-    console.error("PDF export failed:", err);
-    alert("PDF export failed.");
-  } finally {
-    setIsExportingPDF(false);
-  }
-};
-
-  // ── derive topic from vulnerability name or response content ───────────────
   const deriveChatTitle = (data, fallback) => {
     const vulnName =
       data?.vulnDtos?.[0]?.VulnName ||
@@ -1943,16 +1919,16 @@ const generateChatPDF = async () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <div className={`max-w-[100%] pointer-events-auto ${msg.sender === "user" ? "w-auto" : "w-full"}`}>
+                      <div className={`max-w-[100%]  ${msg.sender === "user" ? "w-auto" : "w-full"}`}>
                         {msg.sender === "user" ? (
                           <div className="flex flex-col items-end gap-3">
-                            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-white/5 [[data-theme=light]_&]:bg-black/[0.05] border border-white/5 [[data-theme=light]_&]:border-black/[0.08] mb-1">
+                            <div className="pointer-events-auto flex items-center gap-2 px-2 py-1 rounded-full bg-white/5 [[data-theme=light]_&]:bg-black/[0.05] border border-white/5 [[data-theme=light]_&]:border-black/[0.08] mb-1">
                               <MessageSquare size={10} className="text-zinc-600 [[data-theme=light]_&]:text-zinc-600" />
-                              <span className="text-[8px] font-mono text-zinc-600 [[data-theme=light]_&]:text-zinc-600 uppercase tracking-widest">
+                              <span className="pointer-events-auto text-[8px] font-mono text-zinc-600 [[data-theme=light]_&]:text-zinc-600 uppercase tracking-widest">
                                 {msg.isText ? "text_query" : "file_upload"}
                               </span>
                             </div>
-                            <div className="px-6 py-4 rounded-2xl bg-white [[data-theme=light]_&]:bg-zinc-900 text-black [[data-theme=light]_&]:text-white font-bold font-space text-sm tracking-tight shadow-xl">
+                            <div className="pointer-events-auto px-6 py-4 rounded-2xl bg-white [[data-theme=light]_&]:bg-zinc-900 text-black [[data-theme=light]_&]:text-white font-bold font-space text-sm tracking-tight shadow-xl">
                               {msg.text}
                             </div>
                             <span className="text-[8px] font-mono text-zinc-600 [[data-theme=light]_&]:text-zinc-500 tracking-[0.5em] uppercase">Status: Ingested</span>
@@ -1967,22 +1943,26 @@ const generateChatPDF = async () => {
                               >
                                 <img
                                   src="/assets/icon1.svg"
-                                  className="w-[32px] h-[3a2px]"
+                                  className="w-[32px] h-[32px]"
                                   alt="shield"
                                 />
                               </motion.div>
                               <div className="flex flex-col">
-                                <span className="text-[10px] font-black font-mono tracking-[0.4em] text-purple-500 uppercase leading-none">VulnSneak-Engin</span>
+                                <span className="text-[10px] font-black font-mono tracking-[0.4em] text-purple-500 uppercase leading-none">VulnSneak-Engine</span>
                                 <span className="text-[8px] font-mono text-zinc-600 [[data-theme=light]_&]:text-zinc-500 uppercase tracking-widest mt-1">Ref_ID: {Math.floor(Math.random() * 999999)}</span>
                               </div>
                             </div>
 
-                            <div className="max-w-3xl">
+                            <div className="pointer-events-auto max-w-3xl p-6 md:p-8 rounded-3xl backdrop-blur-xl border shadow-xl transition-all duration-300
+                                            bg-white/[0.02] [[data-theme=light]_&]:bg-black/[0.03]
+                                            border-white/[0.06] [[data-theme=light]_&]:border-black/[0.08]
+                                            text-sm md:text-base font-semibold text-zinc-300 [[data-theme=light]_&]:text-zinc-800 leading-relaxed"
+                            >
                               <MarkdownMessage content={msg.text} />
                             </div>
 
                             {msg.detail && (
-                              <motion.p className="text-xs text-zinc-500 [[data-theme=light]_&]:text-zinc-700 font-mono bg-white/5 [[data-theme=light]_&]:bg-black/[0.04] p-4 border border-white/5 [[data-theme=light]_&]:border-black/[0.08] rounded-xl italic">
+                              <motion.p className="pointer-events-auto text-xs text-zinc-500 [[data-theme=light]_&]:text-zinc-700 font-mono bg-white/5 [[data-theme=light]_&]:bg-black/[0.04] p-4 border border-white/5 [[data-theme=light]_&]:border-black/[0.08] rounded-xl italic">
                                 {msg.detail}
                               </motion.p>
                             )}
@@ -1997,7 +1977,7 @@ const generateChatPDF = async () => {
                               ))}
                             </div>
 
-                            <div className="flex flex-wrap gap-4">
+                            <div className=" pointer-events-auto flex flex-wrap gap-4">
                               {msg.fileReport && (
                                 <button
                                   onClick={() => downloadFile(msg.fileReport, `REPORT_${msg.fileName}`)}
@@ -2097,7 +2077,6 @@ const generateChatPDF = async () => {
                         {stagedCode ? "CODE" : "TEXT"}
                       </span>
 
-                      {/* ── EXPORT PDF BUTTON (inline in bottom bar) ── */}
                       <button
                         onClick={generateChatPDF}
                         disabled={isExportingPDF || messages.length === 0}
